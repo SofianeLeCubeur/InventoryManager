@@ -1,0 +1,211 @@
+const { escapeRegExp } = require('./../utils');
+
+module.exports = function(router, database, authMiddleware){
+
+    function searchInvs(query, callback){
+        database.fetchInventories(query, 0, 0, docs => {
+            if(docs !== null){
+                let items = docs.map(inv => {
+                    return { id: inv._id, name: inv.name, icon: inv.icon, location: inv.location, state: inv.state, items: inv.items };
+                });
+                callback(items);
+            }
+        })
+    }
+
+    function searchCnts(query, callback){
+        let queryR = { ...query };
+        if(queryR['name']){
+            queryR['content'] = queryR['name'];
+            delete queryR['name'];
+        }
+        database.fetchContainers(query, 0, 0, docs => {
+            if(docs != null){
+                let containers = docs.map(cnt => {
+                    let location = cnt.locations.sort((a, b) => b-a)[0].location;
+                    return { id: cnt._id, content: cnt.content, location, state: cnt.state };
+                });
+                callback(containers);
+            }
+        })
+    }
+
+    function searchItems(query, callback){
+        database.fetchItems(query, 0, 0, docs => {
+            if(docs !== null){
+                let items = docs.map(it => {
+                    return { id: it._id, name: it.name, description: it.description, reference: it.reference, serial_number: it.serial_number, icon: it.icon }
+                });
+                callback(items);
+            }
+        });
+    }
+
+    function prepareParams(query){
+        let parameters = {
+            'id': {
+                key: '_id',
+                val: function(s){
+                    return new RegExp('^' + escapeRegExp(s));
+                }
+            },
+            'name': {
+                key: 'name',
+                val: function(s){
+                    return new RegExp(escapeRegExp(s));
+                }
+            },
+            'ref': {
+                key: 'reference',
+                val: function(s){
+                    return new RegExp(escapeRegExp(s));
+                }
+            },
+            'sn': {
+                key: 'serial_number',
+                val: function(s){
+                    return new RegExp('^' + escapeRegExp(s));
+                }
+            },
+            'state': {
+                key: 'state',
+                val: function(s){
+                    return new RegExp(escapeRegExp(s));
+                }
+            },
+            'desc': {
+                key: 'description',
+                val: function(s){
+                    return new RegExp(escapeRegExp(s));
+                }
+            },
+            'desc': {
+                key: 'description',
+                val: function(s){
+                    return new RegExp(escapeRegExp(s));
+                }
+            },
+            'details': {
+                key: 'details',
+                val: function(s){
+                    return new RegExp(escapeRegExp(s));
+                }
+            }
+        };
+        let out = {};
+        Object.keys(parameters).forEach(param => {
+            let l = parameters[param];
+            if(query[param]){
+                out[l.key] = l.val(query[param]);
+            }
+        })
+        return out;
+    }
+
+    router.all('/scan/:id', (req, res) => {
+        if(req.method !== 'POST'){
+            res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+            return;
+        }
+
+        let id = req.params.id;
+        if(id && typeof id === 'string'){
+            let type = parseInt(id.substring(0,2), 16);
+            if(type == 0){
+                database.fetchInventory({ _id: id }, inv => {
+                    if(inv != null){
+                        res.json({ success: true, type: 'inventory', id: inv._id, name: inv.name, icon: inv.icon, location: inv.location, state: inv.state, items: inv.items });
+                    } else {
+                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                    }
+                });
+            } else if(type == 1){
+                database.fetchItem({ _id: id }, it => {
+                    if(it != null){
+                        res.json({ success: true, type: 'item', id: it._id, name: it.name, description: it.description, icon: it.icon });
+                    } else {
+                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any item in the database.' })
+                    }
+                });
+            } else if(type == 2){
+                database.fetchContainer({ _id: id }, cnt => {
+                    if(cnt != null){
+                        let location = cnt.locations.sort((a, b) => b-a)[0].location;
+                        res.json({ success: true, type: 'container', id: cnt._id, content: cnt.content, location, state: cnt.state });
+                    } else {
+                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any container in the database.' })
+                    }
+                });
+            } else {
+                res.status(404).json({ success: false, err: 'not_found', err_description: 'The id provided does not have a valid key' });
+            }
+        } else {
+            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Missing id field' });
+        }
+    })
+
+    router.all('/search', (req, res) => {
+        if(req.method !== 'POST'){
+            res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+            return;
+        }
+
+        const body = req.body;
+        const query = prepareParams(body);
+        console.log(body, '->', query);
+        let results = null;
+
+        function validate(){
+            res.json({ success: true, ...results });
+        }
+
+        if(Object.keys(query).length > 0 && !!body.type){
+            switch(body.type){
+                case '*':
+                case 'all':
+                    results = {};
+                    searchInvs(query, invs => {
+                        results.inventories = invs;
+    
+                        searchItems(query, items => {
+                            results.items = items;
+    
+                            searchCnts(query, cnts => {
+                                results.containers = cnts;
+                                validate();
+                            });
+                        });
+                    });
+                    break;
+                case 'inventories':
+                    results = {};
+                    searchInvs(query, cb => {
+                        results.inventories = cb;
+                        validate();
+                    });
+                    break;
+                case 'items':
+                    results = {};
+                    searchItems(query, cb => {
+                        results.items = cb;
+                        validate();
+                    });
+                    break;
+                case 'containers':
+                    results = {};
+                    searchCnts(query, cb => {
+                        results.containers = cb;
+                        validate();
+                    });
+                    break;
+            }
+    
+            if(!results){
+                res.status(404).json({ success: false, err: 'not_found', err_description: 'Query does not have any result' });
+            }
+        } else {
+            res.status(400).json({ success: false, err: 'bad_request', err_description: 'No filter was provided' });
+        }
+    })
+
+};
