@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="ItemComponent">
+        <attr name="itemIcon" format="string" />
+        <attr name="details" format="string" />
+    </declare-styleable>
+</resources>

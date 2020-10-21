@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/inventory_full_swipe"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.github.sofiman.inventory.InventoryActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/inventory_full_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp"
+                android:visibility="visible"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <View
+                    android:id="@+id/dummy_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:visibility="invisible"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/inventory_full_back"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="20dp"
+                    android:elevation="4dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:src="@drawable/icon_material_arrow_back"
+                    app:layout_constraintBottom_toBottomOf="@id/dummy_header"
+                    app:layout_constraintLeft_toLeftOf="@id/dummy_header"
+                    app:layout_constraintTop_toTopOf="@id/dummy_header"
+                    app:tint="@color/foreground" />
+
+                <LinearLayout
+                    android:id="@+id/inventory_full_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="30dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/dummy_header">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/white_box_top"
+                        android:orientation="horizontal"
+                        android:paddingTop="10dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent">
+
+                        <TextView
+                            android:id="@+id/inventory_full_icon_text"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:background="@drawable/small_icon"
+                            android:gravity="center"
+                            android:textSize="24sp"
+                            android:transitionName="inventory_icon"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/inventory_full_icon_image"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:transitionName="inventory_image"
+                            app:layout_constraintBottom_toBottomOf="@id/inventory_full_icon_text"
+                            app:layout_constraintLeft_toLeftOf="@id/inventory_full_icon_text"
+                            app:layout_constraintRight_toRightOf="@id/inventory_full_icon_text"
+                            app:layout_constraintTop_toTopOf="@id/inventory_full_icon_text" />
+
+                        <TextView
+                            android:id="@+id/inventory_full_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="15dp"
+                            android:text="{InventoryName}"
+                            android:textColor="@color/foreground"
+                            android:textSize="22sp"
+                            android:transitionName="inventory_name"
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/inventory_full_icon_text" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/inventory_full_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/inventory_full_header">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="30dp"
+                        android:background="@drawable/white_box_bottom"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="20dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="20dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/icon_ionic_ios_pin"
+                                app:tint="@color/foreground" />
+
+                            <TextView
+                                android:id="@+id/inventory_full_location"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginStart="15dp"
+                                android:textColor="@color/foreground"
+                                android:longClickable="true"
+                                android:background="?selectableItemBackground"
+                                android:textSize="16sp" />
+
+                            <com.facebook.shimmer.ShimmerFrameLayout
+                                android:id="@+id/inventory_full_location_shimmer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center">
+
+                                <View
+                                    android:layout_width="150dp"
+                                    android:layout_height="20dp"
+                                    android:background="@color/placeholder_color" />
+
+                            </com.facebook.shimmer.ShimmerFrameLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/state_machine"
+                                app:tint="@color/foreground" />
+
+                            <TextView
+                                android:id="@+id/inventory_full_state"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginStart="15dp"
+                                android:textColor="@color/foreground"
+                                android:longClickable="true"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?selectableItemBackground"
+                                android:textSize="16sp" />
+
+                            <com.facebook.shimmer.ShimmerFrameLayout
+                                android:id="@+id/inventory_full_state_shimmer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center">
+
+                                <View
+                                    android:layout_width="100dp"
+                                    android:layout_height="20dp"
+                                    android:background="@color/placeholder_color" />
+
+                            </com.facebook.shimmer.ShimmerFrameLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <ImageView
+                android:id="@+id/inventory_full_header_bg"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:elevation="-1dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:background="@drawable/liquid_header"
+                android:backgroundTint="@color/placeholder_color" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="15dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/inventory_full_layout">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="14dp"
+                    android:layout_marginBottom="20dp"
+                    android:orientation="vertical">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/inventory_full_notification"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/white_box_ripple"
+                        android:backgroundTint="@color/yellow_mask"
+                        android:padding="10dp"
+                        android:visibility="gone"
+                        android:layout_marginBottom="20dp">
+
+                        <ImageView
+                            android:id="@+id/inventory_full_notification_icon"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:padding="6dp"
+                            android:src="@drawable/bell_outline"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/yellow" />
+
+                        <TextView
+                            android:id="@+id/inventory_full_notification_content"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:textColor="@color/yellow"
+                            android:layout_marginHorizontal="5dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/inventory_full_notification_next"
+                            app:layout_constraintLeft_toRightOf="@id/inventory_full_notification_icon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/inventory_full_notification_next"
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/icon_material_chevron_right"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/yellow" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/inventory_full_qr_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/white_box_ripple_top"
+                        android:padding="10dp">
+
+                        <ImageView
+                            android:id="@+id/inventory_full_qr_code_icon"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/small_icon"
+                            android:backgroundTint="@color/purple_mask"
+                            android:padding="6dp"
+                            android:src="@drawable/qrcode_scan"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/purple" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="15dp"
+                            android:text="@string/full_page_qr_code"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toRightOf="@id/inventory_full_qr_code_icon"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/icon_material_chevron_right"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/foreground" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/inventory_full_assign_tracker"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:background="@drawable/white_ripple"
+                        android:padding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="@drawable/small_icon"
+                                android:backgroundTint="@color/green_mask"
+                                android:padding="6dp"
+                                android:src="@drawable/radar"
+                                app:tint="@color/green" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginStart="15dp"
+                                android:text="@string/full_page_track" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/icon_material_chevron_right"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/foreground" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/inventory_full_add_item"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:background="@drawable/white_ripple"
+                        android:padding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="@drawable/small_icon"
+                                android:backgroundTint="@color/orange_mask"
+                                android:padding="6dp"
+                                android:src="@drawable/cube_outline"
+                                app:tint="@color/orange" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginStart="15dp"
+                                android:text="@string/full_page_add" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/icon_material_chevron_right"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/foreground" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/inventory_full_edit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:background="@drawable/white_box_ripple_bottom"
+                        android:padding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="@drawable/small_icon"
+                                android:backgroundTint="@color/colorAccentTransparent"
+                                android:padding="8dp"
+                                android:src="@drawable/icon_material_mode_edit"
+                                app:tint="@color/colorAccent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginStart="15dp"
+                                android:text="@string/full_page_edit" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/icon_material_chevron_right"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/foreground" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category_trk"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <SearchView
+                    android:id="@+id/inventory_full_search_trackers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="15dp"
+                    android:background="@drawable/white_box"
+                    android:iconifiedByDefault="false"
+                    android:paddingStart="-12dp"
+                    android:paddingEnd="-12dp"
+                    android:queryBackground="@color/transparent"
+                    android:queryHint="@string/search_trackers"
+                    android:searchIcon="@drawable/magnify"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/inventory_full_tracker_shimmer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <include layout="@layout/component_tracker_placeholder" />
+
+                        <include layout="@layout/component_tracker_placeholder" />
+
+                        <include layout="@layout/component_tracker_placeholder" />
+
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <RelativeLayout
+                    android:id="@+id/inventory_full_trackers_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/inventory_full_trackers"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:nestedScrollingEnabled="false" />
+
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/category_itm"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <SearchView
+                    android:id="@+id/inventory_full_search_items"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="15dp"
+                    android:background="@drawable/white_box"
+                    android:iconifiedByDefault="false"
+                    android:paddingStart="-12dp"
+                    android:paddingEnd="-12dp"
+                    android:queryBackground="@color/transparent"
+                    android:queryHint="@string/search_items"
+                    android:searchIcon="@drawable/magnify"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/inventory_full_item_shimmer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <include layout="@layout/component_item_placeholder" />
+
+                        <include layout="@layout/component_item_placeholder" />
+
+                        <include layout="@layout/component_item_placeholder" />
+
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <RelativeLayout
+                    android:id="@+id/inventory_full_items_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/inventory_full_items"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:nestedScrollingEnabled="false" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

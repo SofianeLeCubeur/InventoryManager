@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.github.sofiman.inventory">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".CreateObjectActivity"
+            android:windowSoftInputMode="adjustPan"
+            />
+        <activity android:name=".ui.scan.ScanHistoryActivity" />
+        <activity android:name=".ItemActivity"
+            android:windowSoftInputMode="adjustPan"
+            />
+        <activity android:name=".ContainerActivity"
+            android:windowSoftInputMode="adjustPan"
+            />
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/title_home"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".InventoryActivity"
+            android:label="Inventory Details"
+            android:windowSoftInputMode="adjustPan" />
+    </application>
+
+</manifest>

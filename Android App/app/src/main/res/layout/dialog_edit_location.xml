@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="24dp"
+    android:minWidth="300dp"
+    android:outlineProvider="paddedBounds">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="4dp"
+        android:text="@string/dialog_edit_location" />
+    
+    <EditText
+        android:id="@+id/dialog_edit_location_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_box"
+        android:backgroundTint="@color/background"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="14dp"
+        android:importantForAutofill="no"
+        android:textColor="@color/foreground"
+        android:textSize="14sp"
+        android:inputType="text"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="4dp"
+        android:text="@string/dialog_edit_marker_position" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/dialog_edit_location_geo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/dialog_edit_geo_latitude"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="14dp"
+                android:importantForAutofill="no"
+                android:background="@drawable/white_box_top"
+                android:backgroundTint="@color/background"
+                android:textColor="@color/foreground"
+                android:textSize="14sp"
+                android:inputType="numberDecimal"
+                android:hint="Latitude"/>
+
+            <EditText
+                android:id="@+id/dialog_edit_geo_longitude"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="14dp"
+                android:importantForAutofill="no"
+                android:background="@drawable/white_box_bottom"
+                android:backgroundTint="@color/background"
+                android:textColor="@color/foreground"
+                android:textSize="14sp"
+                android:inputType="numberDecimal"
+                android:hint="Longitude"
+                android:layout_marginBottom="10dp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/dialog_edit_locate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_box_ripple"
+            android:backgroundTint="@color/colorAccentTransparent"
+            android:stateListAnimator="@null"
+            android:drawableStart="@drawable/icon_ionic_ios_pin"
+            android:drawableTint="@color/colorAccent"
+            android:drawablePadding="10dp"
+            android:text="@string/dialog_edit_location_locate"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="10dp"
+            android:textColor="@color/colorAccent"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/dialog_edit_location_geo"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

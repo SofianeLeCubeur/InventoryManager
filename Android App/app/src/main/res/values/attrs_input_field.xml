@@ -1,0 +1,7 @@
+<resources>
+    <declare-styleable name="InputFieldComponent">
+        <attr name="icon" format="reference" />
+        <attr name="hint" format="string" />
+        <attr name="text" format="string" />
+    </declare-styleable>
+</resources>

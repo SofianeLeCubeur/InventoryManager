@@ -1,0 +1,33 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/dark_gray</item>
+        <item name="font">@font/segoe_ui_font</item>
+
+        <item name="android:windowBackground">@color/background</item>
+        <item name="panelBackground">@android:color/transparent</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.InventoryManager.Dialog</item>
+
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowEnterTransition">@transition/slide_right</item>
+        <item name="android:windowExitTransition">@transition/slide_left</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/simple_slide_item_transform</item>
+        <item name="android:windowSharedElementExitTransition">@transition/simple_slide_item_transform</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+    </style>
+
+    <style name="ThemeOverlay.InventoryManager.Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="dialogCornerRadius">16dp</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/foreground</item>
+        <item name="android:windowBackground">@drawable/white_box</item>
+    </style>
+
+</resources>

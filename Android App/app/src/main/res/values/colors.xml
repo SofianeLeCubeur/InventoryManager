@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#BB596B</color>
+    <color name="colorPrimaryDark">#8E3B4A</color>
+    <color name="colorAccent">#F96D80</color>
+    <color name="colorAccentTransparent">#4DF96D80</color>
+
+    <color name="dark_gray">#333333</color>
+    <color name="foreground">#707070</color>
+    <color name="iconAccent">#ADADAD</color>
+    <color name="light_gray">#DCDCDC</color>
+    <color name="background">#EFEFEF</color>
+    <color name="popup">#E5E5E5</color>
+    <color name="image_background">#F3F3F3</color>
+    <color name="panel_background">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="placeholder_color">#D4D4D4</color>
+    <color name="ripple_mask">#42808080</color>
+    <color name="green">#50d890</color>
+    <color name="green_mask">#4D50d890</color>
+    <color name="aqua">#35CED9</color>
+    <color name="brown">#612C2C</color>
+    <color name="brown_mask">#33612C2C</color>
+    <color name="orange">#FF9800</color>
+    <color name="orange_mask">#33FF9800</color>
+    <color name="purple">#03A9F4</color>
+    <color name="purple_mask">#4D03A9F4</color>
+    <color name="glass">#2EFFFFFF</color>
+    <color name="yellow">#FF712E</color>
+    <color name="yellow_mask">#FFF0E9</color>
+    <color name="yellow_glass">#33FF712E</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="black_overlay">#66000000</color>
+</resources>

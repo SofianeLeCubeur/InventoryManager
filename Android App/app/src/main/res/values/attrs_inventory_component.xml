@@ -1,0 +1,7 @@
+<resources>
+    <declare-styleable name="InventoryComponent">
+        <attr name="iconUri" format="string" />
+        <attr name="itemCount" format="integer" />
+        <attr name="trackerCount" format="integer" />
+    </declare-styleable>
+</resources>

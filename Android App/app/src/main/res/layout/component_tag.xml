@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tag_content"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/tag"
+    android:backgroundTint="@color/transparent"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:textColor="@color/foreground"
+    android:textSize="16sp" />

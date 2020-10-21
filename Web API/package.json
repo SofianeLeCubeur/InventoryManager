@@ -9,6 +9,7 @@
   "author": "Sofiman",
   "license": "ISC",
   "dependencies": {
+    "bl": "^2.2.1",
     "express": "^4.17.1",
     "mongodb": "^3.5.9"
   }

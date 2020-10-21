@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="24dp"
+    android:minWidth="300dp"
+    android:outlineProvider="paddedBounds">
+
+    <TextView
+        android:id="@+id/double_edit_dialog_first_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="4dp" />
+    
+    <EditText
+        android:id="@+id/double_edit_dialog_first_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_box"
+        android:backgroundTint="@color/background"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="14dp"
+        android:importantForAutofill="no"
+        android:textColor="@color/foreground"
+        android:textSize="14sp"
+        android:inputType="text"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:id="@+id/double_edit_dialog_second_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="4dp" />
+
+    <EditText
+        android:id="@+id/double_edit_dialog_second_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_box"
+        android:backgroundTint="@color/background"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="14dp"
+        android:importantForAutofill="no"
+        android:textColor="@color/foreground"
+        android:textSize="14sp"
+        android:inputType="textUri" />
+
+</LinearLayout>

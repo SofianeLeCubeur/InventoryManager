@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SearchView
+        android:id="@+id/selective_add_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/white_box"
+        android:backgroundTint="@color/image_background"
+        android:elevation="0dp"
+        android:iconifiedByDefault="false"
+        android:paddingStart="-12dp"
+        android:paddingEnd="-12dp"
+        android:queryBackground="@color/transparent"
+        android:queryHint="@string/search_items"
+        android:searchIcon="@drawable/magnify"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/selective_add_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:nestedScrollingEnabled="true"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintTop_toBottomOf="@id/selective_add_search"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+   <androidx.constraintlayout.widget.ConstraintLayout
+       android:id="@+id/selective_add_footer"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       app:layout_constraintTop_toBottomOf="@id/selective_add_list"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       android:padding="10dp">
+
+       <Button
+           android:id="@+id/selective_add_cancel"
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center"
+           android:elevation="0dp"
+           android:layout_marginEnd="10dp"
+           app:layout_constraintTop_toTopOf="parent"
+           app:layout_constraintBottom_toBottomOf="parent"
+           app:layout_constraintLeft_toLeftOf="parent"
+           app:layout_constraintRight_toLeftOf="@id/selective_add_submit"
+           android:background="@drawable/white_box_ripple"
+           android:backgroundTint="@color/image_background"
+           android:stateListAnimator="@null"
+           android:gravity="center"
+           android:text="@string/dialog_cancel"
+           android:textAllCaps="false"
+           android:textColor="@color/foreground" />
+
+       <Button
+           android:id="@+id/selective_add_submit"
+           android:layout_width="0dp"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center"
+           app:layout_constraintTop_toTopOf="parent"
+           app:layout_constraintBottom_toBottomOf="parent"
+           app:layout_constraintRight_toRightOf="parent"
+           app:layout_constraintLeft_toRightOf="@id/selective_add_cancel"
+           android:background="@drawable/white_box_ripple"
+           android:backgroundTint="@color/colorAccentTransparent"
+           android:stateListAnimator="@null"
+           android:gravity="center"
+           android:text="@string/button_add"
+           android:textAllCaps="false"
+           android:textColor="@color/colorAccent" />
+
+   </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout >

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="5dp">
+
+    <ImageView
+        android:id="@+id/search_history_item_icon"
+        app:tint="@color/foreground"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/small_icon"
+        android:src="@drawable/magnify" />
+
+    <TextView
+        android:id="@+id/search_history_item_query"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Water bottle ltt"
+        android:textSize="14sp" />
+
+</LinearLayout>

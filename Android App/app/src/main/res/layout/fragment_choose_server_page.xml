@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="30dp"
+        android:text="@string/login_page_title"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_page_registered_servers"
+        android:layout_marginStart="25dp"
+        android:textSize="16sp"
+        android:layout_marginBottom="12dp" />
+
+    <RelativeLayout
+        android:id="@+id/login_server_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/login_server_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:nestedScrollingEnabled="false" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_gravity="center">
+
+        <Button
+            android:id="@+id/login_with_qr_code_button"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="204dp"
+            android:layout_height="36dp"
+            android:background="@drawable/rounded_button"
+            android:drawableStart="@drawable/qrcode_scan"
+            android:drawablePadding="-10dp"
+            android:elevation="0dp"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:text="@string/button_scan_to_login"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
+
+        <ImageButton
+            android:id="@+id/help_login_button"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/icon_awesome_question"
+            android:backgroundTint="@color/foreground"
+            android:background="@drawable/circle_button"
+            android:gravity="center"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

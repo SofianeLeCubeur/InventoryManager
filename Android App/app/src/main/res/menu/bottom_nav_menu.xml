@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/icon_material_home"
+        android:title="@string/title_home"
+        android:enabled="true" />
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/magnify"
+        android:title="@string/title_explore"
+        android:enabled="true" />
+
+    <item
+        android:id="@+id/navigation_scan"
+        android:icon="@drawable/cube_scan"
+        android:title="@string/title_scan"
+        android:enabled="true" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/icon_material_settings"
+        android:title="@string/title_settings"
+        android:enabled="true" />
+
+</menu>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/white_box"
+    android:paddingHorizontal="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--<TextView
+        android:id="@+id/field_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Label"
+        android:textSize="16sp"
+        android:layout_marginBottom="3dp"
+        android:layout_marginStart="5dp"
+        android:textColor="@color/iconAccent" />
+
+    <EditText
+        android:id="@+id/field_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:textColor="@color/foreground"
+        android:textColorHint="@color/foreground"
+        android:layout_marginHorizontal="5dp"
+        android:textSize="16sp"
+        android:hint="Content" />-->
+
+    <ImageView
+        android:id="@+id/field_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        app:tint="@color/foreground" />
+
+    <EditText
+        android:id="@+id/field_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:textColor="@color/foreground"
+        android:textColorHint="@color/foreground"
+        android:layout_marginStart="5dp"
+        android:textSize="18sp"
+        android:padding="15dp"
+        android:hint="Content" />
+
+</LinearLayout>

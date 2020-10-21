@@ -1,0 +1,7 @@
+<resources>
+    <declare-styleable name="TagComponent">
+        <attr name="tagName" format="string" />
+        <attr name="tagId" format="string" />
+        <attr name="active" format="boolean" />
+    </declare-styleable>
+</resources>

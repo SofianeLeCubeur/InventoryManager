@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginHorizontal="5dp">
+
+    <RadioButton
+        android:id="@+id/server_select"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/server_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="10dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintLeft_toRightOf="@id/server_select"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/server_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Server Name Test Lol"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/server_ip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="http://192.168.0.117/" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" >
+
+            <ImageView
+                android:id="@+id/server_edit"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="4dp"
+                android:tint="@color/foreground"
+                android:src="@drawable/icon_material_mode_edit"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginEnd="10dp"
+                android:background="?selectableItemBackgroundBorderless" />
+
+            <ImageView
+                android:id="@+id/server_delete"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:padding="4dp"
+                android:tint="@color/colorAccent"
+                android:src="@drawable/icon_material_remove"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?selectableItemBackgroundBorderless" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

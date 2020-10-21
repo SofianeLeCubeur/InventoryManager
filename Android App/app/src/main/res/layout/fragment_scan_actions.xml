@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/scan_not_found"
+        android:layout_gravity="center_horizontal"
+        android:textAlignment="center"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/scan_action_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textStyle="bold"
+        />
+    
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="5dp">
+
+        <Button
+            android:id="@+id/scan_action_history"
+            style="?metaButtonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/rounded_button"
+            android:elevation="0dp"
+            android:gravity="center"
+            android:paddingHorizontal="20dp"
+            android:text="@string/scan_add_to_history"
+            android:textAllCaps="false"
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</LinearLayout>

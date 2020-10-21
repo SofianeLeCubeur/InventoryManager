@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/white_box_ripple"
+    android:clickable="true"
+    android:focusable="true"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/item_icon"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:padding="19dp"
+        android:background="@drawable/small_icon"
+        android:backgroundTint="@color/brown_mask"
+        android:src="@drawable/cube"
+        android:transitionName="item_icon"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="@color/brown" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/item_icon"
+        app:layout_constraintTop_toTopOf="@id/item_icon"
+        app:layout_constraintBottom_toBottomOf="@id/item_icon"
+        app:layout_constraintRight_toLeftOf="@id/item_more"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="5dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:transitionName="item_name"
+            android:text="Water Bottle"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/item_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/iconAccent"
+            android:lines="2"
+            android:maxLines="2"
+            android:text="LTT 'STEALTH' INSULATED WATER BOTTLE" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/item_more"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:src="@drawable/icon_material_chevron_right"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="@color/foreground" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

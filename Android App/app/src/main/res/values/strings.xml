@@ -1,0 +1,159 @@
+<resources>
+    <string name="app_name">InventoryManager</string>
+    <string name="app_title">Inventory Manager</string>
+    <string name="lang">English</string>
+    <string name="slogan">An easy way to manage your items!</string>
+    <string name="button_start">Get started</string>
+    <string name="open_source">This project is open source and available at</string>
+    <string name="button_next">Next</string>
+    <string name="button_add">Add items</string>
+    <string name="button_scan_to_login">Scan a QR Code to login</string>
+
+    <string name="login_page_title">Login</string>
+    <string name="login_page_register">Register</string>
+    <string name="login_page_server_addr">Server Address</string>
+    <string name="login_page_server_addr_desc">Inventory Server to fetch data</string>
+    <string name="login_page_server_addr_ext">Inventory Server to fetch data</string>
+    <string name="login_page_username">Username</string>
+    <string name="login_page_username_desc">Username to login to the server</string>
+    <string name="login_page_password">Password</string>
+    <string name="login_page_password_desc">Password to login the server</string>
+    <string name="login_page_no_connection">Could not connect to the target server: %s</string>
+    <string name="login_page_registered_servers">Registered Servers:</string>
+
+    <string name="home_page_server_state">Connected to</string>
+    <string name="home_switch_dialog_title">Choose one Database server:</string>
+    <string name="home_switch_dialog_positive">Connect</string>
+    <string name="home_switch_dialog_neutral">Manage</string>
+
+    <string name="explore_page_search_bar">Search anything</string>
+    <string name="explore_filters_title">Filters</string>
+    <string name="explore_filters_title_reduced">Filters (%d)</string>
+    <string name="explore_page_history">Search History</string>
+    <string name="explore_filters_instructions">Click on a filter to add it to the query (typing also works) then add a \';\' at the end of the filter to validate it</string>
+    <string name="explore_filter_details">details:</string>
+    <string name="explore_filter_details_desc">Selects movables with the same details</string>
+    <string name="explore_filter_desc">desc:</string>
+    <string name="explore_filter_desc_desc">Selects all descriptions starting with a query</string>
+    <string name="explore_filter_state">state:</string>
+    <string name="explore_filter_state_desc">Selects all objects matching the state</string>
+    <string name="explore_filter_sn">sn:</string>
+    <string name="explore_filter_sn_desc">Selects all items matching the Serial Number</string>
+    <string name="explore_filter_ref">ref:</string>
+    <string name="explore_filter_ref_desc">Selects all items matching the Reference</string>
+    <string name="explore_filter_name">name:</string>
+    <string name="explore_filter_name_desc">Selects all objects matching the Name</string>
+    <string name="explore_filter_id">id:</string>
+    <string name="explore_filter_id_desc">Selects the object with that ID</string>
+    <string name="explore_no_result">We couldn\'t find any result to your query:</string>
+
+    <string name="scan_waiting_for_code">Scanning…</string>
+    <string name="scan_fetching">Fetching...</string>
+    <string name="scan_not_found">Sorry but we could not find any object with this ID:</string>
+    <string name="scan_permission_dialog_title">Permission required</string>
+    <string name="scan_permission_consent">We need your permission to access the camera to scan codes</string>
+    <string name="scan_history">Scan History</string>
+    <string name="scan_no_history">Sorry, we couldn\'t find any scans in your recent activity</string>
+    <string name="scan_start_scanning">Start scanning now</string>
+    <string name="scan_add_to_history">Add to history</string>
+    <string name="scan_added_to_history">Added to history</string>
+    <string name="scan_history_selection_copied">%s successfully copied to the clipboard</string>
+    <string name="scan_state_desc">Searching for codes</string>
+
+    <string name="category_all">All</string>
+    <string name="category_inv">Inventories</string>
+    <string name="category_cnt">Containers</string>
+    <string name="category_itm">Items</string>
+    <string name="category_trk">Trackers</string>
+    <string name="category_act">Actions</string>
+
+    <string name="new_inv">New Inventory</string>
+    <string name="new_cnt">New Container</string>
+    <string name="new_itm">New Item</string>
+    <string name="new_trk">New Tracker</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_explore">Explore</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_scan">Scan</string>
+
+    <string name="trademark">Created and designed by Sofiman with</string>
+    <string name="settings_server_label">Servers</string>
+    <string name="settings_login_label">Login Preferences</string>
+    <string name="settings_scan_label">Scan</string>
+    <string name="settings_misc_label">Miscellaneous</string>
+    <string name="settings_about_label">About</string>
+    <string name="settings_login_autoconnect">Auto Connect</string>
+    <string name="settings_login_autoconnect_desc">The app will try automatically to connect one by one to the registered servers (favorite first)</string>
+    <string name="settings_login_autoconnect_info">Auto connect is disabled</string>
+    <string name="settings_scan_register_unknown">Register non-recognized codes</string>
+    <string name="settings_scan_register_unknown_desc">Codes that cannot be found in the database will be added to the history as well</string>
+    <string name="settings_scan_clear_history">Clear scan history</string>
+    <string name="settings_scan_history_cleared">Successfully cleared scan history!</string>
+    <string name="settings_device_as_tracker_desc">A Tracker is a device that updates the properties of all scanned objects, like object\'s locations or state.</string>
+    <string name="settings_device_as_tracker">Use this device as a tracker</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_desc">The app is fully translated in multiple languages</string>
+
+    <string name="full_data">Informations</string>
+    <string name="full_page_qr_code">QR Code</string>
+    <string name="full_page_add">Add Item</string>
+    <string name="full_page_update">Update Location</string>
+    <string name="full_page_track">Assign Tracker</string>
+    <string name="full_page_edit">Edit Details</string>
+    <string name="full_page_save">Save</string>
+    <string name="full_page_no_state">No State Defined</string>
+    <string name="full_location_history">Location History</string>
+    <string name="full_page_error_items">Could not fetch items: %s</string>
+    <string name="full_page_error_item">Could not fetch item: %s</string>
+    <string name="full_page_error_inventory">Could not fetch inventory: %s</string>
+    <string name="full_page_error_containers">Could not fetch container: %s</string>
+    <string name="full_page_error_query">Could not do query: %s</string>
+    <string name="full_page_location_point">Location</string>
+    <string name="full_page_state">State</string>
+
+    <string name="no_result_apologies">Sorry</string>
+    <string name="content_copied">%s successfully copied to the clipboard</string>
+    <string name="qr_code_instructions">Click on the ID to copy it or simply scan or share this QR Code!</string>
+    <string name="search_items">Search any item</string>
+    <string name="search_trackers">Search any tracker</string>
+
+    <string name="create_object_update_location">Update location</string>
+    <string name="create_object_update_location_details">Push a new location point</string>
+    <string name="create_object_icon_url">Icon URL</string>
+    <string name="create_object_background_url">Background URL</string>
+    <string name="create_object_push_error">Unable to update %s: %s</string>
+    <string name="create_object_push_inventory">the inventory</string>
+    <string name="create_object_push_container">the container</string>
+    <string name="create_object_push_item">the item</string>
+    <string name="create_object_items_added">Added</string>
+    <string name="create_object_items_explore">Explore</string>
+
+    <string name="dialog_edit">Edit</string>
+    <string name="dialog_save">Save</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_delete">Delete</string>
+    <string name="dialog_accept">OK</string>
+    <string name="dialog_confirm">Confirm %s?</string>
+    <string name="dialog_confirm_delete">deleting</string>
+    <string name="dialog_confirm_clear">clearing</string>
+    <string name="dialog_clear">Clear</string>
+    <string name="dialog_clear_scan">You are about to clear the scan history (%d items)</string>
+    <string name="dialog_delete_confirmation">You are about to delete %s</string>
+    <string name="dialog_edit_tracker">Editing device\'s tracker details</string>
+    <string name="dialog_edit_server">Edit %s\'s details</string>
+    <string name="dialog_edit_tracker_name">Tracker Nickname</string>
+    <string name="dialog_edit_tracker_location">Tracker Location</string>
+    <string name="dialog_selective_add_title">Add items</string>
+    <string name="dialog_edit_server_name">Server Name</string>
+    <string name="dialog_edit_server_address">Server Address</string>
+    <string name="dialog_edit_location_title">Set location</string>
+    <string name="dialog_edit_location">Location Label</string>
+    <string name="dialog_edit_marker_position">Marker Position</string>
+    <string name="dialog_edit_location_locate">Locate</string>
+    <string name="dialog_edit_location_granted">You can now use the locate feature</string>
+
+    <string name="date_today_at">Today at %s</string>
+    <string name="date_ago">%d days ago at %s</string>
+
+</resources>

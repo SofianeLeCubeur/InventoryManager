@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/white_box_ripple"
+    android:clickable="true"
+    android:focusable="true"
+    android:longClickable="true"
+    android:paddingEnd="10dp">
+
+    <ImageView
+        android:id="@+id/location_point_add"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:padding="5dp"
+        android:layout_marginStart="5dp"
+        android:src="@drawable/icon_material_add"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:elevation="1dp"
+        android:background="@drawable/white_box"
+        android:backgroundTint="@color/colorAccent"
+        app:tint="@color/colorPrimaryDark" />
+
+    <LinearLayout
+        android:id="@+id/location_point_continuity"
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="10dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/location_point_continuity_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/white_box"
+                android:backgroundTint="@color/colorAccentTransparent"
+                />
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/white_box"
+                android:backgroundTint="@color/colorAccentTransparent"
+                android:layout_marginTop="2dp"
+                />
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/white_box"
+                android:backgroundTint="@color/colorAccentTransparent"
+                android:layout_marginTop="2dp"
+                />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="@drawable/white_box"
+            android:backgroundTint="@color/colorAccent"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="1dp" />
+
+        <LinearLayout
+            android:id="@+id/location_point_continuity_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/white_box"
+                android:backgroundTint="@color/colorAccentTransparent"
+                android:layout_marginTop="2dp"
+                />
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/white_box"
+                android:backgroundTint="@color/colorAccentTransparent"
+                android:layout_marginTop="2dp"
+                />
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:background="@drawable/white_box"
+                android:backgroundTint="@color/colorAccentTransparent"
+                android:layout_marginTop="2dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/location_point_continuity"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constrainedWidth="true"
+        android:padding="5dp"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/location_point_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/location_point_timestamp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/iconAccent" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
