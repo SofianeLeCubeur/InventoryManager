@@ -1,4 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
+const { generateId, randomColor } = require('./../utils');
 
 function assertQueryMatch(query, match){
     let valid = true;
@@ -24,7 +25,7 @@ module.exports = class Database {
                 this.db = c.db(config.mongodb.databaseName);
                 this.db.listCollections().toArray(function(err, cols){
                     if(!err){
-                        let needed = ['containers', 'inventories', 'items', 'scan_log']
+                        let needed = ['containers', 'inventories', 'items', 'scan_log', 'tokens']
                         cols.forEach(col => {
                             needed.forEach((n,i) => {
                                 if(col.name === n){
@@ -34,7 +35,7 @@ module.exports = class Database {
                         })
                         if(needed.length == 0) return;
                     }
-                    console.warn('[DB][MongoDB] Warning: Missing', needed.join(', '), 'collections: Rebuilding');
+                    console.warn('[DB][MongoDB] Warning: Missing', needed.join(', '), 'collections!');
                 }.bind(this))
             }
         });
@@ -94,6 +95,33 @@ module.exports = class Database {
             }
         });
     }
+    
+    updateContainer(query, cnt, callback){
+        const collection = this.db.collection('containers');
+        collection.updateOne(query, { $set: cnt }, function(err, result) {
+            if(!err){
+                callback(true);
+            } else {
+                callback(false);
+            }
+        });
+    }
+
+    pushInventory(inventory, callback){
+        const id = generateId();
+        const collection = this.db.collection('inventories');
+        if(!inventory['icon']){
+            inventory['icon'] = inventory.name.substring(0,1).toUpperCase() + ':' + randomColor();
+        }
+        let inv = Object.assign({ _id: id, background: null, state: '', location: '', items: [], }, inventory);
+        collection.insertOne(inv, function(err, result) {
+            if(!err && result.ops[0]._id === id && callback){
+                callback(result.ops[0]);
+            } else {
+                callback(null);
+            }
+        });
+    }
 
     fetchInventory(query, callback){
         const collection = this.db.collection('inventories');
@@ -102,6 +130,17 @@ module.exports = class Database {
                 callback(result);
             } else {
                 callback(null);
+            }
+        });
+    }
+    
+    updateInventory(query, inv, callback){
+        const collection = this.db.collection('inventories');
+        collection.updateOne(query, { $set: inv }, function(err, result) {
+            if(!err){
+                callback(true);
+            } else {
+                callback(false);
             }
         });
     }
@@ -140,5 +179,32 @@ module.exports = class Database {
                     callback(null);
                 }
             });
+    }
+
+    pushScanLog(log, callback){
+        console.log('pushScanLog->', log);
+        callback(true);
+    }
+
+    storeToken(token, callback){
+        const collection = this.db.collection('tokens');
+        collection.insertOne({ _id: token.token, type: token.type, uid: token.uid, scope: token.scope }, function(err, result) {
+            if(!err && result.ops[0]._id === token.token && callback){
+                callback(true);
+            } else {
+                callback(null);
+            }
+        });
+    }
+
+    getToken(token, callback){
+        const collection = this.db.collection('tokens');
+        collection.findOne({ _id: token }, function(err, result) {
+            if(!err && result){
+                callback(result);
+            } else {
+                callback(null);
+            }
+        });
     }
 }

@@ -52,7 +52,7 @@ module.exports = function(router, database, authMiddleware){
             'name': {
                 key: 'name',
                 val: function(s){
-                    return new RegExp(escapeRegExp(s));
+                    return new RegExp(s);
                 }
             },
             'ref': {
@@ -109,36 +109,47 @@ module.exports = function(router, database, authMiddleware){
         }
 
         let id = req.params.id;
+        let device = req.body.device;
+        let location = req.body.location || req.ip;
         if(id && typeof id === 'string'){
             let type = parseInt(id.substring(0,2), 16);
-            if(type == 0){
-                database.fetchInventory({ _id: id }, inv => {
-                    if(inv != null){
-                        res.json({ success: true, type: 'inventory', id: inv._id, name: inv.name, icon: inv.icon, location: inv.location, state: inv.state, items: inv.items });
+            database.pushScanLog({
+                device, location, timestamp: Date.now(), recipient: { id }
+            }, result => {
+                if(result){
+                    if(type == 0){
+                        database.fetchInventory({ _id: id }, inv => {
+                            if(inv != null){
+                                res.json({ success: true, type: 'inventory', id: inv._id, name: inv.name, icon: inv.icon, location: inv.location, state: inv.state, items: inv.items });
+                            } else {
+                                res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                            }
+                        });
+                    } else if(type == 1){
+                        database.fetchItem({ _id: id }, it => {
+                            if(it != null){
+                                res.json({ success: true, type: 'item', id: it._id, name: it.name, description: it.description, icon: it.icon });
+                            } else {
+                                res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any item in the database.' })
+                            }
+                        });
+                    } else if(type == 2){
+                        database.fetchContainer({ _id: id }, cnt => {
+                            if(cnt != null){
+                                let location = cnt.locations.sort((a, b) => b-a)[0].location;
+                                res.json({ success: true, type: 'container', id: cnt._id, content: cnt.content, location, state: cnt.state });
+                            } else {
+                                res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any container in the database.' })
+                            }
+                        });
                     } else {
-                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The id provided does not have a valid key' });
                     }
-                });
-            } else if(type == 1){
-                database.fetchItem({ _id: id }, it => {
-                    if(it != null){
-                        res.json({ success: true, type: 'item', id: it._id, name: it.name, description: it.description, icon: it.icon });
-                    } else {
-                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any item in the database.' })
-                    }
-                });
-            } else if(type == 2){
-                database.fetchContainer({ _id: id }, cnt => {
-                    if(cnt != null){
-                        let location = cnt.locations.sort((a, b) => b-a)[0].location;
-                        res.json({ success: true, type: 'container', id: cnt._id, content: cnt.content, location, state: cnt.state });
-                    } else {
-                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any container in the database.' })
-                    }
-                });
-            } else {
-                res.status(404).json({ success: false, err: 'not_found', err_description: 'The id provided does not have a valid key' });
-            }
+                } else {
+                    res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not push scan log' });
+                }
+            });
+            
         } else {
             res.status(400).json({ success: false, err: 'bad_request', err_description: 'Missing id field' });
         }
@@ -152,7 +163,6 @@ module.exports = function(router, database, authMiddleware){
 
         const body = req.body;
         const query = prepareParams(body);
-        console.log(body, '->', query);
         let results = null;
 
         function validate(){

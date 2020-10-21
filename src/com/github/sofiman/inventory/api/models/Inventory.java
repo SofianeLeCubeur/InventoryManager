@@ -7,6 +7,7 @@ import java.util.Set;
 
 public interface Inventory extends Identifiable {
 
+    String getIcon();
     String getName();
     String getState();
     String getLocation();

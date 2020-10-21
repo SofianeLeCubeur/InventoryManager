@@ -1,10 +1,79 @@
+const { mutate } = require('./../utils');
+
 module.exports = function(router, database, authMiddleware){
 
+    const modifiableProps = {
+        'name': function(s){
+            return typeof s === 'string' && s.length >= 1 && s.length <= 22
+        }, 
+        'icon': function(s){
+            if(typeof s !== 'string') return false;
+            if(s.length == 0) return true;
+            try {
+                new URL(s);
+                return true;
+            } catch (_) {}
+            return false;
+        },
+        'background': function(s){
+            if(typeof s !== 'string') return false;
+            if(s.length == 0) return true;
+            try {
+                new URL(s);
+                return true;
+            } catch (_) {}
+            return false;
+        },
+        'location': function(s){
+            return typeof s === 'string' && s.length >= 3 && s.length <= 40
+        },
+        'marker': function(s){
+            return false; // DISABLED FOR NOW, Enable with latitude and longitude location control
+        }, 
+        'state': function(s){
+            return typeof s === 'string' && s.length <= 16
+        }, 
+        'items': function(s){
+            let b = 0;
+            s.forEach(item => {
+                if(typeof item === 'string') b++;
+            })
+            return Array.isArray(s) && b === s.length;
+        }
+    };
+
+    router.post('/inventory', authMiddleware('Bearer'), (req, res) => {
+        let body = req.body;
+        let keys = Object.keys(req.body);
+        let props = {}, p = 0;
+        Object.keys(modifiableProps).forEach(prop => {
+            if(keys.indexOf(prop) >= 0 && modifiableProps[prop](body[prop])){
+                props[prop] = body[prop];
+                p++;
+            }
+        });
+
+        if(p > 0 && !!props['name']){
+            database.pushInventory(props, result => {
+                if(result){
+                    result.id = result._id;
+                    delete result._id;
+                    res.status(200).json({ sucess: true, ...result });
+                } else {
+                    res.status(500).json({ sucess: false, error: 'internal_error', err_description: 'Could not push inventory' });
+                }
+            });
+        } else {
+            res.status(400).json({  sucess: false, error: 'bad_request', err_description: 'Fields are missing' });
+        }
+    });
+
     router.all('/inventory/:id', authMiddleware('Bearer'), (req, res) => {
-        let id = req.params.id;
+        const id = req.params.id;
+        const query = { _id: id };
         if(id && typeof id === 'string'){
             if(req.method === 'GET'){
-                database.fetchInventory({ _id: id }, inv => {
+                database.fetchInventory(query, inv => {
                     if(inv != null){
                         inv.id = inv._id;
                         delete inv._id;
@@ -15,7 +84,38 @@ module.exports = function(router, database, authMiddleware){
                 });
                 return;
             } else if(req.method === 'POST' || req.method === 'UPDATE'){
-                res.status(500).json({ success: false, err: 'api_unavailable', err_description: 'API Server is unavailable' });
+                const body = req.body;
+                let mutation = mutate(modifiableProps, body);
+
+                if(mutation.length == 0){
+                    res.status(204).end();
+                    return;
+                }
+                console.log('mutation', mutation, 'from', body);
+
+                database.fetchInventory(query, inv => {
+                    if(inv != null){
+                        let mutedInv = Object.assign({}, inv, mutation);
+                        if(inv != mutedInv){
+                            database.updateInventory(query, mutedInv, cb => {
+                                if(cb){
+                                    mutedInv.id = mutedInv._id;
+                                    delete mutedInv._id;
+                                    res.status(200).json(mutedInv);
+                                } else {
+                                    res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not update the inventory' });
+                                }
+                            });
+                        } else {
+                            res.status(200).json(mutedInv);
+                        }
+                    } else {
+                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                    }
+                });
+
+                //res.status(500).json({ success: false, err: 'api_unavailable', err_description: 'API Server is unavailable' });
+                return;
             }
         } else {
             res.status(400).json({ success: false, err: 'bad_request', err_description: 'Bad Request' });
