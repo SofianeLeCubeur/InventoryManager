@@ -34,8 +34,8 @@ module.exports = class Database {
                             })
                         })
                         if(needed.length == 0) return;
+                        console.warn('[DB][MongoDB] Warning: Missing', needed.join(', '), 'collections!');
                     }
-                    console.warn('[DB][MongoDB] Warning: Missing', needed.join(', '), 'collections!');
                 }.bind(this))
             }
         });

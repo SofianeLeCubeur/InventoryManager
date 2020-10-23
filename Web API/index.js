@@ -69,7 +69,7 @@ app.use(function(req, res) {
     res.sendFile(path.resolve('./errors/404.html'));
 });
 
-let server = app.listen(80, () => {
+let server = app.listen(8080, () => {
     console.log('[Express] Listening on localhost:80');
 })
 
