@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.LocaleList;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -37,21 +38,26 @@ import com.github.sofiman.inventory.model.ServerListAdapter;
 import com.github.sofiman.inventory.utils.Animations;
 import com.github.sofiman.inventory.utils.Callback;
 import com.github.sofiman.inventory.utils.LayoutHelper;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SettingsFragment extends Fragment {
 
     private ServerListAdapter serverListAdapter;
     private Animations.Debouncer debouncer = new Animations.Debouncer();
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
@@ -67,71 +73,21 @@ public class SettingsFragment extends Fragment {
         serverListAdapter = new ServerListAdapter(getContext(), Fetcher.getInstance().getServerList());
         recyclerView.setAdapter(serverListAdapter);
 
-        serverListAdapter.setListeners(new Callback<Pair<Server, Pair<String, String>>>() {
-            @Override
-            public void run(Pair<Server, Pair<String, String>> data) {
-                edit(data);
-            }
-        }, new Callback<Pair<Server, Pair<String, String>>>() {
-            @Override
-            public void run(Pair<Server, Pair<String, String>> data) {
-                deleteServer(data);
-            }
-        }, new Callback<Pair<Server, Pair<String, String>>>() {
-            @Override
-            public void run(Pair<Server, Pair<String, String>> data) {
-                debouncer.debounce("save_servers", new Runnable() {
-                    @Override
-                    public void run() {
-                        saveServers();
-                    }
-                }, 1, TimeUnit.SECONDS);
-            }
-        });
+        serverListAdapter.setListeners(this::edit, this::deleteServer, data -> debouncer.debounce("save_servers", this::saveServers, 1, TimeUnit.SECONDS));
 
         ImageView button = root.findViewById(R.id.settings_register);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openLoginActivity();
-            }
-        });
+        button.setOnClickListener(view -> openLoginActivity());
 
         SwitchMaterial autoConnectSwitch = root.findViewById(R.id.settings_login_autoconnect);
         autoConnectSwitch.setChecked(isAutoconnectEnabled());
-        autoConnectSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                debouncer.debounce("auto_connect", new Runnable() {
-                    @Override
-                    public void run() {
-                        setAutoconnect(b);
-                    }
-                }, 750, TimeUnit.MILLISECONDS);
-            }
-        });
+        autoConnectSwitch.setOnCheckedChangeListener((compoundButton, b) -> debouncer.debounce("auto_connect", () -> setAutoconnect(b), 750, TimeUnit.MILLISECONDS));
 
         SwitchMaterial registerUnknownCodesSwitch = root.findViewById(R.id.settings_scan_register_unknown);
         registerUnknownCodesSwitch.setChecked(canRegisterUnknownCodes());
-        registerUnknownCodesSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                debouncer.debounce("register_unknown_codes", new Runnable() {
-                    @Override
-                    public void run() {
-                        setRegisterUnknownCodes(b);
-                    }
-                }, 750, TimeUnit.MILLISECONDS);
-            }
-        });
+        registerUnknownCodesSwitch.setOnCheckedChangeListener((compoundButton, b) -> debouncer.debounce("register_unknown_codes", () -> setRegisterUnknownCodes(b), 750, TimeUnit.MILLISECONDS));
 
-        TextView clearScanHistory = root.findViewById(R.id.settings_clear_scan_history);
-        clearScanHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clearScanLog();
-            }
-        });
+        ConstraintLayout clearScanHistory = root.findViewById(R.id.settings_clear_scan_history);
+        clearScanHistory.setOnClickListener(view -> clearScanLog());
 
         ConstraintLayout trackerDetails = root.findViewById(R.id.settings_scan_as_tracker_details);
         TextView trackerName = root.findViewById(R.id.settings_scan_as_tracker_name);
@@ -139,55 +95,46 @@ public class SettingsFragment extends Fragment {
 
         SwitchMaterial useDeviceAsTracker = root.findViewById(R.id.settings_scan_as_tracker);
         useDeviceAsTracker.setChecked(isScanAsTrackerEnabled());
-        useDeviceAsTracker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    Animations.expand(trackerDetails);
-                    trackerEdit.setEnabled(true);
-                    debouncer.debounce("toggle_device_as_tracker", new Runnable() {
-                        @Override
-                        public void run() {
-                            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putBoolean("scanning_as_tracker", true);
-                            editor.apply();
-                        }
-                    }, 750, TimeUnit.MILLISECONDS);
-                } else {
-                    Animations.collapse(trackerDetails);
-                    trackerEdit.setEnabled(false);
-                    debouncer.debounce("toggle_device_as_tracker", new Runnable() {
-                        @Override
-                        public void run() {
-                            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putBoolean("scanning_as_tracker", false);
-                            editor.apply();
-                        }
-                    }, 750, TimeUnit.MILLISECONDS);
-                }
+        useDeviceAsTracker.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) {
+                Animations.expand(trackerDetails);
+                trackerEdit.setEnabled(true);
+                debouncer.debounce("toggle_device_as_tracker", () -> {
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("scanning_as_tracker", true);
+                    editor.apply();
+                }, 750, TimeUnit.MILLISECONDS);
+            } else {
+                Animations.collapse(trackerDetails);
+                trackerEdit.setEnabled(false);
+                debouncer.debounce("toggle_device_as_tracker", () -> {
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("scanning_as_tracker", false);
+                    editor.apply();
+                }, 750, TimeUnit.MILLISECONDS);
             }
         });
-        trackerEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-                String name = sharedPreferences.getString("scan_tracker_name", HistoryDataModel.getDeviceName());
-                String location = sharedPreferences.getString("scan_tracker_location", "");
-                editTracker(name, location, new Callback<String>() {
-                    @Override
-                    public void run(String name) {
-                        trackerName.setText(name);
-                    }
-                });
-            }
+        trackerEdit.setOnClickListener(view -> {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+            String name = sharedPreferences.getString("scan_tracker_name", HistoryDataModel.getDeviceName());
+            String location = sharedPreferences.getString("scan_tracker_location", "");
+            editTracker(name, location, trackerName::setText);
         });
         if (useDeviceAsTracker.isChecked()) {
             trackerDetails.setVisibility(View.VISIBLE);
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
             trackerName.setText(sharedPreferences.getString("scan_tracker_name", HistoryDataModel.getDeviceName()));
         }
+
+        root.findViewById(R.id.settings_change_lang).setOnClickListener(v -> openSwitchLocale());
+
+        root.findViewById(R.id.settings_intro).setOnClickListener(v -> {
+            invalidateIntro();
+            Toast.makeText(getContext(), R.string.settings_intro_info, Toast.LENGTH_SHORT).show();
+        });
+        root.findViewById(R.id.settings_acknowledgements).setOnClickListener(v -> startActivity(new Intent(getContext(), Acknowledgements.class)));
 
         return root;
     }
@@ -214,19 +161,15 @@ public class SettingsFragment extends Fragment {
 
         AlertDialog handle = dialog.getDialog();
 
-        dialog.setButtons(getString(R.string.dialog_save), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        final String serverName = dialog.getFirstField().getText().toString().trim();
-                        if (!serverName.isEmpty()) {
-                            server.setName(serverName);
-                            serverListAdapter.notifyItemChanged(serverListAdapter.getServers().indexOf(store));
-                            saveServers();
-                            dialogInterface.dismiss();
-                        }
-                    }
-                },
-                getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE);
+        dialog.setButtons(getString(R.string.dialog_save), (dialogInterface, i) -> {
+            final String serverName = dialog.getFirstField().getText().toString().trim();
+            if (!serverName.isEmpty()) {
+                server.setName(serverName);
+                serverListAdapter.notifyItemChanged(serverListAdapter.getServers().indexOf(store));
+                saveServers();
+                dialogInterface.dismiss();
+            }
+        }, getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE);
 
         handle.setTitle(getString(R.string.dialog_edit_server, server.getName()));
         handle.show();
@@ -240,19 +183,16 @@ public class SettingsFragment extends Fragment {
         AlertDialog handle = dialog.getDialog();
         handle.setTitle(getString(R.string.dialog_edit_tracker));
 
-        dialog.setButtons(getString(R.string.dialog_save), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                final String name = dialog.getFirstField().getText().toString();
-                final String location = dialog.getSecondField().getText().toString();
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("scanning_as_tracker", true);
-                editor.putString("scan_tracker_name", name);
-                editor.putString("scan_tracker_location", location);
-                editor.apply();
-                edited.run(name);
-            }
+        dialog.setButtons(getString(R.string.dialog_save), (dialogInterface, i) -> {
+            final String name = dialog.getFirstField().getText().toString();
+            final String location1 = dialog.getSecondField().getText().toString();
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("scanning_as_tracker", true);
+            editor.putString("scan_tracker_name", name);
+            editor.putString("scan_tracker_location", location1);
+            editor.apply();
+            edited.run(name);
         }, getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE);
 
         handle.show();
@@ -261,52 +201,38 @@ public class SettingsFragment extends Fragment {
     private void deleteServer(Pair<Server, Pair<String, String>> store) {
         final Server server = store.first;
         showConfirmDialog(getString(R.string.dialog_confirm, getString(R.string.dialog_confirm_delete)),
-                getString(R.string.dialog_delete_confirmation, server.getName()), getString(R.string.dialog_delete), new Runnable() {
-            @Override
-            public void run() {
-                serverListAdapter.notifyItemRemoved(serverListAdapter.getServers().indexOf(store));
-                serverListAdapter.getServers().remove(store);
-                saveServers();
-                if (serverListAdapter.getServers().size() <= 0) {
-                    openLoginActivity();
-                }
-            }
-        });
+                getString(R.string.dialog_delete_confirmation, server.getName()), getString(R.string.dialog_delete), () -> {
+                    serverListAdapter.notifyItemRemoved(serverListAdapter.getServers().indexOf(store));
+                    serverListAdapter.getServers().remove(store);
+                    saveServers();
+                    if (serverListAdapter.getServers().size() <= 0) {
+                        openLoginActivity();
+                    }
+                });
     }
 
     private void clearScanLog() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         int count = sharedPreferences.getStringSet("scan_log", new HashSet<>()).size();
         showConfirmDialog(getString(R.string.dialog_confirm, getString(R.string.dialog_confirm_clear)),
-                getString(R.string.dialog_clear_scan, count), getString(R.string.dialog_clear), new Runnable() {
-            @Override
-            public void run() {
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove("scan_log");
-                editor.apply();
-                Toast.makeText(getContext(), R.string.settings_scan_history_cleared, Toast.LENGTH_SHORT).show();
-            }
-        });
+                getString(R.string.dialog_clear_scan, count), getString(R.string.dialog_clear), () -> {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove("scan_log");
+                    editor.apply();
+                    Toast.makeText(getContext(), R.string.settings_scan_history_cleared, Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void showConfirmDialog(String title, String message, String positiveButton, Runnable deleteCallback) {
         AlertDialog alertDialog = new AlertDialog.Builder(getContext(), R.style.ThemeOverlay_InventoryManager_Dialog)
                 .setTitle(title).setMessage(message)
-                .setPositiveButton(positiveButton, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        deleteCallback.run();
-                        dialogInterface.dismiss();
-                    }
+                .setPositiveButton(positiveButton, (dialogInterface, i) -> {
+                    deleteCallback.run();
+                    dialogInterface.dismiss();
                 })
                 .setNegativeButton(getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE).create();
 
-        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-                alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getContext().getColor(R.color.colorAccent));
-            }
-        });
+        alertDialog.setOnShowListener(dialogInterface -> alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getContext().getColor(R.color.colorAccent)));
 
         alertDialog.show();
     }
@@ -373,15 +299,60 @@ public class SettingsFragment extends Fragment {
         return sharedPreferences.getBoolean("register_unknown_codes", false);
     }
 
-    /**public void setLocale(String lang) {
-        Locale myLocale = new Locale(lang);
-        Resources res = getResources();
-        DisplayMetrics dm = res.getDisplayMetrics();
-        Configuration conf = res.getConfiguration();
-        conf.locale = myLocale;
-        res.updateConfiguration(conf, dm);
-        Intent refresh = new Intent(this, AndroidLocalize.class);
-        finish();
-        startActivity(refresh);
-    }*/
+    private void invalidateIntro(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("iintro", false);
+        editor.apply();
+    }
+
+    private void openSwitchLocale() {
+        String[] localeList = getResources().getStringArray(R.array.languages);
+        Map<Locale, String> localeMap = new HashMap<>();
+        for (int i = 0; i < localeList.length; i++) {
+            String localString = localeList[i];
+            if (localString.contains("-")) {
+                localString = localString.substring(0,
+                        localString.indexOf("-"));
+            }
+            Locale locale = new Locale(localString);
+            localeMap.put(locale, locale.getDisplayLanguage() + " ("
+                    + localeList[i]+ ")");
+        }
+
+        List<String> values = new ArrayList<>(localeMap.values());
+        String s = localeMap.get(Locale.getDefault());
+        System.out.println(Locale.getDefault() + ":" + s);
+        final AtomicInteger selectedIndex = new AtomicInteger(values.indexOf(s));
+        final androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(getContext(), R.style.ThemeOverlay_InventoryManager_Dialog)
+                .setTitle(R.string.settings_language_dialog_title)
+                .setSingleChoiceItems(values.toArray(new String[0]), selectedIndex.get(), (dialogInterface, i) -> selectedIndex.set(i))
+                .setPositiveButton(R.string.dialog_save, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        System.out.println("Selected locale: " + values.get(selectedIndex.get()) + "");
+                        //changeServer(Fetcher.getInstance().getServerList().get(selectedIndex.get()));
+                    }
+                })
+                .setNegativeButton(R.string.dialog_cancel, DoubleEditDialog.DISPOSE)
+                .create();
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(getContext().getColor(R.color.colorAccent));
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(getContext().getColor(R.color.iconAccent));
+        });
+        dialog.show();
+    }
+
+    private void setLocale(Locale locale){
+        Resources resources = getResources();
+        Configuration configuration = resources.getConfiguration();
+        DisplayMetrics displayMetrics = resources.getDisplayMetrics();
+        configuration.setLocale(locale);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N){
+            getContext().createConfigurationContext(configuration);
+        } else {
+            resources.updateConfiguration(configuration, displayMetrics);
+        }
+    }
 }

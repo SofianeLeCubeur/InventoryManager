@@ -118,7 +118,7 @@ public class ContainerActivity extends AppCompatActivity {
                     @Override
                     public void error(RequestError error) {
                         System.err.println("Failed to fetch container data: " + error);
-                        Toast.makeText(getApplicationContext(), getString(R.string.full_page_error_containers, error.toString()), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.full_page_error_container, error.toString()), Toast.LENGTH_LONG).show();
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 });
@@ -143,7 +143,7 @@ public class ContainerActivity extends AppCompatActivity {
             @Override
             public void error(RequestError error) {
                 System.err.println("Failed to fetch container data: " + error);
-                Toast.makeText(getApplicationContext(), getString(R.string.full_page_error_containers, error.toString()), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.full_page_error_container, error.toString()), Toast.LENGTH_LONG).show();
                 finish();
             }
         });
@@ -240,7 +240,7 @@ public class ContainerActivity extends AppCompatActivity {
                 @Override
                 public void error(RequestError error) {
                     System.err.println("Failed to fetch container data: " + error);
-                    Toast.makeText(getApplicationContext(), getString(R.string.full_page_error_containers, error.toString()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.full_page_error_container, error.toString()), Toast.LENGTH_LONG).show();
                 }
             });
         }

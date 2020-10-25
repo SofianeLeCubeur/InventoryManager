@@ -27,6 +27,12 @@ public class SearchHistoryItemComponent extends Component {
     }
 
     @Override
+    protected void setup(AttributeSet attrs, int defStyle) {
+        super.setup(attrs, defStyle);
+        type = R.drawable.magnify;
+    }
+
+    @Override
     public void update() {
         TextView query = findViewById(R.id.search_history_item_query);
         query.setText(this.query);

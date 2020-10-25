@@ -94,6 +94,7 @@
                             android:text="{ItemName}"
                             android:textColor="@color/foreground"
                             android:textSize="22sp"
+                            android:textIsSelectable="true"
                             android:transitionName="item_name"
                             app:layout_constrainedWidth="true"
                             app:layout_constraintLeft_toLeftOf="parent"
@@ -129,8 +130,8 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="@dimen/full_page_data_icon_size"
+                                android:layout_height="@dimen/full_page_data_icon_size"
                                 android:src="@drawable/icon_ionic_ios_pin"
                                 app:tint="@color/foreground" />
 
@@ -140,6 +141,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginStart="15dp"
+                                android:textIsSelectable="true"
                                 android:textColor="@color/foreground"
                                 android:textSize="16sp" />
 
@@ -165,8 +167,8 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="@dimen/full_page_data_icon_size"
+                                android:layout_height="@dimen/full_page_data_icon_size"
                                 android:src="@drawable/icon_material_book"
                                 app:tint="@color/foreground" />
 
@@ -176,6 +178,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginStart="15dp"
+                                android:textIsSelectable="true"
                                 android:textColor="@color/foreground"
                                 android:textSize="16sp" />
 
@@ -201,8 +204,8 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="@dimen/full_page_data_icon_size"
+                                android:layout_height="@dimen/full_page_data_icon_size"
                                 android:src="@drawable/id_card"
                                 app:tint="@color/foreground" />
 
@@ -212,6 +215,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginStart="15dp"
+                                android:textIsSelectable="true"
                                 android:textColor="@color/foreground"
                                 android:textSize="16sp" />
 
@@ -237,8 +241,8 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="@dimen/full_page_data_icon_size"
+                                android:layout_height="@dimen/full_page_data_icon_size"
                                 android:src="@drawable/icon_ionic_md_list"
                                 app:tint="@color/foreground" />
 
@@ -248,6 +252,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginStart="15dp"
+                                android:textIsSelectable="true"
                                 android:textColor="@color/foreground"
                                 android:textSize="16sp"
                                 android:transitionName="item_description" />
@@ -274,8 +279,8 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="@dimen/full_page_data_icon_size"
+                                android:layout_height="@dimen/full_page_data_icon_size"
                                 android:src="@drawable/icon_awesome_info"
                                 app:tint="@color/foreground" />
 
@@ -284,6 +289,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
+                                android:textIsSelectable="true"
                                 android:layout_marginStart="15dp"
                                 android:textColor="@color/foreground"
                                 android:textSize="16sp" />
@@ -309,8 +315,8 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
+                                android:layout_width="@dimen/full_page_data_icon_size"
+                                android:layout_height="@dimen/full_page_data_icon_size"
                                 android:src="@drawable/state_machine"
                                 app:tint="@color/foreground" />
 
@@ -320,6 +326,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginStart="15dp"
+                                android:textIsSelectable="true"
                                 android:textColor="@color/foreground"
                                 android:textSize="16sp" />
 
@@ -355,434 +362,6 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!--<androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_full_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/liquid_header"
-                android:backgroundTint="@color/white"
-                android:paddingBottom="40dp"
-                android:visibility="visible"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <View
-                    android:id="@+id/dummy_header"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:background="@color/transparent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/item_full_back"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="20dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="8dp"
-                    android:src="@drawable/icon_material_arrow_back"
-                    app:layout_constraintBottom_toBottomOf="@id/dummy_header"
-                    app:layout_constraintLeft_toLeftOf="@id/dummy_header"
-                    app:layout_constraintTop_toTopOf="@id/dummy_header"
-                    app:tint="@color/foreground" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="30dp"
-                    android:orientation="vertical"
-                    app:layout_constraintTop_toBottomOf="@id/dummy_header">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="20dp"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:id="@+id/item_full_icon"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
-                            android:padding="19dp"
-                            android:transitionName="item_icon"
-                            android:background="@drawable/small_icon"
-                            android:backgroundTint="@color/brown_mask"
-                            android:src="@drawable/cube"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:tint="@color/brown" />
-
-                        <TextView
-                            android:id="@+id/item_full_name"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginStart="20dp"
-                            android:text="{ItemName}"
-                            android:textColor="@color/foreground"
-                            android:textSize="22sp"
-                            android:transitionName="item_name"
-                            app:layout_constrainedWidth="true"
-                            app:layout_constraintBottom_toBottomOf="@id/item_full_icon"
-                            app:layout_constraintLeft_toRightOf="@id/item_full_icon"
-                            app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintTop_toTopOf="@id/item_full_icon" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <LinearLayout
-                        android:id="@+id/item_full_details"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="20dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/icon_material_book"
-                                app:tint="@color/foreground" />
-
-                            <TextView
-                                android:id="@+id/item_full_internal_name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginStart="15dp"
-                                android:textColor="@color/foreground"
-                                android:textSize="16sp" />
-
-                            <com.facebook.shimmer.ShimmerFrameLayout
-                                android:id="@+id/item_full_internal_name_shimmer"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center">
-
-                                <View
-                                    android:layout_width="150dp"
-                                    android:layout_height="20dp"
-                                    android:background="@color/placeholder_color" />
-
-                            </com.facebook.shimmer.ShimmerFrameLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="20dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/id_card"
-                                app:tint="@color/foreground" />
-
-                            <TextView
-                                android:id="@+id/item_full_serial_number"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginStart="15dp"
-                                android:textColor="@color/foreground"
-                                android:textSize="16sp" />
-
-                            <com.facebook.shimmer.ShimmerFrameLayout
-                                android:id="@+id/item_full_serial_number_shimmer"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center">
-
-                                <View
-                                    android:layout_width="120dp"
-                                    android:layout_height="20dp"
-                                    android:background="@color/placeholder_color" />
-
-                            </com.facebook.shimmer.ShimmerFrameLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="20dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/icon_ionic_md_list"
-                                app:tint="@color/foreground" />
-
-                            <TextView
-                                android:id="@+id/item_full_description"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginStart="15dp"
-                                android:transitionName="item_description"
-                                android:textColor="@color/foreground"
-                                android:textSize="16sp" />
-
-                            <com.facebook.shimmer.ShimmerFrameLayout
-                                android:id="@+id/item_full_description_shimmer"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center">
-
-                                <View
-                                    android:layout_width="200dp"
-                                    android:layout_height="20dp"
-                                    android:background="@color/placeholder_color" />
-
-                            </com.facebook.shimmer.ShimmerFrameLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="20dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/icon_awesome_info"
-                                app:tint="@color/foreground" />
-
-                            <TextView
-                                android:id="@+id/item_full_item_details"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginStart="15dp"
-                                android:textColor="@color/foreground"
-                                android:textSize="16sp" />
-
-                            <com.facebook.shimmer.ShimmerFrameLayout
-                                android:id="@+id/item_full_details_shimmer"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center">
-
-                                <View
-                                    android:layout_width="160dp"
-                                    android:layout_height="20dp"
-                                    android:background="@color/placeholder_color" />
-
-                            </com.facebook.shimmer.ShimmerFrameLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="20dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/state_machine"
-                                app:tint="@color/foreground" />
-
-                            <TextView
-                                android:id="@+id/item_full_state"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginStart="15dp"
-                                android:textColor="@color/foreground"
-                                android:textSize="16sp" />
-
-                            <com.facebook.shimmer.ShimmerFrameLayout
-                                android:id="@+id/item_full_state_shimmer"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center">
-
-                                <View
-                                    android:layout_width="110dp"
-                                    android:layout_height="20dp"
-                                    android:background="@color/placeholder_color" />
-
-                            </com.facebook.shimmer.ShimmerFrameLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="20dp"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/icon_ionic_ios_pin"
-                                app:tint="@color/foreground" />
-
-                            <TextView
-                                android:id="@+id/item_full_location"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginStart="15dp"
-                                android:textColor="@color/foreground"
-                                android:textSize="16sp" />
-
-                            <com.facebook.shimmer.ShimmerFrameLayout
-                                android:id="@+id/item_full_location_shimmer"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center">
-
-                                <View
-                                    android:layout_width="140dp"
-                                    android:layout_height="20dp"
-                                    android:background="@color/placeholder_color" />
-
-                            </com.facebook.shimmer.ShimmerFrameLayout>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="5dp"
-                            android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:id="@+id/item_full_qr_code"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_marginEnd="30dp"
-                                android:background="?selectableItemBackgroundBorderless"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/qrcode_scan"
-                                    app:tint="@color/colorAccent" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:text="@string/full_page_qr_code"
-                                    android:textColor="@color/colorAccent"
-                                    android:textSize="12sp" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_marginEnd="30dp"
-                                android:background="?selectableItemBackgroundBorderless"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/icon_awesome_warehouse"
-                                    app:tint="@color/colorAccent" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:text="@string/full_page_add"
-                                    android:textColor="@color/colorAccent"
-                                    android:textSize="12sp" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_marginEnd="30dp"
-                                android:background="?selectableItemBackgroundBorderless"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/bag_personal"
-                                    android:tint="@color/colorAccent" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:text="@string/full_page_add"
-                                    android:textColor="@color/colorAccent"
-                                    android:textSize="12sp" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:background="?selectableItemBackgroundBorderless"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:layout_marginBottom="8dp"
-                                    android:src="@drawable/icon_material_mode_edit"
-                                    android:tint="@color/colorAccent" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:text="@string/full_page_edit"
-                                    android:textColor="@color/colorAccent"
-                                    android:textSize="12sp" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>-->
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -809,8 +388,8 @@
 
                         <ImageView
                             android:id="@+id/item_full_qr_code_icon"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="@dimen/full_page_action_icon_size"
+                            android:layout_height="@dimen/full_page_action_icon_size"
                             android:background="@drawable/small_icon"
                             android:backgroundTint="@color/purple_mask"
                             android:padding="6dp"
@@ -857,8 +436,8 @@
                             app:layout_constraintTop_toTopOf="parent">
 
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
+                                android:layout_width="@dimen/full_page_action_icon_size"
+                                android:layout_height="@dimen/full_page_action_icon_size"
                                 android:background="@drawable/small_icon"
                                 android:backgroundTint="@color/green_mask"
                                 android:padding="6dp"
@@ -901,8 +480,8 @@
                             app:layout_constraintTop_toTopOf="parent">
 
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
+                                android:layout_width="@dimen/full_page_action_icon_size"
+                                android:layout_height="@dimen/full_page_action_icon_size"
                                 android:background="@drawable/small_icon"
                                 android:backgroundTint="@color/orange_mask"
                                 android:padding="6dp"
@@ -946,8 +525,8 @@
                             app:layout_constraintTop_toTopOf="parent">
 
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
+                                android:layout_width="@dimen/full_page_action_icon_size"
+                                android:layout_height="@dimen/full_page_action_icon_size"
                                 android:background="@drawable/small_icon"
                                 android:backgroundTint="@color/colorAccentTransparent"
                                 android:padding="8dp"

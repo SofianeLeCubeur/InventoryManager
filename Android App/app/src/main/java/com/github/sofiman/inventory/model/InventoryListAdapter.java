@@ -70,12 +70,9 @@ public class InventoryListAdapter extends RecyclerView.Adapter<InventoryListAdap
         component.setLocation(store.getLocation());
 
         component.update();
-        component.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(clickCallback != null){
-                    clickCallback.run(new Pair<>(store, component));
-                }
+        component.setOnClickListener(view -> {
+            if(clickCallback != null){
+                clickCallback.run(new Pair<>(store, component));
             }
         });
     }

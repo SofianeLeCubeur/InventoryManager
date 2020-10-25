@@ -68,7 +68,7 @@ public class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHistoryAdap
         SearchHistoryItem store = searchHistory.get(position);
 
         component.setQuery(store.getQuery());
-        component.setType(R.drawable.magnify);
+        //component.setType(R.drawable.magnify);
         component.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

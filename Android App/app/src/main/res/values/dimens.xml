@@ -2,4 +2,16 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="acknowledgement_library_name_size">16sp</dimen>
+    <dimen name="acknowledgement_margin_bottom">20dp</dimen>
+    <dimen name="action_width">80dp</dimen>
+    <dimen name="action_height">90dp</dimen>
+    <dimen name="action_margin_end">10dp</dimen>
+    <dimen name="action_padding">2dp</dimen>
+    <dimen name="action_drawable_padding">5dp</dimen>
+    <dimen name="category_vertical_separator_margin">10dp</dimen>
+    <dimen name="category_label_size">18sp</dimen>
+    <dimen name="full_page_data_icon_size">24dp</dimen>
+    <dimen name="full_page_action_icon_size">32dp</dimen>
+    <dimen name="acknowledgement_license_margin">10dp</dimen>
 </resources>

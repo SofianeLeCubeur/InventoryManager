@@ -1,14 +1,11 @@
 package com.github.sofiman.inventory.ui.home;
 
-import android.app.ActivityOptions;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.URLUtil;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -30,7 +27,6 @@ import com.github.sofiman.inventory.ContainerActivity;
 import com.github.sofiman.inventory.CreateObjectActivity;
 import com.github.sofiman.inventory.InventoryActivity;
 import com.github.sofiman.inventory.ItemActivity;
-import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.api.Item;
 import com.github.sofiman.inventory.ui.dialogs.DoubleEditDialog;
 import com.github.sofiman.inventory.ui.login.LoginActivity;
@@ -44,14 +40,12 @@ import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.model.ContainerListAdapter;
 import com.github.sofiman.inventory.model.InventoryListAdapter;
 import com.github.sofiman.inventory.ui.components.ContainerComponent;
-import com.github.sofiman.inventory.ui.components.InventoryComponent;
 import com.github.sofiman.inventory.utils.Callback;
 import com.github.sofiman.inventory.utils.IntentBuilder;
 import com.github.sofiman.inventory.utils.LayoutHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -69,8 +63,11 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
+        if(getContext() == null || getActivity() == null){
+            return null;
+        }
 
+        View root = inflater.inflate(R.layout.fragment_home, container, false);
         FrameLayout layout = root.findViewById(R.id.home_fragment_layout);
         LayoutHelper.addStatusBarOffset(layout.getContext(), layout);
         ViewGroup.LayoutParams params = layout.getLayoutParams();
@@ -83,12 +80,7 @@ public class HomeFragment extends Fragment {
         bodyLayout.setLayoutParams(llp);
 
         ConstraintLayout switcher = root.findViewById(R.id.home_server_switch);
-        switcher.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openSwitchDialog();
-            }
-        });
+        switcher.setOnClickListener(view -> openSwitchDialog());
         serverName = root.findViewById(R.id.home_server_name);
         if(Fetcher.getInstance().getCurrentServer() == null){
             Intent intent = new Intent(getContext(), LoginActivity.class);
@@ -206,35 +198,21 @@ public class HomeFragment extends Fragment {
         final AtomicInteger selectedIndex = new AtomicInteger(choicesString.indexOf(t));
         final AlertDialog dialog = new AlertDialog.Builder(getContext(), R.style.ThemeOverlay_InventoryManager_Dialog)
                 .setTitle(R.string.home_switch_dialog_title)
-                .setSingleChoiceItems(choicesString.toArray(new String[0]), selectedIndex.get(), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        selectedIndex.set(i);
-                    }
+                .setSingleChoiceItems(choicesString.toArray(new String[0]), selectedIndex.get(), (dialogInterface, i) -> selectedIndex.set(i))
+                .setPositiveButton(R.string.home_switch_dialog_positive, (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    changeServer(Fetcher.getInstance().getServerList().get(selectedIndex.get()));
                 })
-                .setPositiveButton(R.string.home_switch_dialog_positive, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        changeServer(Fetcher.getInstance().getServerList().get(selectedIndex.get()));
-                    }
-                })
-                .setNeutralButton(R.string.home_switch_dialog_neutral, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        BottomNavigationView navigationView = getActivity().findViewById(R.id.nav_view);
-                        navigationView.setSelectedItemId(R.id.navigation_settings);
-                    }
+                .setNeutralButton(R.string.home_switch_dialog_neutral, (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    BottomNavigationView navigationView = getActivity().findViewById(R.id.nav_view);
+                    navigationView.setSelectedItemId(R.id.navigation_settings);
                 })
                 .setNegativeButton(R.string.dialog_cancel, DoubleEditDialog.DISPOSE)
                 .create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getContext().getColor(R.color.colorAccent));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getContext().getColor(R.color.iconAccent));
-            }
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getContext().getColor(R.color.colorAccent));
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getContext().getColor(R.color.iconAccent));
         });
         dialog.show();
     }
@@ -245,23 +223,15 @@ public class HomeFragment extends Fragment {
             serverName.setText(server.first.getName());
             Fetcher fetcher = Fetcher.getInstance();
             fetcher.init(server.first);
-            fetcher.login(server.second.first, server.second.second, new Callback<RequestError>() {
-                @Override
-                public void run(RequestError data) {
-                    if(data != null){
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), "Could not connect to the target server: " + data.toString(), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    } else {
-                        loadData();
-                    }
+            fetcher.login(server.second.first, server.second.second, error -> {
+                if(error != null){
+                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getString(R.string.login_page_no_connection, error.toString()), Toast.LENGTH_LONG).show());
+                } else {
+                    loadData();
                 }
             });
         } catch (Exception e){
-            Toast.makeText(getContext(), "Could not connect to the target server: (" + e.getClass().getSimpleName() + ") " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.login_page_no_connection, "(" + e.getClass().getSimpleName() + ") " + e.getMessage()), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -271,12 +241,7 @@ public class HomeFragment extends Fragment {
         Fetcher.getInstance().fetchInventories(new APIResponse<List<Inventory>>() {
             @Override
             public void response(List<Inventory> result) {
-                invRecycler.setAdapter(new InventoryListAdapter(getContext(), result, new Callback<Pair<Inventory, InventoryComponent>>() {
-                    @Override
-                    public void run(Pair<Inventory, InventoryComponent> data) {
-                        LayoutHelper.openInventory(getActivity(), data);
-                    }
-                }));
+                invRecycler.setAdapter(new InventoryListAdapter(getContext(), result, data -> LayoutHelper.openInventory(getActivity(), data)));
                 inventoryShimmer.stopShimmer();
                 LayoutHelper.hide(inventoryShimmer, loadingIndicator);
                 LayoutHelper.show(inventoryLayout, actionLayout);
@@ -284,14 +249,8 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void error(RequestError error) {
-                String s = "Fetch Error: " + error.getError() + " (" + error.getStatusCode() + "): " + error.getDescription();
-                System.err.println("Failed to fetch inventory data: " + s);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
-                    }
-                });
+                System.err.println("Failed to fetch inventory data: " + error.toString());
+                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getString(R.string.full_page_error_inventories, error.toString()), Toast.LENGTH_LONG).show());
             }
         });
         Fetcher.getInstance().fetchContainers(new APIResponse<List<Container>>() {
@@ -310,14 +269,8 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void error(RequestError error) {
-                String s = "Fetch Error: " + error.getError() + " (" + error.getStatusCode() + "): " + error.getDescription();
-                System.err.println("Failed to fetch container data: " + s);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
-                    }
-                });
+                System.err.println("Failed to fetch container data: " + error.toString());
+                getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getString(R.string.full_page_error_containers, error.toString()), Toast.LENGTH_LONG).show());
             }
         });
     }

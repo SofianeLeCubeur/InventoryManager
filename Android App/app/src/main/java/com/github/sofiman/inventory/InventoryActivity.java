@@ -163,12 +163,7 @@ public class InventoryActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 clicked++;
-                setNotification("You clicked this " + clicked + " times!", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        hideNotification();
-                    }
-                });
+                setNotification("You clicked this " + clicked + " times!", view1 -> hideNotification());
             }
         });
 
@@ -286,13 +281,11 @@ public class InventoryActivity extends AppCompatActivity {
 
         TextView location = findViewById(R.id.inventory_full_location);
         location.setText(inventory.getLocation());
-        location.setOnLongClickListener(StringUtils.createLongClickCopy(this, inventory.getLocation(), R.string.full_page_location_point));
 
         TextView state = findViewById(R.id.inventory_full_state);
         String stateTxr = getString(R.string.full_page_no_state);
         if (inventory.getState() != null && !inventory.getState().isEmpty()) {
             stateTxr = inventory.getState();
-            state.setOnLongClickListener(StringUtils.createLongClickCopy(this, inventory.getState(), R.string.full_page_state));
         }
 
         state.setText(stateTxr);

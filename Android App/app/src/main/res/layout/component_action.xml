@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="80dp"
     android:layout_height="90dp"
     android:orientation="vertical"
@@ -13,12 +14,12 @@
         android:id="@+id/action_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableTop="@drawable/icon_awesome_question"
-        android:drawableTint="@color/colorAccent"
         android:drawablePadding="5dp"
         android:layout_gravity="center"
-        android:text="Action"
+        android:text="@string/action_placeholder"
         android:textAlignment="center"
-        android:textColor="@color/foreground" />
+        android:textColor="@color/foreground"
+        app:drawableTopCompat="@drawable/icon_awesome_question"
+        app:drawableTint="@color/colorAccent" />
 
 </FrameLayout>

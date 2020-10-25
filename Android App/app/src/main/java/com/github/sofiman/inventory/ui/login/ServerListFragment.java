@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.sofiman.inventory.HomeActivity;
+import com.github.sofiman.inventory.ui.home.HomeActivity;
 import com.github.sofiman.inventory.R;
 import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
@@ -54,6 +54,16 @@ public class ServerListFragment extends Fragment {
         for (Pair<Server, Pair<String, String>> entry : this.serverList){
             links.put(entry.first.getName(), entry);
         }
+
+        view.findViewById(R.id.login_offline).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), HomeActivity.class);
+                intent.putExtra("selectedItemId", R.id.navigation_settings);
+                startActivity(intent);
+                getActivity().finish();;
+            }
+        });
 
         SampleListAdapter adapter = new SampleListAdapter(getContext(), new ArrayList<String>(links.keySet()));
         adapter.setOnClickListener(new Callback<String>() {

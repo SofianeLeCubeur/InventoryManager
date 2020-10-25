@@ -44,19 +44,18 @@
         android:layout_gravity="center">
 
         <Button
-            android:id="@+id/login_with_qr_code_button"
-            style="?metaButtonBarButtonStyle"
+            android:id="@+id/login_offline"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="204dp"
             android:layout_height="36dp"
             android:background="@drawable/rounded_button"
-            android:drawableStart="@drawable/qrcode_scan"
-            android:drawablePadding="-10dp"
-            android:elevation="0dp"
+            android:backgroundTint="@color/colorAccentTransparent"
+            android:backgroundTintMode="src_atop"
+            android:foregroundTint="@color/colorAccent"
             android:gravity="center"
-            android:paddingStart="10dp"
-            android:text="@string/button_scan_to_login"
+            android:text="@string/button_offline_login"
             android:textAllCaps="false"
-            android:textColor="@color/white" />
+            android:textColor="@color/colorAccent" />
 
         <ImageButton
             android:id="@+id/help_login_button"

@@ -16,16 +16,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".CreateObjectActivity"
-            android:windowSoftInputMode="adjustPan"
-            />
+        <activity android:name=".ui.settings.Acknowledgements"></activity>
+        <activity android:name=".IntroActivity" />
+        <activity
+            android:name=".CreateObjectActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".ui.scan.ScanHistoryActivity" />
-        <activity android:name=".ItemActivity"
-            android:windowSoftInputMode="adjustPan"
-            />
-        <activity android:name=".ContainerActivity"
-            android:windowSoftInputMode="adjustPan"
-            />
+        <activity
+            android:name=".ItemActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".ContainerActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.login.LoginActivity"
             android:label="@string/app_name"
@@ -38,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HomeActivity"
+            android:name=".ui.home.HomeActivity"
             android:label="@string/title_home"
             android:windowSoftInputMode="adjustPan" />
         <activity

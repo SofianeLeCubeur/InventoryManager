@@ -28,17 +28,19 @@
 
         <Button
             android:id="@+id/scan_action_history"
-            style="?metaButtonBarButtonStyle"
+            style="?borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:background="@drawable/rounded_button"
+            android:backgroundTint="@color/colorAccentTransparent"
+            android:backgroundTintMode="src_atop"
             android:elevation="0dp"
             android:gravity="center"
             android:paddingHorizontal="20dp"
             android:text="@string/scan_add_to_history"
             android:textAllCaps="false"
             android:layout_marginEnd="5dp"
-            android:textColor="@color/white" />
+            android:textColor="@color/colorAccent" />
 
     </LinearLayout>
 

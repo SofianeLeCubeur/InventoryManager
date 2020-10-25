@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,7 @@ import com.github.sofiman.inventory.utils.LayoutHelper;
 import com.google.gson.Gson;
 import com.google.zxing.Result;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -128,12 +130,7 @@ public class ScanFragment extends Fragment {
                                    Toast.makeText(getContext(), getString(R.string.login_page_no_connection, error.toString()), Toast.LENGTH_LONG).show();
                                    resetState();
                                }
-                               new Handler().postDelayed(new Runnable() {
-                                   @Override
-                                   public void run() {
-                                       previous = "";
-                                   }
-                               }, 500);
+                               new Handler().postDelayed(() -> previous = "", 500);
                            }
                        });
                        canScan.set(true);
@@ -141,13 +138,10 @@ public class ScanFragment extends Fragment {
                 });
             }
         });
-        scanner.setErrorCallback(new ErrorCallback() {
-            @Override
-            public void onError(@NonNull Exception error) {
-                canScan.set(false);
-                System.out.println("Could not read code: " + error.getMessage());
-                error.printStackTrace();
-            }
+        scanner.setErrorCallback(error -> {
+            canScan.set(false);
+            System.out.println("Could not read code: " + error.getMessage());
+            error.printStackTrace();
         });
 
         // Setup the scan canvas
@@ -219,22 +213,14 @@ public class ScanFragment extends Fragment {
          AlertDialog dialog =  new AlertDialog.Builder(getContext(), R.style.ThemeOverlay_InventoryManager_Dialog)
                 .setTitle(R.string.scan_permission_dialog_title)
                 .setMessage(R.string.scan_permission_consent)
-                .setPositiveButton(R.string.dialog_accept, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        ActivityCompat.requestPermissions(getActivity(), new String[] { Manifest.permission.CAMERA }, 200);
-                    }
+                .setPositiveButton(R.string.dialog_accept, (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    ActivityCompat.requestPermissions(getActivity(), new String[] { Manifest.permission.CAMERA }, 200);
                 })
                 .setNegativeButton(getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE)
                 .create();
 
-         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-             @Override
-             public void onShow(DialogInterface dialogInterface) {
-                 dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getContext().getColor(R.color.colorAccent));
-             }
-         });
+         dialog.setOnShowListener(dialogInterface -> dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getContext().getColor(R.color.colorAccent)));
          dialog.show();
     }
 
@@ -391,19 +377,22 @@ public class ScanFragment extends Fragment {
         text.setText(scannedText);
 
         Button addToHistory = v.findViewById(R.id.scan_action_history);
-        addToHistory.setEnabled(false);
-        addToHistory.setBackgroundTintList(ColorStateList.valueOf(getContext().getColor(R.color.popup)));
-        addToHistory.setTextColor(getContext().getColor(R.color.foreground));
 
         if(addUnknownToHistory){
             HistoryDataModel.getInstance().pushScanLog(scannedText, timestamp, "raw", null, getContext());
             addToHistory.setText(R.string.scan_added_to_history);
+            addToHistory.setBackgroundTintList(ColorStateList.valueOf(getContext().getColor(R.color.popup)));
+            addToHistory.setTextColor(getContext().getColor(R.color.foreground));
+            addToHistory.setEnabled(false);
         } else {
             addToHistory.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     HistoryDataModel.getInstance().pushScanLog(scannedText, timestamp, "raw", null, getContext());
                     addToHistory.setText(R.string.scan_added_to_history);
+                    addToHistory.setBackgroundTintList(ColorStateList.valueOf(getContext().getColor(R.color.popup)));
+                    addToHistory.setTextColor(getContext().getColor(R.color.foreground));
+                    addToHistory.setEnabled(false);
                 }
             });
         }

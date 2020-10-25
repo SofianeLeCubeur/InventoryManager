@@ -1,10 +1,11 @@
 package com.github.sofiman.inventory.ui.login;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.preference.PreferenceManager;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,13 +15,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.sofiman.inventory.HomeActivity;
+import com.github.sofiman.inventory.ui.home.HomeActivity;
+import com.github.sofiman.inventory.IntroActivity;
 import com.github.sofiman.inventory.R;
 import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.utils.Callback;
 import com.github.sofiman.inventory.utils.LayoutHelper;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -32,8 +36,6 @@ import java.util.Set;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private TextView username;
-    private TextView password;
     private ConstraintLayout loadingLayout;
     private List<Pair<Server, Pair<String, String>>> serverList;
     private boolean autoconnect = true;
@@ -46,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         loadSettings();
 
         boolean embed = getIntent().getBooleanExtra("embed", false);
-        boolean autoconnect = this.autoconnect && getIntent().getBooleanExtra("autoconnect", true);
+        autoconnect = this.autoconnect && getIntent().getBooleanExtra("autoconnect", true);
 
         final ConstraintLayout layout = findViewById(R.id.login_layout);
         LayoutHelper.addStatusBarOffset(this, layout);
@@ -58,16 +60,24 @@ public class LoginActivity extends AppCompatActivity {
 
         loadingLayout = findViewById(R.id.login_loading);
 
-        ViewPager pager = findViewById(R.id.login_pager);
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        ViewPager2 pager = findViewById(R.id.login_pager);
+        TabLayout tabLayout = findViewById(R.id.indicator);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(this);
 
         if(serverList != null && serverList.size() > 0 && !embed){
-            adapter.addFragment(new ServerListFragment(serverList, loadingLayout), "Login");
+            adapter.addFragment(new ServerListFragment(serverList, loadingLayout));
         }
 
-        adapter.addFragment(new AddServerFragment(loadingLayout), "Register");
+        adapter.addFragment(new AddServerFragment(loadingLayout, embed));
 
         pager.setAdapter(adapter);
+        TabLayoutMediator mediator = new TabLayoutMediator(tabLayout, pager, new TabLayoutMediator.TabConfigurationStrategy() {
+            @Override
+            public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+                tab.setTabLabelVisibility(TabLayout.TAB_LABEL_VISIBILITY_UNLABELED);
+            }
+        });
+        mediator.attach();
 
         if(embed){
             ImageView back = findViewById(R.id.login_back);
@@ -78,6 +88,7 @@ public class LoginActivity extends AppCompatActivity {
                     supportFinishAfterTransition();
                 }
             });
+            tabLayout.setVisibility(View.INVISIBLE);
         }
 
         if (autoconnect) {
@@ -107,6 +118,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loadSettings() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        System.out.println("Showing intro: " + !sharedPreferences.contains("iintro"));
+        if(!sharedPreferences.contains("iintro")){
+            startActivity(new Intent(this, IntroActivity.class));
+            finish();
+            return;
+        }
         if (sharedPreferences.contains("servers")) {
             serverList = new ArrayList<>();
             Set<String> servers = sharedPreferences.getStringSet("servers", new HashSet<>());

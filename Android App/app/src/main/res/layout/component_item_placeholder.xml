@@ -33,7 +33,6 @@
             android:layout_width="120dp"
             android:layout_height="20dp"
             android:background="@color/placeholder_color"
-            android:text="Water Bottle"
             android:textSize="16sp" />
 
         <View
@@ -41,7 +40,6 @@
             android:layout_height="14dp"
             android:background="@color/placeholder_color"
             android:layout_marginTop="10dp"
-            android:text="Water Bottle"
             android:textSize="16sp" />
 
         <View
@@ -49,7 +47,6 @@
             android:layout_height="14dp"
             android:background="@color/placeholder_color"
             android:layout_marginTop="3dp"
-            android:text="Water Bottle"
             android:textSize="16sp" />
 
     </LinearLayout>
@@ -58,9 +55,9 @@
         android:layout_width="12dp"
         android:layout_height="12dp"
         android:src="@drawable/icon_material_chevron_right"
-        android:tint="@color/foreground"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="@color/foreground" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -37,14 +37,12 @@
                 android:id="@+id/server_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Server Name Test Lol"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/server_ip"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="http://192.168.0.117/" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -60,23 +58,23 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:padding="4dp"
-                android:tint="@color/foreground"
                 android:src="@drawable/icon_material_mode_edit"
                 android:clickable="true"
                 android:focusable="true"
                 android:layout_marginEnd="10dp"
-                android:background="?selectableItemBackgroundBorderless" />
+                android:background="?selectableItemBackgroundBorderless"
+                app:tint="@color/foreground" />
 
             <ImageView
                 android:id="@+id/server_delete"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:padding="4dp"
-                android:tint="@color/colorAccent"
                 android:src="@drawable/icon_material_remove"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?selectableItemBackgroundBorderless" />
+                android:background="?selectableItemBackgroundBorderless"
+                app:tint="@color/colorAccent" />
 
         </LinearLayout>
 

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context="com.github.sofiman.inventory.ui.settings.Acknowledgements">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/acknowledgement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/dummy_header"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:visibility="invisible"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/acknowledgements_back"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="20dp"
+            android:elevation="4dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            android:src="@drawable/icon_material_arrow_back"
+            app:layout_constraintBottom_toBottomOf="@id/dummy_header"
+            app:layout_constraintLeft_toLeftOf="@id/dummy_header"
+            app:layout_constraintTop_toTopOf="@id/dummy_header"
+            app:tint="@color/foreground" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_title"
+            android:layout_marginStart="10dp"
+            android:textSize="@dimen/category_label_size"
+            app:layout_constraintTop_toTopOf="@id/dummy_header"
+            app:layout_constraintBottom_toBottomOf="@id/dummy_header"
+            app:layout_constraintLeft_toRightOf="@id/acknowledgements_back" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/dummy_header">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:padding="10dp"
+                android:textSize="16sp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="@string/acknowledgements_thanks" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/acknowledgement_library_name_size"
+                    android:layout_marginBottom="@dimen/acknowledgement_margin_bottom"
+                    android:text="@string/acknowledgements_open_source" />
+
+                <!-- Start GSON License -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/acknowledgement_library_name_size"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_gson" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/acknowledgement_margin_bottom"
+                    android:layout_marginHorizontal="@dimen/acknowledgement_license_margin"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_gson_license" />
+
+                <!-- Start Zxing License -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/acknowledgement_library_name_size"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_zxing" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/acknowledgement_margin_bottom"
+                    android:layout_marginHorizontal="@dimen/acknowledgement_license_margin"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_zxing_license" />
+
+                <!-- Start Shimmer License -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/acknowledgement_library_name_size"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_shimmer" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/acknowledgement_margin_bottom"
+                    android:layout_marginHorizontal="@dimen/acknowledgement_license_margin"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_shimmer_license" />
+
+                <!-- Start Retrofit License -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/acknowledgement_library_name_size"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_retrofit" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/acknowledgement_margin_bottom"
+                    android:layout_marginHorizontal="@dimen/acknowledgement_license_margin"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_retrofit_license" />
+
+                <!-- Start Picasso License -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/acknowledgement_library_name_size"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_picasso" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/acknowledgement_margin_bottom"
+                    android:layout_marginHorizontal="@dimen/acknowledgement_license_margin"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_picasso_license" />
+
+                <!-- Start code-scanner License -->
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/acknowledgement_library_name_size"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_code_scanner" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/acknowledgement_margin_bottom"
+                    android:layout_marginHorizontal="@dimen/acknowledgement_license_margin"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_code_scanner_license" />
+
+                <!-- Start picasso-transformations License -->
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/acknowledgement_library_name_size"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_picasso_transformations" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/acknowledgement_margin_bottom"
+                    android:layout_marginHorizontal="@dimen/acknowledgement_license_margin"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_picasso_transformations_license" />
+
+                <!-- Start android-gpuimage License -->
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/acknowledgement_library_name_size"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_android_gpuimage" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/acknowledgement_margin_bottom"
+                    android:layout_marginHorizontal="@dimen/acknowledgement_license_margin"
+                    android:textIsSelectable="true"
+                    android:text="@string/acknowledgements_android_gpuimage_license" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

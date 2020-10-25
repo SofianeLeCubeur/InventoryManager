@@ -7,9 +7,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.URLUtil;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,30 +17,27 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
-import com.github.sofiman.inventory.HomeActivity;
+import com.github.sofiman.inventory.ui.home.HomeActivity;
 import com.github.sofiman.inventory.R;
 import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.utils.Callback;
-import com.github.sofiman.inventory.utils.StringUtils;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class AddServerFragment extends Fragment {
 
+    private final ConstraintLayout loadingLayout;
+    private final boolean embed;
     private TextView username;
     private TextView password;
-    private ConstraintLayout loadingLayout;
 
-    public AddServerFragment(ConstraintLayout loadingLayout){
+    public AddServerFragment(ConstraintLayout loadingLayout, boolean embed){
         this.loadingLayout = loadingLayout;
+        this.embed = embed;
     }
 
     @Nullable
@@ -57,6 +52,17 @@ public class AddServerFragment extends Fragment {
         username = layout.findViewById(R.id.login_username);
         password = layout.findViewById(R.id.login_password);
 
+        if(embed){
+            layout.findViewById(R.id.login_more_panel).setVisibility(View.GONE);
+        } else {
+            layout.findViewById(R.id.login_offline).setOnClickListener(v -> {
+                Intent intent = new Intent(getContext(), HomeActivity.class);
+                intent.putExtra("selectedItemId", R.id.navigation_settings);
+                startActivity(intent);
+                getActivity().finish();
+            });
+        }
+
         Button button = layout.findViewById(R.id.login_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +75,7 @@ public class AddServerFragment extends Fragment {
                 password.setEnabled(false);
                 loadingLayout.setVisibility(View.VISIBLE);
 
-                long p = Math.round(Math.random() * 1000);
+                long p = Math.round(Math.random() * 9000 + 1000);
                 Server toConnect = new Server("Inventory Server " + p, ip);
 
                 login(toConnect, id, secret, new Callback<RequestError>() {
@@ -143,6 +149,7 @@ public class AddServerFragment extends Fragment {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putStringSet("servers", servers);
         editor.apply();
+        System.out.println("Saving new server: " + item.toString());
 
         Fetcher.getInstance().getServerList().add(new Pair<>(server, new Pair<>(username, password)));
     }

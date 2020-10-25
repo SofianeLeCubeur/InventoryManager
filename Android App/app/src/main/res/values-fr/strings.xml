@@ -8,7 +8,10 @@
     <string name="open_source">This project is open source and available at</string>
     <string name="button_next">Suivant</string>
     <string name="button_add">Ajouter des objets</string>
-    <string name="button_scan_to_login">Utiliser un QR de conexion</string>
+    <string name="button_offline_login">Connexion hors-ligne</string>
+
+    <string name="intro_presentation">Inventory Manager, de quoi s\'agit-il ?</string>
+    <string name="intro_presentation_desc">Inventory Manager est un outil pour vous aider à gérer vos affaires. Vous pouvez ajouter tout ce que vous voulez!</string>
 
     <string name="login_page_title">Se connecter</string>
     <string name="login_page_register">Ajouter</string>
@@ -81,6 +84,7 @@
     <string name="dialog_edit_server_address">Adresse du Serveur</string>
     <string name="trademark">Created and designed by Sofiman with</string>
     <string name="settings_server_label">Serveurs</string>
+    <string name="settings_servers_add">Ajouter un Serveur</string>
     <string name="settings_login_label">Options de connexion</string>
     <string name="settings_scan_label">Scan</string>
     <string name="settings_misc_label">Autre</string>
@@ -94,8 +98,13 @@
     <string name="settings_scan_history_cleared">L\'historique des scans a été effacé!</string>
     <string name="settings_device_as_tracker_desc">A Tracker is a device that updates the properties of all scanned objects, like object\'s locations or state.</string>
     <string name="settings_device_as_tracker">Utiliser cet appareil comme tracker</string>
-    <string name="settings_language">Langage</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_change_language">Changer la langue</string>
     <string name="settings_language_desc">L\'application est entierement traduite en plusieurs langages</string>
+    <string name="settings_language_dialog_title">Choissiez la langue:</string>
+    <string name="settings_intro">Revoir l\'intro</string>
+    <string name="settings_intro_info">Vous pouvez redémarrez l\'application pour voir l\'intro</string>
+    <string name="settings_acknowledgements">Remerciments</string>
 
     <string name="full_data">Informations</string>
     <string name="full_page_qr_code">QR Code</string>
@@ -109,7 +118,9 @@
     <string name="full_page_error_items">Affichage des objets impossible: %s</string>
     <string name="full_page_error_item">Affichage de l\'objet impossible: %s</string>
     <string name="full_page_error_inventory">Affichage de l\'inventaire impossible: %s</string>
-    <string name="full_page_error_containers">Affichage du contenaire impossible: %s</string>
+    <string name="full_page_error_inventories">Affichage des inventaires impossible: %s</string>
+    <string name="full_page_error_containers">Affichage des contenaires impossible: %s</string>
+    <string name="full_page_error_container">Affichage du contenaire impossible: %s</string>
     <string name="login_page_no_connection">Connexion au serveur impossible: %s</string>
     <string name="full_page_error_query">Could not do query: %s</string>
     <string name="full_page_location_point">Position</string>
@@ -131,6 +142,8 @@
     <string name="create_object_push_item">de l\'objet</string>
     <string name="create_object_items_added">Ajouté</string>
     <string name="create_object_items_explore">Explorer</string>
+    <string name="input_field_placeholder">Contenu</string>
+    <string name="action_placeholder">Action</string>
 
     <string name="dialog_edit">Editer</string>
     <string name="dialog_save">Enregistrer</string>
@@ -156,5 +169,7 @@
 
     <string name="date_today_at">Aujourd\'hui à %s</string>
     <string name="date_ago">Il ya %d jours à %s</string>
+
+    <string name="acknowledgements_thanks">Merci d\'utiliser mon application ! Merci à tous ceux qui m\'ont soutenu et aidé à travers son developpement. Si vous souhaitez m\'aider davantage vous pouvez me contactez via GitHub. (Serveurs publiques et Illustrations)</string>
 
 </resources>
