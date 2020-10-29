@@ -7,7 +7,6 @@ module.exports = function(router, database, authMiddleware){
             return typeof s === 'string' && s.length >= 1 && s.length <= 22
         },
         'state': function(s){
-            console.log(s, typeof s, s.length, s.length <= 16);
             return typeof s === 'string' && s.length <= 16
         },
         'details': function(s){
@@ -119,11 +118,16 @@ module.exports = function(router, database, authMiddleware){
         if(!isFinite(length)){
             length = 0;
         }
-        database.fetchContainers({  }, offset, length, docs => {
+        database.fetchContainers({}, offset, length, docs => {
             if(docs != null){
                 let containers = docs.map(cnt => {
-                    let location = cnt.locations.sort((a, b) => b-a)[0].location;
-                    return { id: cnt._id, content: cnt.content, location, state: cnt.state };
+                    try {
+                        let location = cnt.locations.length > 0 && cnt.locations.sort((a, b) => b-a)[0].location || '';
+                        return { id: cnt._id, content: cnt.content, location, state: cnt.state };
+                    } catch(e){
+                        console.error(e, cnt);
+                        return undefined;
+                    }
                 });
                 res.json(containers);
             } else {

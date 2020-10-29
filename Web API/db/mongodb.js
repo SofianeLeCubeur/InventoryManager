@@ -126,7 +126,7 @@ module.exports = class Database {
     pushContainer(container, callback){
         const id = generateId();
         const collection = this.db.collection('containers');
-        let cnt = Object.assign({ _id: id, state: '', details: '', locations: '', items: [] }, container);
+        let cnt = Object.assign({ _id: id, state: '', details: '', locations: [], items: [] }, container);
         collection.insertOne(cnt, function(err, result) {
             if(!err && result.ops[0]._id === id && callback){
                 callback(result.ops[0]);
