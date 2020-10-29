@@ -48,6 +48,32 @@ module.exports = function(router, database, authMiddleware){
         },
     };
 
+    router.post('/item', authMiddleware('Bearer'), (req, res) => {
+        let body = req.body;
+        let keys = Object.keys(req.body);
+        let props = {}, p = 0;
+        Object.keys(modifiableProps).forEach(prop => {
+            if(keys.indexOf(prop) >= 0 && modifiableProps[prop](body[prop])){
+                props[prop] = body[prop];
+                p++;
+            }
+        });
+
+        if(p > 0 && !!props['name']){
+            database.pushItem(props, result => {
+                if(result){
+                    result.id = result._id;
+                    delete result._id;
+                    res.status(200).json({ sucess: true, ...result });
+                } else {
+                    res.status(500).json({ sucess: false, error: 'internal_error', err_description: 'Could not push item' });
+                }
+            });
+        } else {
+            res.status(400).json({  sucess: false, error: 'bad_request', err_description: 'Fields are missing' });
+        }
+    });
+
     router.all('/item/:id', authMiddleware('Bearer'), (req, res) => {
         let id = req.params.id;
         if(id && typeof id === 'string'){

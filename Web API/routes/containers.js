@@ -5,24 +5,6 @@ module.exports = function(router, database, authMiddleware){
     const modifiableProps = {
         'content': function(s){
             return typeof s === 'string' && s.length >= 1 && s.length <= 22
-        }, 
-        'icon': function(s){
-            if(typeof s !== 'string') return false;
-            if(s.length == 0) return true;
-            try {
-                new URL(s);
-                return true;
-            } catch (_) {}
-            return false;
-        },
-        'background': function(s){
-            if(typeof s !== 'string') return false;
-            if(s.length == 0) return true;
-            try {
-                new URL(s);
-                return true;
-            } catch (_) {}
-            return false;
         },
         'state': function(s){
             console.log(s, typeof s, s.length, s.length <= 16);
@@ -42,6 +24,32 @@ module.exports = function(router, database, authMiddleware){
             return Array.isArray(s) && b === s.length;
         }
     };
+
+    router.post('/container', authMiddleware('Bearer'), (req, res) => {
+        let body = req.body;
+        let keys = Object.keys(req.body);
+        let props = {}, p = 0;
+        Object.keys(modifiableProps).forEach(prop => {
+            if(keys.indexOf(prop) >= 0 && modifiableProps[prop](body[prop])){
+                props[prop] = body[prop];
+                p++;
+            }
+        });
+
+        if(p > 0 && !!props['content']){
+            database.pushContainer(props, result => {
+                if(result){
+                    result.id = result._id;
+                    delete result._id;
+                    res.status(200).json({ sucess: true, ...result });
+                } else {
+                    res.status(500).json({ sucess: false, error: 'internal_error', err_description: 'Could not push container' });
+                }
+            });
+        } else {
+            res.status(400).json({  sucess: false, error: 'bad_request', err_description: 'Fields are missing' });
+        }
+    });
 
     router.all('/container/:id', authMiddleware('Bearer'), (req, res) => {
         let id = req.params.id;

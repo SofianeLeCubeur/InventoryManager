@@ -85,6 +85,22 @@ module.exports = class Database {
         });
     }
 
+    pushItem(item, callback){
+        const id = generateId();
+        const collection = this.db.collection('items');
+        if(!item['icon']){
+            item['icon'] = item.name.substring(0,1).toUpperCase() + ':' + randomColor();
+        }
+        let itm = Object.assign({ _id: id, background: null, reference: '', serial_number: '', description: '', details: '', locations: [], tags: [], state: '' }, item);
+        collection.insertOne(itm, function(err, result) {
+            if(!err && result.ops[0]._id === id && callback){
+                callback(result.ops[0]);
+            } else {
+                callback(null);
+            }
+        });
+    }
+
     fetchContainer(query, callback){
         const collection = this.db.collection('containers');
         collection.findOne(query, function(err, result) {
@@ -103,6 +119,19 @@ module.exports = class Database {
                 callback(true);
             } else {
                 callback(false);
+            }
+        });
+    }
+
+    pushContainer(container, callback){
+        const id = generateId();
+        const collection = this.db.collection('containers');
+        let cnt = Object.assign({ _id: id, state: '', details: '', locations: '', items: [] }, container);
+        collection.insertOne(cnt, function(err, result) {
+            if(!err && result.ops[0]._id === id && callback){
+                callback(result.ops[0]);
+            } else {
+                callback(null);
             }
         });
     }

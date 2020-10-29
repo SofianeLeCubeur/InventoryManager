@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:latest
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -16,9 +16,5 @@ RUN npm install
 COPY . .
 
 # Open the web port
-EXPOSE 8080
-# Open the Redis port
-EXPOSE 6379
-# Open the MongoDB port
-EXPOSE 27017
+EXPOSE 80
 CMD [ "npm", "run", "serve" ]
