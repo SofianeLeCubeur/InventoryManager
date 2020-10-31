@@ -50,6 +50,10 @@ module.exports = class Database {
         });
     }
 
+    isConnected(){
+        return this.db !== null;
+    }
+
     insertItem(item, callback){
         const collection = this.db.collection('items');
         collection.insertOne(item, function(err, result) {

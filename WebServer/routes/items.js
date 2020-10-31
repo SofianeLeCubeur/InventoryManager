@@ -170,7 +170,7 @@ module.exports = function(router, database, authMiddleware){
                 });
                 res.json(items);
             } else {
-                res.status(404).json({ err: 'find_error', err_description: 'Find error: ' + docs });
+                res.status(404).json({ err: 'not_found', err_description: 'Find error: ' + docs });
             }
         });
     })

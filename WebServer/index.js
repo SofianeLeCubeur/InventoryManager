@@ -18,6 +18,7 @@ function authMiddleware(authorization_type){
     return function(req, res, next){
         let header = req.headers.authorization;
         let validator;
+        let error = () => res.status(401).json({ success: false, err: 'unauthorized', err_description: 'Unauthorized' });
         if(header && header.indexOf(authorization_type) === 0){
             validator = new RegExp(`(${escapeRegExp(authorization_type)})\\s([A-Za-z0-9+.=]+)`);
             if(validator.test(header)){
@@ -28,19 +29,11 @@ function authMiddleware(authorization_type){
                             res.locals.authorization_type = authorization_type;
                             res.locals.token = token;
                             next();
-                        } else {
-                            res.status(401).json({ success: false, err: 'unauthorized', err_description: 'Unauthorized' });
-                        }
+                        } else error();
                     });
-                } else {
-                    res.status(401).json({ success: false, err: 'unauthorized', err_description: 'Unauthorized 3' });
-                }
-            } else {
-                res.status(401).json({ success: false, err: 'unauthorized', err_description: 'Unauthorized 2' });
-            }
-        } else {
-            res.status(401).json({ success: false, err: 'unauthorized', err_description: 'Unauthorized' });
-        }
+                } else error();
+            } else error();
+        } else error();
     }
 }
 
@@ -57,6 +50,14 @@ app.use('/', (req, res, next) => {
 })
 
 let router = express.Router()
+
+app.use(function(req, res, next){
+    if(!database.isConnected()){
+        res.sendFile(path.resolve('./errors/database_not_connected.html'));
+        return;
+    }
+    next();
+});
 
 require('./routes/oauth2')(router, database, authMiddleware)
 require('./routes/inventories')(router, database, authMiddleware)
