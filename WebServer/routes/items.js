@@ -75,10 +75,12 @@ module.exports = function(router, database, authMiddleware){
     });
 
     router.all('/item/:id', authMiddleware('Bearer'), (req, res) => {
+        let token = res.locals.token;
         let id = req.params.id;
         if(id && typeof id === 'string'){
+            const query = { _id: id };
             if(req.method === 'GET'){
-                database.fetchItem({ _id: id }, it => {
+                database.fetchItem(query, it => {
                     if(it != null){
                         it.id = it._id;
                         delete it._id;
@@ -118,15 +120,24 @@ module.exports = function(router, database, authMiddleware){
                         res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
                     }
                 });
-
-                res.status(500).json({ success: false, err: 'api_unavailable', err_description: 'API Server is unavailable' });
+            } else if(req.method === 'DELETE'){
+                if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.itm') >= 0){
+                    database.deleteItem(query, (success) => {
+                        if(success){
+                            res.status(200).json({ sucess: true, message: 'Item successfully deleted' });
+                        } else {
+                            res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not delete the item' });
+                        }
+                    });
+                } else {
+                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                }
+            } else {
+                res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
             }
         } else {
             res.status(400).json({ success: false, err: 'bad_request', err_description: 'Bad Request' });
-            return;
         }
-
-        res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
     });
 
     router.all('/items/', authMiddleware('Bearer'), requireScope([ 'fetch.*', 'fetch.itm' ]), (req, res) => {

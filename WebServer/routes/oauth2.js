@@ -1,5 +1,10 @@
 const { generateToken } = require('./../utils');
-const allowedScopes = ['fetch.*', 'fetch.inv', 'fetch.itm', 'fetch.cnt', 'scan', 'add.inv', 'add.cnt', 'add.itm', 'add.*', 'edit.*', 'edit.inv', 'edit.cnt', 'edit.itm', 'delete.*'];
+const allowedScopes = [
+    'fetch.*', 'fetch.inv', 'fetch.itm', 'fetch.cnt', 
+    'scan', 
+    'add.inv', 'add.cnt', 'add.itm', 'add.*', 
+    'edit.*', 'edit.inv', 'edit.cnt', 'edit.itm', 
+    'delete.*', 'delete.inv', 'delete.cnt', 'delete.itm' ];
 
 module.exports = function(router, database, authMiddleware){
 

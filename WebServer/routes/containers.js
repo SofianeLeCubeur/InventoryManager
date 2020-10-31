@@ -96,6 +96,18 @@ module.exports = function(router, database, authMiddleware){
                     }
                 });
 
+            } else if(req.method === 'DELETE'){
+                if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.cnt') >= 0){
+                    database.deleteContainer(query, (success) => {
+                        if(success){
+                            res.status(200).json({ success: true, message: 'Container successfully deleted' });
+                        } else {
+                            res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not delete the container' });
+                        }
+                    });
+                } else {
+                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                }
             } else {
                 res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
             }
