@@ -19,7 +19,9 @@ module.exports = function(router, database, authMiddleware){
             queryR['content'] = queryR['name'];
             delete queryR['name'];
         }
+        console.log('cnt', queryR);
         database.fetchContainers(query, 0, 0, docs => {
+            console.log(docs);
             if(docs != null){
                 let containers = docs.map(cnt => {
                     let location = cnt.locations.sort((a, b) => b-a)[0].location;
@@ -102,20 +104,19 @@ module.exports = function(router, database, authMiddleware){
         return out;
     }
 
-    router.all('/scan/:id', (req, res) => {
+    router.all('/scan/:id', authMiddleware('Bearer'), (req, res) => {
         if(req.method !== 'POST'){
             res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
             return;
         }
-
+        let token = res.locals.token;
         let id = req.params.id;
         let device = req.body.device;
+        let marker = req.body.marker && req.body.marker.lat && req.body.marker.lon ? req.body.marker : undefined;
         let location = req.body.location || req.ip;
         if(id && typeof id === 'string'){
             let type = parseInt(id.substring(0,2), 16);
-            database.pushScanLog({
-                device, location, timestamp: Date.now(), recipient: { id }
-            }, result => {
+            database.pushScanLog({ uid: token.uid, marker, device, location, timestamp: Date.now(), recipient: { id } }, result => {
                 if(result){
                     if(type == 0){
                         database.fetchInventory({ _id: id }, inv => {
@@ -155,14 +156,22 @@ module.exports = function(router, database, authMiddleware){
         }
     })
 
-    router.all('/search', (req, res) => {
+    router.all('/search', authMiddleware('Bearer'), (req, res) => {
         if(req.method !== 'POST'){
             res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
             return;
         }
 
         const body = req.body;
-        const query = prepareParams(body);
+        let query;
+        try {
+            query = prepareParams(body);
+        } catch(e){
+            console.error('Could not preapre query params:', body, '->', e);
+            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Bad filters' });
+            return;
+        }
+
         let results = null;
 
         function validate(){

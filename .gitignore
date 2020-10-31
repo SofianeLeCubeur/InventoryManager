@@ -116,5 +116,5 @@ fabric.properties
 config.json
 /src/com/github/sofiman/inventory/Test.java
 
-/Web API/node_modules/
+/WebServer/node_modules/
 test

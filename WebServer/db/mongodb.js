@@ -175,44 +175,27 @@ module.exports = class Database {
     }
 
     fetchItems(query, offset, length, callback){
-        const collection = this.db.collection('items');
-        collection.find(query)
-            .limit(length).skip(offset).toArray((err, docs) => {
-                if(!err){
-                    callback(docs);
-                } else {
-                    callback(null);
-                }
-            });
+        this.fetch('items', query, offset, length, callback);
     }
     
     fetchContainers(query, offset, length, callback){
-        const collection = this.db.collection('containers');
-        collection.find(query)
-            .limit(length).skip(offset).toArray((err, docs) => {
-                if(!err){
-                    callback(docs);
-                } else {
-                    callback(null);
-                }
-            });
+        this.fetch('containers', query, offset, length, callback);
     }    
 
     fetchInventories(query, offset, length, callback){
-        const collection = this.db.collection('inventories');
-        collection.find(query)
-            .limit(length).skip(offset).toArray((err, docs) => {
-                if(!err){
-                    callback(docs);
-                } else {
-                    callback(null);
-                }
-            });
+        this.fetch('inventories', query, offset, length, callback);
     }
 
     pushScanLog(log, callback){
+        const collection = this.db.collection('scan_log');
+        collection.insertOne(log, function(err, result) {
+            if(!err && callback){
+                callback(true);
+            } else {
+                callback(null);
+            }
+        });
         console.log('pushScanLog->', log);
-        callback(true);
     }
 
     storeToken(token, callback){
@@ -235,5 +218,17 @@ module.exports = class Database {
                 callback(null);
             }
         });
+    }
+
+    fetch(col, query, offset, length, callback){
+        const collection = this.db.collection(col);
+        collection.find(query)
+            .limit(length).skip(offset).toArray((err, docs) => {
+                if(!err){
+                    callback(docs);
+                } else {
+                    callback(null);
+                }
+            });
     }
 }
