@@ -91,35 +91,39 @@ module.exports = function(router, database, authMiddleware){
                 });
                 return;
             } else if(req.method === 'POST' || req.method === 'UPDATE'){
-                const body = req.body;
-                let mutation = mutate(modifiableProps, body);
+                if(token.scope.indexOf('edit.*') >= 0 || token.scope.indexOf('edit.itm') >= 0){
+                    const body = req.body;
+                    let mutation = mutate(modifiableProps, body);
 
-                if(mutation.length == 0){
-                    res.status(204).end();
-                    return;
-                }
-                console.log('mutation', mutation, 'from', body);
-
-                database.fetchItem(query, itm => {
-                    if(itm != null){
-                        let mutedItm = Object.assign({}, itm, mutation);
-                        if(itm != mutedItm){
-                            database.updateItem(query, mutedItm, cb => {
-                                if(cb){
-                                    mutedItm.id = mutedItm._id;
-                                    delete mutedItm._id;
-                                    res.status(200).json(mutedItm);
-                                } else {
-                                    res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not update the item' });
-                                }
-                            });
-                        } else {
-                            res.status(200).json(mutedItm);
-                        }
-                    } else {
-                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                    if(mutation.length == 0){
+                        res.status(204).end();
+                        return;
                     }
-                });
+                    console.log('mutation', mutation, 'from', body);
+
+                    database.fetchItem(query, itm => {
+                        if(itm != null){
+                            let mutedItm = Object.assign({}, itm, mutation);
+                            if(itm != mutedItm){
+                                database.updateItem(query, mutedItm, cb => {
+                                    if(cb){
+                                        mutedItm.id = mutedItm._id;
+                                        delete mutedItm._id;
+                                        res.status(200).json(mutedItm);
+                                    } else {
+                                        res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not update the item' });
+                                    }
+                                });
+                            } else {
+                                res.status(200).json(mutedItm);
+                            }
+                        } else {
+                            res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                        }
+                    });
+                } else {
+                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                }
             } else if(req.method === 'DELETE'){
                 if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.itm') >= 0){
                     database.deleteItem(query, (success) => {

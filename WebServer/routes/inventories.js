@@ -84,34 +84,38 @@ module.exports = function(router, database, authMiddleware){
                 });
                 return;
             } else if(req.method === 'POST' || req.method === 'UPDATE'){
-                const body = req.body;
-                let mutation = mutate(modifiableProps, body);
+                if(token.scope.indexOf('edit.*') >= 0 || token.scope.indexOf('edit.inv') >= 0){
+                    const body = req.body;
+                    let mutation = mutate(modifiableProps, body);
 
-                if(mutation.length == 0){
-                    res.status(204).end();
-                    return;
-                }
-
-                database.fetchInventory(query, inv => {
-                    if(inv != null){
-                        let mutedInv = Object.assign({}, inv, mutation);
-                        if(inv != mutedInv){
-                            database.updateInventory(query, mutedInv, cb => {
-                                if(cb){
-                                    mutedInv.id = mutedInv._id;
-                                    delete mutedInv._id;
-                                    res.status(200).json(mutedInv);
-                                } else {
-                                    res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not update the inventory' });
-                                }
-                            });
-                        } else {
-                            res.status(200).json(mutedInv);
-                        }
-                    } else {
-                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                    if(mutation.length == 0){
+                        res.status(204).end();
+                        return;
                     }
-                });
+
+                    database.fetchInventory(query, inv => {
+                        if(inv != null){
+                            let mutedInv = Object.assign({}, inv, mutation);
+                            if(inv != mutedInv){
+                                database.updateInventory(query, mutedInv, cb => {
+                                    if(cb){
+                                        mutedInv.id = mutedInv._id;
+                                        delete mutedInv._id;
+                                        res.status(200).json(mutedInv);
+                                    } else {
+                                        res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not update the inventory' });
+                                    }
+                                });
+                            } else {
+                                res.status(200).json(mutedInv);
+                            }
+                        } else {
+                            res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                        }
+                    });
+                } else {
+                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                }
             } else if(req.method === 'DELETE'){
                 if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.inv') >= 0){
                     database.deleteInventory(query, (success) => {
