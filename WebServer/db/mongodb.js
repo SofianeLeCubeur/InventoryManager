@@ -51,7 +51,7 @@ module.exports = class Database {
     }
 
     isConnected(){
-        return this.db !== null;
+        return !!this.db;
     }
 
     insertItem(item, callback){
