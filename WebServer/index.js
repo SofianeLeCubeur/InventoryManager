@@ -23,7 +23,7 @@ function authMiddleware(authorization_type){
             if(validator.test(header)){
                 const stk = header.substring(authorization_type.length+1);
                 if(validateAccessToken(stk)){
-                    database.getToken(stk, token => {
+                    database.fetchToken(stk, token => {
                         if(token && token.type === authorization_type){
                             res.locals.authorization_type = authorization_type;
                             res.locals.token = token;

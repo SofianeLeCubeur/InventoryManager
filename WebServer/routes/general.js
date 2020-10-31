@@ -19,9 +19,7 @@ module.exports = function(router, database, authMiddleware){
             queryR['content'] = queryR['name'];
             delete queryR['name'];
         }
-        console.log('cnt', queryR);
         database.fetchContainers(query, 0, 0, docs => {
-            console.log(docs);
             if(docs != null){
                 let containers = docs.map(cnt => {
                     let location = cnt.locations.sort((a, b) => b-a)[0].location;
@@ -230,4 +228,4 @@ module.exports = function(router, database, authMiddleware){
         }
     })
 
-};
+}

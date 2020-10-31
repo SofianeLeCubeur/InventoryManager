@@ -34,7 +34,16 @@ module.exports = class Database {
                             })
                         })
                         if(needed.length == 0) return;
-                        console.warn('[DB][MongoDB] Warning: Missing', needed.join(', '), 'collections!');
+                        console.warn('[DB][MongoDB] Warning: Missing', needed.join(', '), 'collections! Trying to rebuild...');
+                        needed.forEach(col => {
+                            this.db.createCollection(col, function(err, result) {
+                                if (err){
+                                    console.error('[DB][MongoDB] Could not create', col, ':', err);
+                                } else {
+                                    console.log('[DB][MongoDB] Collection', col, 'successfully created');
+                                }
+                            });
+                        });
                     }
                 }.bind(this))
             }
@@ -75,118 +84,23 @@ module.exports = class Database {
     }
 
     fetchItem(query, callback){
-        const collection = this.db.collection('items');
-        collection.findOne(query, function(err, result) {
-            if(!err && result && assertQueryMatch(query, result)){
-                callback(result);
-            } else {
-                callback(null);
-            }
-        });
-    }
-
-    pushItem(item, callback){
-        const id = generateId();
-        const collection = this.db.collection('items');
-        if(!item['icon']){
-            item['icon'] = item.name.substring(0,1).toUpperCase() + ':' + randomColor();
-        }
-        let itm = Object.assign({ _id: id, background: null, reference: '', serial_number: '', description: '', details: '', locations: [], tags: [], state: '' }, item);
-        collection.insertOne(itm, function(err, result) {
-            if(!err && result.ops[0]._id === id && callback){
-                callback(result.ops[0]);
-            } else {
-                callback(null);
-            }
-        });
+        this.findOne('items', query, callback);
     }
 
     fetchContainer(query, callback){
-        const collection = this.db.collection('containers');
-        collection.findOne(query, function(err, result) {
-            if(!err && result && assertQueryMatch(query, result)){
-                callback(result);
-            } else {
-                callback(null);
-            }
-        });
-    }
-    
-    updateContainer(query, cnt, callback){
-        const collection = this.db.collection('containers');
-        collection.updateOne(query, { $set: cnt }, function(err, result) {
-            if(!err){
-                callback(true);
-            } else {
-                callback(false);
-            }
-        });
-    }
-
-    pushContainer(container, callback){
-        const id = generateId();
-        const collection = this.db.collection('containers');
-        let cnt = Object.assign({ _id: id, state: '', details: '', locations: [], items: [] }, container);
-        collection.insertOne(cnt, function(err, result) {
-            if(!err && result.ops[0]._id === id && callback){
-                callback(result.ops[0]);
-            } else {
-                callback(null);
-            }
-        });
-    }
-
-    pushInventory(inventory, callback){
-        const id = generateId();
-        const collection = this.db.collection('inventories');
-        if(!inventory['icon']){
-            inventory['icon'] = inventory.name.substring(0,1).toUpperCase() + ':' + randomColor();
-        }
-        let inv = Object.assign({ _id: id, background: null, state: '', location: '', items: [], }, inventory);
-        collection.insertOne(inv, function(err, result) {
-            if(!err && result.ops[0]._id === id && callback){
-                callback(result.ops[0]);
-            } else {
-                callback(null);
-            }
-        });
+        this.findOne('containers', query, callback);
     }
 
     fetchInventory(query, callback){
-        const collection = this.db.collection('inventories');
-        collection.findOne(query, function(err, result) {
-            if(!err && result && assertQueryMatch(query, result)){
-                callback(result);
-            } else {
-                callback(null);
-            }
-        });
+        this.findOne('inventories', query, callback);
     }
-    
-    updateInventory(query, inv, callback){
-        const collection = this.db.collection('inventories');
-        collection.updateOne(query, { $set: inv }, function(err, result) {
-            if(!err){
-                callback(true);
-            } else {
-                callback(false);
-            }
-        });
+
+    fetchToken(token, callback){
+        this.findOne('tokens', { _id: token }, callback);
     }
 
     fetchItems(query, offset, length, callback){
         this.fetch('items', query, offset, length, callback);
-    }
-        
-    updateItem(query, item, callback){
-        const collection = this.db.collection('items');
-        collection.updateOne(query, { $set: item }, function(err, result) {
-            if(!err){
-                callback(true);
-            } else {
-                callback(false);
-            }
-        });
     }
 
     fetchContainers(query, offset, length, callback){
@@ -196,34 +110,77 @@ module.exports = class Database {
     fetchInventories(query, offset, length, callback){
         this.fetch('inventories', query, offset, length, callback);
     }
+    
+    updateInventory(query, inv, callback){
+        this.updateOne('inventories', query, inv, callback);
+    }
+
+    updateContainer(query, cnt, callback){
+        this.updateOne('containers', query, cnt, callback);
+    }
+
+    updateItem(query, item, callback){
+        this.updateOne('items', query, item, callback);
+    }
+
+    pushContainer(container, callback){
+        const id = generateId();
+        let cnt = Object.assign({ _id: id, state: '', details: '', locations: [], items: [] }, container);
+        this.insertOne('containers', cnt, (result, data) => result.ops[0]._id === id, callback);
+    }
+
+    pushInventory(inventory, callback){
+        const id = generateId();
+        if(!inventory['icon']){
+            inventory['icon'] = inventory.name.substring(0,1).toUpperCase() + ':' + randomColor();
+        }
+        let inv = Object.assign({ _id: id, background: null, state: '', location: '', items: [], }, inventory);
+        this.insertOne('inventories', inv, (result, data) => result.ops[0]._id === id, callback);
+    }
+    
+    pushItem(item, callback){
+        const id = generateId();
+        if(!item['icon']){
+            item['icon'] = item.name.substring(0,1).toUpperCase() + ':' + randomColor();
+        }
+        let itm = Object.assign({ _id: id, background: null, reference: '', serial_number: '', description: '', details: '', locations: [], tags: [], state: '' }, item);
+        this.insertOne('items', itm, (result, data) => result.ops[0]._id === id, callback);
+    }
 
     pushScanLog(log, callback){
-        const collection = this.db.collection('scan_log');
-        collection.insertOne(log, function(err, result) {
-            if(!err && callback){
-                callback(true);
-            } else {
-                callback(null);
-            }
-        });
-        console.log('pushScanLog->', log);
+        this.insertOne('scan_log', log, (result, data) => result.ops[0].uid === data.uid, callback);
     }
 
     storeToken(token, callback){
-        const collection = this.db.collection('tokens');
-        collection.insertOne({ _id: token.token, type: token.type, uid: token.uid, scope: token.scope }, function(err, result) {
-            if(!err && result.ops[0]._id === token.token && callback){
-                callback(true);
-            } else {
-                callback(null);
-            }
-        });
+        this.insertOne('tokens', { _id: token.token, type: token.type, uid: token.uid, scope: token.scope }, 
+            (result, data) => result.ops[0]._id === data.token, callback);
     }
 
-    getToken(token, callback){
-        const collection = this.db.collection('tokens');
-        collection.findOne({ _id: token }, function(err, result) {
-            if(!err && result){
+    deleteInventory(id, callback){
+        this.deleteOne('inventories', { _id: id }, callback);
+    }
+
+    deleteContainer(id, callback){
+        this.deleteOne('containers', { _id: id }, callback);
+    }
+
+    deleteItem(id, callback){
+        this.deleteOne('items', { _id: id }, callback);
+    }
+
+    /* Actions */
+    fetch(col, query, offset, length, callback){
+        const collection = this.db.collection(col);
+        collection.find(query)
+            .limit(length).skip(offset).toArray((err, docs) => {
+                callback(err ? null : docs);
+            });
+    }
+
+    findOne(col, query, callback){
+        const collection = this.db.collection(col);
+        collection.findOne(query, function(err, result) {
+            if(!err && result && assertQueryMatch(query, result)){
                 callback(result);
             } else {
                 callback(null);
@@ -231,15 +188,28 @@ module.exports = class Database {
         });
     }
 
-    fetch(col, query, offset, length, callback){
+    insertOne(col, data, validator, callback){
         const collection = this.db.collection(col);
-        collection.find(query)
-            .limit(length).skip(offset).toArray((err, docs) => {
-                if(!err){
-                    callback(docs);
-                } else {
-                    callback(null);
-                }
-            });
+        collection.insertOne(data, function(err, result) {
+            if(!err && validator(result, data) && callback){
+                callback(result.ops[0]);
+            } else {
+                callback(null);
+            }
+        });
+    }
+
+    updateOne(col, query, data, callback){
+        const collection = this.db.collection(col);
+        collection.updateOne(query, { $set: data }, function(err, result) {
+            callback(!err);
+        });
+    }
+
+    deleteOne(col, query, callback){
+        const collection = this.db.collection(col);
+        collection.deleteOne(query, function(err, result){
+            callback(!err);
+        })
     }
 }
