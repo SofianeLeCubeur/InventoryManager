@@ -27,5 +27,21 @@ module.exports = {
     randomColor(){
         let idx = Math.floor(Math.random() * colors.length);
         return colors[idx];
+    },
+    requireScope(scopes){
+        return function(req, res, next){
+            let token = res.locals.token;
+            if(token){
+                let contains = false;
+                scopes.forEach(scope => {
+                    contains = contains || token.scope.indexOf(scope) >= 0
+                });
+                if(contains){
+                    next();
+                    return;
+                }
+            }
+            res.status(403).json({ success: false, err: 'forbidden', err_description: 'Forbidden: missing scope in authorization' });
+        }
     }
 };

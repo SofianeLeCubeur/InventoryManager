@@ -1,4 +1,4 @@
-const { mutate } = require('./../utils');
+const { mutate, requireScope } = require('./../utils');
 
 module.exports = function(router, database, authMiddleware){
 
@@ -48,7 +48,7 @@ module.exports = function(router, database, authMiddleware){
         },
     };
 
-    router.post('/item', authMiddleware('Bearer'), (req, res) => {
+    router.post('/item', authMiddleware('Bearer'), requireScope([ 'add.*', 'add.itm' ]), (req, res) => {
         let body = req.body;
         let keys = Object.keys(req.body);
         let props = {}, p = 0;
@@ -91,7 +91,33 @@ module.exports = function(router, database, authMiddleware){
             } else if(req.method === 'POST' || req.method === 'UPDATE'){
                 const body = req.body;
                 let mutation = mutate(modifiableProps, body);
-                console.log('Mutation', mutation);
+
+                if(mutation.length == 0){
+                    res.status(204).end();
+                    return;
+                }
+                console.log('mutation', mutation, 'from', body);
+
+                database.fetchItem(query, itm => {
+                    if(itm != null){
+                        let mutedItm = Object.assign({}, itm, mutation);
+                        if(itm != mutedItm){
+                            database.updateItem(query, mutedItm, cb => {
+                                if(cb){
+                                    mutedItm.id = mutedItm._id;
+                                    delete mutedItm._id;
+                                    res.status(200).json(mutedItm);
+                                } else {
+                                    res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not update the item' });
+                                }
+                            });
+                        } else {
+                            res.status(200).json(mutedItm);
+                        }
+                    } else {
+                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                    }
+                });
 
                 res.status(500).json({ success: false, err: 'api_unavailable', err_description: 'API Server is unavailable' });
             }
@@ -103,7 +129,7 @@ module.exports = function(router, database, authMiddleware){
         res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
     });
 
-    router.all('/items/', authMiddleware('Bearer'), (req, res) => {
+    router.all('/items/', authMiddleware('Bearer'), requireScope([ 'fetch.*', 'fetch.itm' ]), (req, res) => {
         if(req.method !== 'POST'){
             res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
             return;

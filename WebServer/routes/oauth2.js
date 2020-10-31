@@ -1,14 +1,19 @@
 const { generateToken } = require('./../utils');
-const allowedScopes = ['fetch.*', 'scan', 'add.inv', 'add.*', 'edit.*', 'delete.*'];
+const allowedScopes = ['fetch.*', 'fetch.inv', 'fetch.itm', 'fetch.cnt', 'scan', 'add.inv', 'add.cnt', 'add.itm', 'add.*', 'edit.*', 'edit.inv', 'edit.cnt', 'edit.itm', 'delete.*'];
 
 module.exports = function(router, database, authMiddleware){
 
     function filterScopes(scope, allowedScopes){
-        let scopes = scope.matchAll(/([a-zA-Z0-9.*]+)\s?/g);
-        for(let scope in scopes){
-            console.log('->', scope);
+        let filteredScope = '';
+        let scopes = [...scope.matchAll(/([a-zA-Z0-9.*]+)\s?/g)];
+        console.log(scope, scopes);
+        for(let idx in scopes){
+            let sc = scopes[idx][1];
+            if(allowedScopes.indexOf(sc) >= 0){
+                filteredScope += ' ' + sc;
+            }
         }
-        return scope;
+        return filteredScope.substring(1);
     }
 
     router.all('/token', (req, res) => {

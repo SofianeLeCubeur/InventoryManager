@@ -1,4 +1,4 @@
-const { mutate } = require('./../utils');
+const { mutate, requireScope } = require('./../utils');
 
 module.exports = function(router, database, authMiddleware){
 
@@ -24,7 +24,7 @@ module.exports = function(router, database, authMiddleware){
         }
     };
 
-    router.post('/container', authMiddleware('Bearer'), (req, res) => {
+    router.post('/container', authMiddleware('Bearer'), requireScope([ 'add.*', 'add.cnt' ]), (req, res) => {
         let body = req.body;
         let keys = Object.keys(req.body);
         let props = {}, p = 0;
@@ -104,7 +104,7 @@ module.exports = function(router, database, authMiddleware){
         }
     });
 
-    router.all('/containers', authMiddleware('Bearer'), (req, res) => {
+    router.all('/containers', authMiddleware('Bearer'), requireScope([ 'fetch.*', 'fetch.cnt' ]), (req, res) => {
         if(req.method !== 'GET'){
             res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
             return;

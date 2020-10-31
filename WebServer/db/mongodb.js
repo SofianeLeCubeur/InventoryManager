@@ -177,7 +177,18 @@ module.exports = class Database {
     fetchItems(query, offset, length, callback){
         this.fetch('items', query, offset, length, callback);
     }
-    
+        
+    updateItem(query, item, callback){
+        const collection = this.db.collection('items');
+        collection.updateOne(query, { $set: item }, function(err, result) {
+            if(!err){
+                callback(true);
+            } else {
+                callback(false);
+            }
+        });
+    }
+
     fetchContainers(query, offset, length, callback){
         this.fetch('containers', query, offset, length, callback);
     }    
