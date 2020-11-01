@@ -51,6 +51,7 @@ module.exports = function(router, database, authMiddleware){
     });
 
     router.all('/container/:id', authMiddleware('Bearer'), (req, res) => {
+        let token = res.locals.token;
         let id = req.params.id;
         if(id && typeof id === 'string'){
             const query = { _id : id };
