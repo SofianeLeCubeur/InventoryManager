@@ -157,7 +157,7 @@ module.exports = class Database {
 
     storeToken(token, callback){
         this.insertOne('tokens', { _id: token.token, type: token.type, uid: token.uid, scope: token.scope }, 
-            (result, data) => result.ops[0]._id === data.token, callback);
+            (result, data) => result.ops[0]._id === token.token, callback);
     }
 
     deleteInventory(id, callback){

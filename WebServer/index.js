@@ -53,7 +53,7 @@ let router = express.Router()
 
 app.use(function(req, res, next){
     if(!database.isConnected()){
-        res.sendFile(path.resolve('./errors/database_not_connected.html'));
+        res.status(500).sendFile(path.resolve('./errors/database_not_connected.html'));
         return;
     }
     next();
