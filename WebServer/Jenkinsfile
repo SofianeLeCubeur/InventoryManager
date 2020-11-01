@@ -1,25 +1,18 @@
 pipeline {
-
     agent any
 
     stages {
-
         stage("build"){
-
             steps {
-                echo 'BUILDING'
+                sh 'docker build -t im-api-server .'
             }
-
         }
 
         stage("deploy"){
-
             steps {
                 echo 'DEPLOYING'
+                sh 'docker-compose up -d'
             }
-
         }
-
     }
-
 }
