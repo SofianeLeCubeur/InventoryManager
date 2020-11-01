@@ -4,15 +4,13 @@ pipeline {
     stages {
         stage("build"){
             steps {
-                docker.build 'im-api-server' 'WebServer/'
+                sh 'docker-compose build'
             }
         }
 
         stage("deploy"){
             steps {
-                dir('WebServer/'){
-                    sh './deploy.sh'
-                }
+                sh 'docker-compose up -d'
             }
         }
     }
