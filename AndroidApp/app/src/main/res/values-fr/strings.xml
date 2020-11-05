@@ -3,9 +3,9 @@
     <string name="app_name">InventoryManager</string>
     <string name="app_title">Inventory Manager</string>
     <string name="lang">Français</string>
-    <string name="slogan">An easy way to manage your items!</string>
+    <string name="slogan">Une façon simple de gérer vos affaires !</string>
     <string name="button_start">Commencer</string>
-    <string name="open_source">This project is open source and available at</string>
+    <string name="open_source">Cet projet est open source et disponible sur</string>
     <string name="button_next">Suivant</string>
     <string name="button_add">Ajouter des objets</string>
     <string name="button_offline_login">Connexion hors-ligne</string>
@@ -22,6 +22,7 @@
     <string name="login_page_username_desc">Utilisateur pour se connecter au serveur</string>
     <string name="login_page_password">Mot de passe</string>
     <string name="login_page_password_desc">Mot de passe pour se connecter au serveur</string>
+    <string name="login_page_password_confirm">Confirmer le mot de passe</string>
     <string name="login_page_registered_servers">Serveurs ajoutés:</string>
 
     <string name="home_page_server_state">Connecté à</string>
@@ -33,26 +34,26 @@
     <string name="explore_filters_title">Filtres</string>
     <string name="explore_filters_title_reduced">Filtres (%d)</string>
     <string name="explore_page_history">Historique</string>
-    <string name="explore_filters_instructions">Click on a filter to add it to the query (typing also works) then add a \';\' at the end of the filter to validate it</string>
+    <string name="explore_filters_instructions">Cliquer sur un filtre pour l\'ajouter à la recherche (vous pouvez également taper) puis ajoutez un \';\' pour le valider. Astuce: Utilisez $name pour rechercher avec un regex.</string>
     <string name="explore_filter_details">details:</string>
-    <string name="explore_filter_details_desc">Selects movables with the same details</string>
+    <string name="explore_filter_details_desc">Selectionnes les mêmes détails</string>
     <string name="explore_filter_desc">desc:</string>
-    <string name="explore_filter_desc_desc">Selects all descriptions starting with a query</string>
+    <string name="explore_filter_desc_desc">Selectionnes les descriptions commençant par votre recherche</string>
     <string name="explore_filter_state">state:</string>
-    <string name="explore_filter_state_desc">Selects all objects matching the state</string>
+    <string name="explore_filter_state_desc">Selectionnes les elements avec le même état</string>
     <string name="explore_filter_sn">sn:</string>
-    <string name="explore_filter_sn_desc">Selects all items matching the Serial Number</string>
+    <string name="explore_filter_sn_desc">Selectionnes les objets avec le meme numéro de série</string>
     <string name="explore_filter_ref">ref:</string>
-    <string name="explore_filter_ref_desc">Selects all items matching the Reference</string>
+    <string name="explore_filter_ref_desc">Selectionnes les objets avec la même référence</string>
     <string name="explore_filter_name">name:</string>
-    <string name="explore_filter_name_desc">Selects all objects matching the Name</string>
+    <string name="explore_filter_name_desc">Selectionnes les mêmes noms commençant par votre recherche</string>
     <string name="explore_filter_id">id:</string>
-    <string name="explore_filter_id_desc">Selects the object with that ID</string>
+    <string name="explore_filter_id_desc">Selectionnes les éléments avec le même identifiant</string>
     <string name="explore_no_result">Aucun résultat n\'as été trouvé:</string>
 
     <string name="scan_waiting_for_code">Scan en cours…</string>
     <string name="scan_fetching">Recherche…</string>
-    <string name="scan_not_found">Sorry but we could not find any object with this ID:</string>
+    <string name="scan_not_found">Désolé, nous n\'avons pu trouver aucun élément avec cet identifiant:</string>
     <string name="scan_permission_dialog_title">Permission requise</string>
     <string name="scan_permission_consent">Nous avons besoins de votre autorisation pour accéder à votre caméra</string>
     <string name="scan_history">Historique de Scans</string>
@@ -60,7 +61,8 @@
     <string name="scan_start_scanning">Scanner maintenant</string>
     <string name="scan_add_to_history">Ajouter à l\'historique</string>
     <string name="scan_added_to_history">Ajouté à l\'historique</string>
-    <string name="scan_history_selection_copied">L\'%s a été copié</string>
+    <string name="scan_history_selection_copied">%s a été copié</string>
+    <string name="scan_history_selection_one">objet</string>
     <string name="scan_state_desc">Recherche de codes</string>
 
     <string name="category_all">Tout</string>
@@ -75,6 +77,12 @@
     <string name="new_itm">Nouveau Objet</string>
     <string name="new_trk">Nouveau Tracker</string>
 
+    <string-array name="types">
+        <item>Inventaire</item>
+        <item>Contenaire</item>
+        <item>Objet</item>
+    </string-array>
+
     <string name="title_home">Accueil</string>
     <string name="title_explore">Explorer</string>
     <string name="title_settings">Paramètres</string>
@@ -82,7 +90,7 @@
 
     <string name="dialog_edit_server_name">Nom du Serveur</string>
     <string name="dialog_edit_server_address">Adresse du Serveur</string>
-    <string name="trademark">Created and designed by Sofiman with</string>
+    <string name="trademark">Créé et designé par Sofiman avec</string>
     <string name="settings_server_label">Serveurs</string>
     <string name="settings_servers_add">Ajouter un Serveur</string>
     <string name="settings_login_label">Options de connexion</string>
@@ -90,13 +98,13 @@
     <string name="settings_misc_label">Autre</string>
     <string name="settings_about_label">A propos</string>
     <string name="settings_login_autoconnect">Connexion automatique</string>
-    <string name="settings_login_autoconnect_desc">The app will try automatically to connect one by one to the registered servers (favorite first)</string>
+    <string name="settings_login_autoconnect_desc">L\'application essayera de se connecter aux serveurs enregistrés automatiquement (favoris en premier)</string>
     <string name="settings_login_autoconnect_info">La connexion automatique est désactivée</string>
     <string name="settings_scan_register_unknown">Garder les codes non valides</string>
-    <string name="settings_scan_register_unknown_desc">Codes that cannot be found in the database will be added to the history as well</string>
+    <string name="settings_scan_register_unknown_desc">Les codes non identifiés dans la base de données seront enregistrés dans l\'historique</string>
     <string name="settings_scan_clear_history">Supprimer l\'historique des scans</string>
     <string name="settings_scan_history_cleared">L\'historique des scans a été effacé!</string>
-    <string name="settings_device_as_tracker_desc">A Tracker is a device that updates the properties of all scanned objects, like object\'s locations or state.</string>
+    <string name="settings_device_as_tracker_desc">Un tracker est un appareil qui mettra automatiquement à jour les elements scannés comme par exemple la position ou l\'état d\'un objet.</string>
     <string name="settings_device_as_tracker">Utiliser cet appareil comme tracker</string>
     <string name="settings_language">Langue</string>
     <string name="settings_change_language">Changer la langue</string>
@@ -107,6 +115,7 @@
     <string name="settings_acknowledgements">Remerciments</string>
 
     <string name="full_data">Informations</string>
+    <string name="full_page_back">Retour</string>
     <string name="full_page_qr_code">QR Code</string>
     <string name="full_page_add">Ajouter un objet</string>
     <string name="full_page_update">Mettre à jour la position</string>
@@ -123,11 +132,11 @@
     <string name="full_page_error_container">Affichage du contenaire impossible: %s</string>
     <string name="login_page_no_connection">Connexion au serveur impossible: %s</string>
     <string name="full_page_error_query">Could not do query: %s</string>
-    <string name="full_page_location_point">Position</string>
+    <string name="full_page_location_point">La position</string>
     <string name="full_page_state">L\'Etat</string>
 
     <string name="no_result_apologies">Désolé</string>
-    <string name="content_copied">%s a été copié</string>
+    <string name="content_copied">%s copié</string>
     <string name="qr_code_instructions">Cliquez sur l\'ID pour le copier scannez et partagez ce QR Code!</string>
     <string name="search_items">Rechercher un objet</string>
     <string name="search_trackers">Rechercher un tracker</string>
@@ -142,6 +151,10 @@
     <string name="create_object_push_item">de l\'objet</string>
     <string name="create_object_items_added">Ajouté</string>
     <string name="create_object_items_explore">Explorer</string>
+    <string name="create_object_item_added">Objet ajouté</string>
+    <string name="create_object_scan_assignment">Selection %d sur %d</string>
+    <string name="create_object_extra_data">Données scannées (%d/%d)</string>
+    <string name="create_object_scanned_data">Pour utiliser les donnéess scannées, cliquez sur un champ puis cliquer sur les données scannées</string>
     <string name="input_field_placeholder">Contenu</string>
     <string name="action_placeholder">Action</string>
 
@@ -150,12 +163,15 @@
     <string name="dialog_cancel">Annuler</string>
     <string name="dialog_delete">Supprimer</string>
     <string name="dialog_accept">OK</string>
+    <string name="dialog_create">Créer</string>
     <string name="dialog_confirm">Voulez-vous %s?</string>
     <string name="dialog_confirm_delete">supprimer</string>
     <string name="dialog_confirm_clear">effacer</string>
     <string name="dialog_clear">Effacer</string>
     <string name="dialog_clear_scan">Vous allez effacer l\'historique des scans (%d scans)</string>
     <string name="dialog_delete_confirmation">Vous allez supprimer %s</string>
+    <string name="dialog_create_title">Créer comme</string>
+    <string name="dialog_create_title_all">Créer les elements séléctionnés comme</string>
     <string name="dialog_edit_tracker">Propriétés du tracker</string>
     <string name="dialog_edit_server">Modification de %s </string>
     <string name="dialog_edit_tracker_name">Nom du Tracker</string>
@@ -167,9 +183,21 @@
     <string name="dialog_edit_location_locate">Localiser</string>
     <string name="dialog_edit_location_granted">Vous pouvez maintenant utiliser la fonction localiser</string>
 
+    <string name="privacy_join_title">Commencez par ajouter des serveurs!</string>
+    <string name="privacy_join_desc">Inventory Manager est basé sur un système de serveurs publiques and privés. Nous proposons une solution par défaut: un serveur publique basique pour les utilisateurs qui souhaitent utiliser l\'application simplement.</string>
+    <string name="privacy_join_button">Rejoindre le serveur publique</string>
+    <string name="privacy_policy_title">Politique de Confidentialité</string>
+    <string name="privacy_skip">Passer</string>
+    <string name="privacy_join_dialog">Rejoindre</string>
+    <string name="privacy_join_dialog_desc">Pour rejoindre le serveur publique vous avez besoin d\'un compte (identifiant et mot de passe)</string>
+    <string name="privacy_join_dialog_register">S\'inscrire</string>
+    <string name="privacy_join_dialog_login">Connexion</string>
+
     <string name="date_today_at">Aujourd\'hui à %s</string>
+    <string name="date_yesterday_at">Hier à %s</string>
     <string name="date_ago">Il ya %d jours à %s</string>
 
     <string name="acknowledgements_thanks">Merci d\'utiliser mon application ! Merci à tous ceux qui m\'ont soutenu et aidé à travers son developpement. Si vous souhaitez m\'aider davantage vous pouvez me contactez via GitHub. (Serveurs publiques et Illustrations)</string>
+    <string name="create_object_selection_state">Création %d sur %d</string>
 
 </resources>

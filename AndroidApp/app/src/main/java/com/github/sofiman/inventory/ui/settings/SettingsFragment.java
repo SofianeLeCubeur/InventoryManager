@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -29,6 +30,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.impl.HistoryDataModel;
+import com.github.sofiman.inventory.impl.RequestError;
+import com.github.sofiman.inventory.ui.dialogs.ConfirmDialog;
 import com.github.sofiman.inventory.ui.dialogs.DoubleEditDialog;
 import com.github.sofiman.inventory.ui.login.LoginActivity;
 import com.github.sofiman.inventory.R;
@@ -57,11 +60,21 @@ public class SettingsFragment extends Fragment {
 
     private ServerListAdapter serverListAdapter;
     private Animations.Debouncer debouncer = new Animations.Debouncer();
+    private SharedPreferences sharedPreferences;
+    private boolean invalidateIntro;
+    private boolean autoconnect;
+    private boolean registerUnknownCodes;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
+        return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View root, @Nullable Bundle savedInstanceState) {
         ConstraintLayout layout = root.findViewById(R.id.settings_header);
         LayoutHelper.addStatusBarOffset(getContext(), layout);
 
@@ -73,18 +86,34 @@ public class SettingsFragment extends Fragment {
         serverListAdapter = new ServerListAdapter(getContext(), Fetcher.getInstance().getServerList());
         recyclerView.setAdapter(serverListAdapter);
 
-        serverListAdapter.setListeners(this::edit, this::deleteServer, data -> debouncer.debounce("save_servers", this::saveServers, 1, TimeUnit.SECONDS));
+        serverListAdapter.setListeners(this::edit, this::deleteServer, data -> debouncer.debounce("save_servers", () -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            saveServers(editor);
+            editor.commit();
+        }, 1, TimeUnit.SECONDS));
 
         ImageView button = root.findViewById(R.id.settings_register);
         button.setOnClickListener(view -> openLoginActivity());
 
         SwitchMaterial autoConnectSwitch = root.findViewById(R.id.settings_login_autoconnect);
-        autoConnectSwitch.setChecked(isAutoconnectEnabled());
-        autoConnectSwitch.setOnCheckedChangeListener((compoundButton, b) -> debouncer.debounce("auto_connect", () -> setAutoconnect(b), 750, TimeUnit.MILLISECONDS));
+        autoconnect = isAutoconnectEnabled();
+        autoConnectSwitch.setChecked(autoconnect);
+        autoConnectSwitch.setOnCheckedChangeListener((compoundButton, b) -> debouncer.debounce("auto_connect", () -> {
+            autoconnect = b;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            setAutoconnect(editor, b);
+            editor.commit();
+        }, 750, TimeUnit.MILLISECONDS));
 
         SwitchMaterial registerUnknownCodesSwitch = root.findViewById(R.id.settings_scan_register_unknown);
-        registerUnknownCodesSwitch.setChecked(canRegisterUnknownCodes());
-        registerUnknownCodesSwitch.setOnCheckedChangeListener((compoundButton, b) -> debouncer.debounce("register_unknown_codes", () -> setRegisterUnknownCodes(b), 750, TimeUnit.MILLISECONDS));
+        registerUnknownCodes = canRegisterUnknownCodes();
+        registerUnknownCodesSwitch.setChecked(registerUnknownCodes);
+        registerUnknownCodesSwitch.setOnCheckedChangeListener((compoundButton, b) -> debouncer.debounce("register_unknown_codes", () -> {
+            registerUnknownCodes = b;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            setRegisterUnknownCodes(editor, b);
+            editor.commit();
+        }, 750, TimeUnit.MILLISECONDS));
 
         ConstraintLayout clearScanHistory = root.findViewById(R.id.settings_clear_scan_history);
         clearScanHistory.setOnClickListener(view -> clearScanLog());
@@ -96,59 +125,49 @@ public class SettingsFragment extends Fragment {
         SwitchMaterial useDeviceAsTracker = root.findViewById(R.id.settings_scan_as_tracker);
         useDeviceAsTracker.setChecked(isScanAsTrackerEnabled());
         useDeviceAsTracker.setOnCheckedChangeListener((compoundButton, b) -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
             if (b) {
                 Animations.expand(trackerDetails);
                 trackerEdit.setEnabled(true);
-                debouncer.debounce("toggle_device_as_tracker", () -> {
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean("scanning_as_tracker", true);
-                    editor.apply();
-                }, 750, TimeUnit.MILLISECONDS);
+                debouncer.debounce("toggle_device_as_tracker", () -> setScanningAsTracker(editor, true), 750, TimeUnit.MILLISECONDS);
             } else {
                 Animations.collapse(trackerDetails);
                 trackerEdit.setEnabled(false);
-                debouncer.debounce("toggle_device_as_tracker", () -> {
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean("scanning_as_tracker", false);
-                    editor.apply();
-                }, 750, TimeUnit.MILLISECONDS);
+                debouncer.debounce("toggle_device_as_tracker", () -> setScanningAsTracker(editor, false), 750, TimeUnit.MILLISECONDS);
             }
         });
         trackerEdit.setOnClickListener(view -> {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
             String name = sharedPreferences.getString("scan_tracker_name", HistoryDataModel.getDeviceName());
             String location = sharedPreferences.getString("scan_tracker_location", "");
             editTracker(name, location, trackerName::setText);
         });
         if (useDeviceAsTracker.isChecked()) {
             trackerDetails.setVisibility(View.VISIBLE);
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
             trackerName.setText(sharedPreferences.getString("scan_tracker_name", HistoryDataModel.getDeviceName()));
         }
 
         root.findViewById(R.id.settings_change_lang).setOnClickListener(v -> openSwitchLocale());
 
         root.findViewById(R.id.settings_intro).setOnClickListener(v -> {
-            invalidateIntro();
+            invalidateIntro = true;
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            invalidateIntro(editor);
+            editor.commit();
             Toast.makeText(getContext(), R.string.settings_intro_info, Toast.LENGTH_SHORT).show();
         });
         root.findViewById(R.id.settings_acknowledgements).setOnClickListener(v -> startActivity(new Intent(getContext(), Acknowledgements.class)));
-
-        return root;
     }
 
     @Override
     public void onDetach() {
-        saveServers();
-        View root = getView();
-        if (root != null) {
-            SwitchMaterial autoConnectSwitch = root.findViewById(R.id.settings_login_autoconnect);
-            setAutoconnect(autoConnectSwitch.isChecked());
-            SwitchMaterial registerUnknownCodesSwitch = root.findViewById(R.id.settings_scan_register_unknown);
-            setRegisterUnknownCodes(registerUnknownCodesSwitch.isChecked());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        saveServers(editor);
+        setAutoconnect(editor, autoconnect);
+        setRegisterUnknownCodes(editor, registerUnknownCodes);
+        if (invalidateIntro) {
+            invalidateIntro(editor);
         }
+        editor.apply();
         super.onDetach();
     }
 
@@ -163,10 +182,14 @@ public class SettingsFragment extends Fragment {
 
         dialog.setButtons(getString(R.string.dialog_save), (dialogInterface, i) -> {
             final String serverName = dialog.getFirstField().getText().toString().trim();
-            if (!serverName.isEmpty()) {
+            final String serverIp = dialog.getSecondField().getText().toString().trim();
+            if (!serverName.isEmpty() && !serverIp.isEmpty()) {
                 server.setName(serverName);
+                server.setEndpoint(serverIp + (serverIp.endsWith("/") ? "" : "/"));
                 serverListAdapter.notifyItemChanged(serverListAdapter.getServers().indexOf(store));
-                saveServers();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                saveServers(editor);
+                editor.apply();
                 dialogInterface.dismiss();
             }
         }, getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE);
@@ -199,42 +222,54 @@ public class SettingsFragment extends Fragment {
     }
 
     private void deleteServer(Pair<Server, Pair<String, String>> store) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         final Server server = store.first;
-        showConfirmDialog(getString(R.string.dialog_confirm, getString(R.string.dialog_confirm_delete)),
+        new ConfirmDialog(getContext(), getLayoutInflater(), getString(R.string.dialog_confirm, getString(R.string.dialog_confirm_delete)),
                 getString(R.string.dialog_delete_confirmation, server.getName()), getString(R.string.dialog_delete), () -> {
-                    serverListAdapter.notifyItemRemoved(serverListAdapter.getServers().indexOf(store));
-                    serverListAdapter.getServers().remove(store);
-                    saveServers();
-                    if (serverListAdapter.getServers().size() <= 0) {
-                        openLoginActivity();
-                    }
-                });
+
+            final Fetcher fetcher = Fetcher.getInstance();
+            serverListAdapter.notifyItemRemoved(serverListAdapter.getServers().indexOf(store));
+            serverListAdapter.getServers().remove(store);
+            fetcher.setServerList(serverListAdapter.getServers());
+            Pair<Server, Pair<String, String>> next = fetcher.getServerList().get(0);
+            if(store.first.isDefaultServer()){
+                next.first.setAsDefaultServer(true);
+            }
+            saveServers(editor);
+            editor.apply();
+            if (fetcher.getCurrentServer() == server) {
+                try {
+                    fetcher.init(next.first);
+                    fetcher.login(next.second.first, next.second.second, new Callback<RequestError>() {
+                        @Override
+                        public void run(RequestError data) {
+                            if(data == null){
+                                Toast.makeText(getContext(), getString(R.string.home_page_server_state) + " " + next.first.getName(), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getContext(), getString(R.string.login_page_no_connection, data.toString()), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            if (serverListAdapter.getServers().size() <= 0) {
+                openLoginActivity();
+            }
+        });
     }
 
     private void clearScanLog() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         int count = sharedPreferences.getStringSet("scan_log", new HashSet<>()).size();
-        showConfirmDialog(getString(R.string.dialog_confirm, getString(R.string.dialog_confirm_clear)),
+        new ConfirmDialog(getContext(), getLayoutInflater(), getString(R.string.dialog_confirm, getString(R.string.dialog_confirm_clear)),
                 getString(R.string.dialog_clear_scan, count), getString(R.string.dialog_clear), () -> {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove("scan_log");
-                    editor.apply();
-                    Toast.makeText(getContext(), R.string.settings_scan_history_cleared, Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void showConfirmDialog(String title, String message, String positiveButton, Runnable deleteCallback) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext(), R.style.ThemeOverlay_InventoryManager_Dialog)
-                .setTitle(title).setMessage(message)
-                .setPositiveButton(positiveButton, (dialogInterface, i) -> {
-                    deleteCallback.run();
-                    dialogInterface.dismiss();
-                })
-                .setNegativeButton(getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE).create();
-
-        alertDialog.setOnShowListener(dialogInterface -> alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getContext().getColor(R.color.colorAccent)));
-
-        alertDialog.show();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove("scan_log");
+            editor.apply();
+            Toast.makeText(getContext(), R.string.settings_scan_history_cleared, Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void openLoginActivity() {
@@ -244,10 +279,9 @@ public class SettingsFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void saveServers() {
+    private void saveServers(SharedPreferences.Editor editor) {
         System.out.println("Saving servers now");
         List<Pair<Server, Pair<String, String>>> serverList = serverListAdapter.getServers();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         Set<String> servers = new HashSet<>();
 
         JsonObject item;
@@ -262,48 +296,40 @@ public class SettingsFragment extends Fragment {
             servers.add(item.toString());
         }
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putStringSet("servers", servers);
-        editor.apply();
         Fetcher.getInstance().setServerList(serverList);
     }
 
-    private void setAutoconnect(boolean autoconnect) {
+    private void setAutoconnect(SharedPreferences.Editor editor, boolean autoconnect) {
         System.out.println("Saving autoconnect state now");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("autoconnect", autoconnect);
-        editor.apply();
     }
 
     private boolean isAutoconnectEnabled() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         return sharedPreferences.getBoolean("autoconnect", true);
     }
 
     private boolean isScanAsTrackerEnabled() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         return sharedPreferences.getBoolean("scanning_as_tracker", true);
     }
 
-    private void setRegisterUnknownCodes(boolean registerUnknownCodes) {
+    private void setRegisterUnknownCodes(SharedPreferences.Editor editor, boolean registerUnknownCodes) {
         System.out.println("Saving registerUnknownCodes state now");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("register_unknown_codes", registerUnknownCodes);
-        editor.apply();
     }
 
     private boolean canRegisterUnknownCodes() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         return sharedPreferences.getBoolean("register_unknown_codes", false);
     }
 
-    private void invalidateIntro(){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    private void invalidateIntro(SharedPreferences.Editor editor) {
+        System.out.println("Saving intro state now");
         editor.putBoolean("iintro", false);
-        editor.apply();
+    }
+
+    private void setScanningAsTracker(SharedPreferences.Editor editor, boolean scanningAsTracker) {
+        editor.putBoolean("scanning_as_tracker", scanningAsTracker);
+        editor.commit();
     }
 
     private void openSwitchLocale() {
@@ -317,7 +343,7 @@ public class SettingsFragment extends Fragment {
             }
             Locale locale = new Locale(localString);
             localeMap.put(locale, locale.getDisplayLanguage() + " ("
-                    + localeList[i]+ ")");
+                    + localeList[i] + ")");
         }
 
         List<String> values = new ArrayList<>(localeMap.values());
@@ -344,12 +370,12 @@ public class SettingsFragment extends Fragment {
         dialog.show();
     }
 
-    private void setLocale(Locale locale){
+    private void setLocale(Locale locale) {
         Resources resources = getResources();
         Configuration configuration = resources.getConfiguration();
         DisplayMetrics displayMetrics = resources.getDisplayMetrics();
         configuration.setLocale(locale);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N){
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
             getContext().createConfigurationContext(configuration);
         } else {
             resources.updateConfiguration(configuration, displayMetrics);

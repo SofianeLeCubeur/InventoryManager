@@ -4,6 +4,7 @@
     android:layout_height="match_parent" android:orientation="vertical">
 
     <TextView
+        android:id="@+id/login_server_action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -13,6 +14,7 @@
         android:textStyle="bold" />
 
     <LinearLayout
+        android:id="@+id/login_server_field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
@@ -88,6 +90,38 @@
 
         <EditText
             android:id="@+id/login_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_box"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="14dp"
+            android:hint="@string/login_page_password_desc"
+            android:textColor="@color/foreground"
+            android:textSize="14sp"
+            android:autofillHints="password"
+            android:inputType="textPassword|textNoSuggestions" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/login_confirm_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="@string/login_page_password_confirm"
+            android:textColor="@color/foreground"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/login_password_confirm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/white_box"

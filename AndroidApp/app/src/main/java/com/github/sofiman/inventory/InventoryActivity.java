@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Pair;
@@ -34,30 +33,21 @@ import com.github.sofiman.inventory.api.Tracker;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.impl.APIResponse;
-import com.github.sofiman.inventory.model.ItemCompactListAdapter;
 import com.github.sofiman.inventory.model.ItemListAdapter;
 import com.github.sofiman.inventory.model.TrackerListAdapter;
-import com.github.sofiman.inventory.ui.components.ItemCompactComponent;
 import com.github.sofiman.inventory.ui.components.ItemComponent;
 import com.github.sofiman.inventory.ui.dialogs.QrCodeGeneratorDialog;
-import com.github.sofiman.inventory.ui.dialogs.SelectiveAddDialog;
 import com.github.sofiman.inventory.utils.IntentBuilder;
-import com.github.sofiman.inventory.utils.StringUtils;
 import com.github.sofiman.inventory.utils.transform.BitmapBorderTransformation;
 import com.github.sofiman.inventory.api.ID;
 import com.github.sofiman.inventory.utils.LayoutHelper;
 import com.github.sofiman.inventory.utils.transform.MaskTransformation;
 import com.github.sofiman.inventory.utils.transform.PaletteBitmapTransformation;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.internal.LinkedTreeMap;
 import com.google.zxing.BarcodeFormat;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -72,8 +62,8 @@ public class InventoryActivity extends AppCompatActivity {
             new Tracker("Discharge bay conveyor belt", "", ""),
             new Tracker("Charge bay conveyor belt", "", ""));
 
-    private ShimmerFrameLayout trackerShimmer;
-    private RelativeLayout trackersLayout;
+    //private ShimmerFrameLayout trackerShimmer;
+    //private RelativeLayout trackersLayout;
 
     private ShimmerFrameLayout itemShimmer;
     private RelativeLayout itemsLayout;
@@ -120,7 +110,7 @@ public class InventoryActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 itemsNotLoaded();
-                trackersNotLoaded();
+                //trackersNotLoaded();
                 contentNotLoaded();
                 Fetcher.getInstance().fetchInventory(inventoryId, new APIResponse<Inventory>() {
                     @Override
@@ -146,10 +136,10 @@ public class InventoryActivity extends AppCompatActivity {
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) dummyHeader.getLayoutParams();
         params.setMargins(0, LayoutHelper.getStatusBarHeight(this), 0, 0);
 
-        trackersLayout = findViewById(R.id.inventory_full_trackers_layout);
+        /*trackersLayout = findViewById(R.id.inventory_full_trackers_layout);
         trackerShimmer = findViewById(R.id.inventory_full_tracker_shimmer);
         final RecyclerView trackers = findViewById(R.id.inventory_full_trackers);
-        trackers.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        trackers.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));*/
 
         itemsLayout = findViewById(R.id.inventory_full_items_layout);
         itemShimmer = findViewById(R.id.inventory_full_item_shimmer);
@@ -159,13 +149,13 @@ public class InventoryActivity extends AppCompatActivity {
         stateShimmer = findViewById(R.id.inventory_full_state_shimmer);
         locationShimmer = findViewById(R.id.inventory_full_location_shimmer);
 
-        findViewById(R.id.inventory_full_assign_tracker).setOnClickListener(new View.OnClickListener() {
+        /*findViewById(R.id.inventory_full_assign_tracker).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 clicked++;
                 setNotification("You clicked this " + clicked + " times!", view1 -> hideNotification());
             }
-        });
+        });*/
 
         Fetcher.getInstance().fetchInventory(inventoryId, new APIResponse<Inventory>() {
             @Override
@@ -241,7 +231,7 @@ public class InventoryActivity extends AppCompatActivity {
         final int defaultColor = getColor(R.color.iconAccent),
                 glass = getColor(R.color.glass);
         String url = inventory.getBackground();
-        if(url == null || url.length() == 0){
+        if (url == null || url.length() == 0) {
             url = inventory.getIcon();
         }
         PaletteBitmapTransformation transform = new PaletteBitmapTransformation();
@@ -266,7 +256,6 @@ public class InventoryActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Exception e) {
-
                     }
                 });
     }
@@ -307,7 +296,7 @@ public class InventoryActivity extends AppCompatActivity {
                 bg.setImageTintMode(PorterDuff.Mode.SRC_OVER);
                 ImageView back = findViewById(R.id.inventory_full_back);
                 back.setImageTintList(ColorStateList.valueOf(color));
-            } catch (NullPointerException ignored){
+            } catch (NullPointerException ignored) {
             }
         }
 
@@ -315,9 +304,9 @@ public class InventoryActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivityForResult(new IntentBuilder(InventoryActivity.this, CreateObjectActivity.class)
-                    .icon(inventoryIcon).background(inventory.getBackground())
+                        .icon(inventoryIcon).background(inventory.getBackground())
                         .scope("update").type("inventory").blueprint(inventory)
-                    .build(), 0);
+                        .build(), 0);
             }
         });
 
@@ -329,7 +318,7 @@ public class InventoryActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 0 && resultCode == 1) {
             itemsNotLoaded();
-            trackersNotLoaded();
+            //trackersNotLoaded();
             contentNotLoaded();
             Fetcher.getInstance().fetchInventory(inventory.getId(), new APIResponse<Inventory>() {
                 @Override
@@ -385,12 +374,12 @@ public class InventoryActivity extends AppCompatActivity {
                         getString(R.string.full_page_error_items, error.toString()), Toast.LENGTH_LONG).show());
             }
         });
-        final RecyclerView trackers = findViewById(R.id.inventory_full_trackers);
+        /*final RecyclerView trackers = findViewById(R.id.inventory_full_trackers);
         trackers.setAdapter(new TrackerListAdapter(this, this.trackers));
-        trackersLoaded(); // TODO: Loading the trackers
+        trackersLoaded(); // TODO: Loading the trackers*/
     }
 
-    private void trackersLoaded() {
+    /*private void trackersLoaded() {
         trackerShimmer.setVisibility(View.GONE);
         trackersLayout.setVisibility(View.VISIBLE);
     }
@@ -398,7 +387,7 @@ public class InventoryActivity extends AppCompatActivity {
     private void trackersNotLoaded() {
         trackerShimmer.setVisibility(View.VISIBLE);
         trackersLayout.setVisibility(View.GONE);
-    }
+    }*/
 
     private void itemsLoaded() {
         itemShimmer.setVisibility(View.GONE);

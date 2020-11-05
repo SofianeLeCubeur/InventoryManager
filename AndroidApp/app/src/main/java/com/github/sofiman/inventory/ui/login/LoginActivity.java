@@ -1,7 +1,5 @@
 package com.github.sofiman.inventory.ui.login;
 
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.preference.PreferenceManager;
@@ -16,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.sofiman.inventory.ui.home.HomeActivity;
-import com.github.sofiman.inventory.IntroActivity;
+import com.github.sofiman.inventory.ui.intro.IntroActivity;
 import com.github.sofiman.inventory.R;
 import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
@@ -47,8 +45,12 @@ public class LoginActivity extends AppCompatActivity {
 
         loadSettings();
 
-        boolean embed = getIntent().getBooleanExtra("embed", false);
-        autoconnect = this.autoconnect && getIntent().getBooleanExtra("autoconnect", true);
+        final Intent intent = getIntent();
+        boolean embed = intent.getBooleanExtra("embed", false);
+        String serverIp = intent.getStringExtra("server");
+        boolean confirm = intent.getBooleanExtra("confirm_password", false);
+        autoconnect = this.autoconnect && intent.getBooleanExtra("autoconnect", true);
+        int action = intent.getIntExtra("action", 0);
 
         final ConstraintLayout layout = findViewById(R.id.login_layout);
         LayoutHelper.addStatusBarOffset(this, layout);
@@ -64,36 +66,26 @@ public class LoginActivity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.indicator);
         ViewPagerAdapter adapter = new ViewPagerAdapter(this);
 
-        if(serverList != null && serverList.size() > 0 && !embed){
+        if (serverList != null && serverList.size() > 0 && !embed) {
             adapter.addFragment(new ServerListFragment(serverList, loadingLayout));
         }
 
-        adapter.addFragment(new AddServerFragment(loadingLayout, embed));
+        adapter.addFragment(new AddServerFragment(loadingLayout, embed, serverIp, confirm, action));
 
         pager.setAdapter(adapter);
-        TabLayoutMediator mediator = new TabLayoutMediator(tabLayout, pager, new TabLayoutMediator.TabConfigurationStrategy() {
-            @Override
-            public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-                tab.setTabLabelVisibility(TabLayout.TAB_LABEL_VISIBILITY_UNLABELED);
-            }
-        });
+        TabLayoutMediator mediator = new TabLayoutMediator(tabLayout, pager, (tab, position) -> tab.setTabLabelVisibility(TabLayout.TAB_LABEL_VISIBILITY_UNLABELED));
         mediator.attach();
 
-        if(embed){
+        if (embed) {
             ImageView back = findViewById(R.id.login_back);
             back.setVisibility(View.VISIBLE);
-            back.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    supportFinishAfterTransition();
-                }
-            });
+            back.setOnClickListener(view -> supportFinishAfterTransition());
             tabLayout.setVisibility(View.INVISIBLE);
         }
 
         if (autoconnect) {
             autoConnect();
-        } else if(!embed){
+        } else if (!embed) {
             TextView info = findViewById(R.id.login_info);
             info.setText(R.string.settings_login_autoconnect_info);
         }
@@ -119,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
     private void loadSettings() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         System.out.println("Showing intro: " + !sharedPreferences.contains("iintro"));
-        if(!sharedPreferences.contains("iintro")){
+        if (!sharedPreferences.contains("iintro") || !sharedPreferences.getBoolean("iintro", false)) {
             startActivity(new Intent(this, IntroActivity.class));
             finish();
             return;
@@ -170,11 +162,10 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
         Pair<Server, Pair<String, String>> first = list.get(idx);
-        login(first.first, first.second.first, first.second.second, new Callback<RequestError>() {
-            @Override
-            public void run(RequestError error) {
-                connect(list, idx + 1);
-            }
-        });
+        try {
+            login(first.first, first.second.first, first.second.second, error -> connect(list, idx + 1));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

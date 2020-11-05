@@ -220,6 +220,7 @@ public class HomeFragment extends Fragment {
     private void changeServer(Pair<Server, Pair<String, String>> server){
         contentReset.run();
         try {
+            System.out.println("Trying to connect to " + server.first);
             serverName.setText(server.first.getName());
             Fetcher fetcher = Fetcher.getInstance();
             fetcher.init(server.first);

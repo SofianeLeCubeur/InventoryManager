@@ -11,6 +11,7 @@ import com.github.sofiman.inventory.api.Item;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class IntentBuilder {
 
@@ -18,6 +19,10 @@ public class IntentBuilder {
 
     public IntentBuilder(Context context, Class<?> clazz){
         this.intent = new Intent(context, clazz);
+    }
+
+    public IntentBuilder(){
+        this.intent = new Intent();
     }
 
     public IntentBuilder icon(String icon){
@@ -40,6 +45,13 @@ public class IntentBuilder {
 
     public IntentBuilder type(String type){
         this.intent.putExtra("type", type);
+
+        return this;
+    }
+
+    public IntentBuilder extra(List<String> extra, int idx){
+        this.intent.putStringArrayListExtra("extra", new ArrayList<>(extra));
+        this.intent.putExtra("extraIdx", idx);
 
         return this;
     }
@@ -81,6 +93,28 @@ public class IntentBuilder {
         intent.putParcelableArrayListExtra("locations", new ArrayList<>(item.getLocations()));
         intent.putExtra("object_id", item.getId());
 
+        return this;
+    }
+
+    public IntentBuilder item(Item callback) {
+        intent.putExtra("ITEM_ID", callback.getId());
+        intent.putExtra("ITEM_NAME", callback.getName());
+        intent.putExtra("ITEM_ICON", callback.getIcon());
+
+        return this;
+    }
+
+    public IntentBuilder inventory(Inventory callback) {
+        intent.putExtra("INVENTORY_ID", callback.getId());
+        intent.putExtra("INVENTORY_NAME", callback.getName());
+        intent.putExtra("INVENTORY_ICON", callback.getIcon());
+        return this;
+    }
+
+    public IntentBuilder container(Container callback) {
+        intent.putExtra("CONTAINER_ID", callback.getRawId());
+        intent.putExtra("CONTAINER_NAME", callback.getContent());
+        intent.putExtra("CONTAINER_LOCATION", callback.getLocation());
         return this;
     }
 

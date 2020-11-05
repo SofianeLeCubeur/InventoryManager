@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
@@ -31,13 +32,18 @@ import java.util.Set;
 public class AddServerFragment extends Fragment {
 
     private final ConstraintLayout loadingLayout;
-    private final boolean embed;
+    private final boolean embed, confirmPassword;
+    private final String serverIp;
+    private final @StringRes int action;
     private TextView username;
     private TextView password;
 
-    public AddServerFragment(ConstraintLayout loadingLayout, boolean embed){
+    public AddServerFragment(ConstraintLayout loadingLayout, boolean embed, String serverIp, boolean confirmPassword, @StringRes int action){
         this.loadingLayout = loadingLayout;
         this.embed = embed;
+        this.serverIp = serverIp;
+        this.confirmPassword = confirmPassword;
+        this.action = action;
     }
 
     @Nullable
@@ -63,6 +69,20 @@ public class AddServerFragment extends Fragment {
             });
         }
 
+        if(serverIp != null){
+            server.setText(serverIp);
+            layout.findViewById(R.id.login_server_field).setVisibility(View.GONE);
+        }
+
+        if(confirmPassword){
+            layout.findViewById(R.id.login_password_confirm).setVisibility(View.VISIBLE);
+        }
+
+        if(action != 0){
+            TextView view = layout.findViewById(R.id.login_server_action);
+            view.setText(action);
+        }
+
         Button button = layout.findViewById(R.id.login_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +96,7 @@ public class AddServerFragment extends Fragment {
                 loadingLayout.setVisibility(View.VISIBLE);
 
                 long p = Math.round(Math.random() * 9000 + 1000);
-                Server toConnect = new Server("Inventory Server " + p, ip);
+                Server toConnect = new Server("Inventory Server " + p, ip + (ip.endsWith("/") ? "" : "/"));
 
                 login(toConnect, id, secret, new Callback<RequestError>() {
                     @Override
@@ -98,7 +118,7 @@ public class AddServerFragment extends Fragment {
         });
     }
 
-    private void login(Server server,  String id, String secret, Callback<RequestError> onFail) {
+    private void login(Server server, String id, String secret, Callback<RequestError> onFail) {
         final Fetcher fetcher = Fetcher.getInstance();
         try {
             fetcher.init(server);
@@ -116,12 +136,7 @@ public class AddServerFragment extends Fragment {
                 }
             });
         } catch (Exception e){
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getContext(), getString(R.string.login_page_no_connection, e.getMessage()), Toast.LENGTH_LONG).show();
-                }
-            });
+            getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getString(R.string.login_page_no_connection, e.getMessage()), Toast.LENGTH_LONG).show());
             e.printStackTrace();
         }
     }

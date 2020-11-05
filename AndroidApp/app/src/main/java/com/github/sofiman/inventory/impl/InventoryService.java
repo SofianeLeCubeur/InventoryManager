@@ -44,6 +44,9 @@ public interface InventoryService {
     @POST("items")
     Call<List<Item>> fetchItems(@Header("Authorization") String authorization, @Body HashMap<String, Object> body);
 
+    @POST("item")
+    Call<Item> createItem(@Header("Authorization") String authorization, @Body HashMap<String, Object> body);
+
     @GET("containers")
     Call<List<Container>> listContainers(@Header("Authorization") String authorization);
 
@@ -52,6 +55,9 @@ public interface InventoryService {
 
     @POST("container/{id}")
     Call<Container> pushContainer(@Header("Authorization") String authorization, @Path("id") String id, @Body HashMap<String, Object> body);
+
+    @POST("container")
+    Call<Container> createContainer(@Header("Authorization") String authorization, @Body HashMap<String, Object> body);
 
     @POST("scan/{id}")
     Call<HashMap<String, Object>> fetchScanResult(@Header("Authorization") String authorization, @Path("id") String id, @Body HashMap<String, String> body);

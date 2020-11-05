@@ -11,16 +11,13 @@ import android.widget.TextView;
 import com.github.sofiman.inventory.R;
 import com.github.sofiman.inventory.api.DataField;
 
-public class DoubleEditDialog {
-
-    private final Context context;
-    private AlertDialog dialog;
+public class DoubleEditDialog extends Dialog {
 
     private final EditText firstField;
     private final EditText secondField;
 
     public DoubleEditDialog(Context context, LayoutInflater inflater, DataField first, DataField second) {
-        this.context = context;
+        super(context, inflater);
         final View view = inflater.inflate(R.layout.dialog_edit_double, null);
 
         final TextView firstLabel = view.findViewById(R.id.double_edit_dialog_first_label);
@@ -52,18 +49,6 @@ public class DoubleEditDialog {
         });
 
         return this;
-    }
-
-    public void show(){
-        dialog.show();
-    }
-
-    public Context getContext() {
-        return context;
-    }
-
-    public AlertDialog getDialog() {
-        return dialog;
     }
 
     public EditText getFirstField() {

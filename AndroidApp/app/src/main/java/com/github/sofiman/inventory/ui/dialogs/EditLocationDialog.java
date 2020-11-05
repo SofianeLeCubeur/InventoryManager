@@ -20,13 +20,10 @@ import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.api.LocationPoint;
 import com.github.sofiman.inventory.utils.Callback;
 
-public class EditLocationDialog {
-
-    private final Activity context;
-    private AlertDialog dialog;
+public class EditLocationDialog extends Dialog {
 
     public EditLocationDialog(Activity context, LayoutInflater inflater, Callback<LocationPoint> callback) {
-        this.context = context;
+        super(context, inflater);
         final View view = inflater.inflate(R.layout.dialog_edit_location, null);
 
         EditText label = view.findViewById(R.id.dialog_edit_location_label);
@@ -69,7 +66,7 @@ public class EditLocationDialog {
     private void acquirePosition(EditText latitude, EditText longitude){
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             System.out.println("Cannot locate: permission denied.");
-            ActivityCompat.requestPermissions(context, new String[]{ android.Manifest.permission.ACCESS_FINE_LOCATION }, 101);
+            ActivityCompat.requestPermissions((Activity) context, new String[]{ android.Manifest.permission.ACCESS_FINE_LOCATION }, 101);
         } else {
             LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
             Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -77,17 +74,5 @@ public class EditLocationDialog {
             longitude.setText(String.valueOf(location.getLongitude()));
             System.out.println("Successfully got location: " + location);
         }
-    }
-
-    public void show(){
-        dialog.show();
-    }
-
-    public Context getContext() {
-        return context;
-    }
-
-    public AlertDialog getDialog() {
-        return dialog;
     }
 }

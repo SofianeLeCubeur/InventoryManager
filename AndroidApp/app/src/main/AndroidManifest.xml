@@ -17,7 +17,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:name=".ui.settings.Acknowledgements"></activity>
-        <activity android:name=".IntroActivity" />
+        <activity android:name=".ui.intro.IntroActivity" />
         <activity
             android:name=".CreateObjectActivity"
             android:windowSoftInputMode="adjustPan" />

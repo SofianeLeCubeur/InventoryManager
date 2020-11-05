@@ -6,6 +6,7 @@ import com.github.sofiman.inventory.api.Container;
 import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.api.Inventory;
 import com.github.sofiman.inventory.api.Item;
+import com.github.sofiman.inventory.api.LocationPoint;
 import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.api.Token;
 import com.github.sofiman.inventory.utils.Callback;
@@ -60,7 +61,7 @@ public class Fetcher {
                     callback.run(error);
                 }
             });
-            final String scope = "fetch.* scan add.inv add.* edit.* delete.*";
+            final String scope = "fetch.* add.* edit.* delete.* scan";
             HashMap<String, Object> body = new HashMap<>();
             body.put("grant_type", "password");
             body.put("scope", scope);
@@ -140,12 +141,26 @@ public class Fetcher {
         });
     }
 
-    public void pushItem(final byte[] id, List<DataField> dataFields, String icon, String background, final APIResponse<Item> callback) {
+    public void createItem(List<DataField> dataFields, String icon, String background, final APIResponse<Item> callback) {
         safeExecute(() -> {
             final NetworkCall<Item> networkCall = new NetworkCall<>(callback);
             HashMap<String, Object> body = new HashMap<>();
             body.put("icon", icon);
             body.put("background", background);
+            for (DataField field : dataFields) {
+                body.put(field.getId(), field.getValue());
+            }
+            networkCall.execute(inventoryService.createItem(accessToken.asAuthorization(), body));
+        });
+    }
+
+    public void pushItem(final byte[] id, List<DataField> dataFields, List<LocationPoint> locations, String icon, String background, final APIResponse<Item> callback) {
+        safeExecute(() -> {
+            final NetworkCall<Item> networkCall = new NetworkCall<>(callback);
+            HashMap<String, Object> body = new HashMap<>();
+            body.put("icon", icon);
+            body.put("background", background);
+            body.put("locations", locations);
             for (DataField field : dataFields) {
                 body.put(field.getId(), field.getValue());
             }
@@ -160,13 +175,14 @@ public class Fetcher {
         });
     }
 
-    public void pushContainer(final byte[] id, List<DataField> dataFields, List<String> items, String icon, String background, final APIResponse<Container> callback) {
+    public void pushContainer(final byte[] id, List<DataField> dataFields, List<String> items, List<LocationPoint> locations, String icon, String background, final APIResponse<Container> callback) {
         safeExecute(() -> {
             final NetworkCall<Container> networkCall = new NetworkCall<>(callback);
             HashMap<String, Object> body = new HashMap<>();
             body.put("icon", icon);
             body.put("background", background);
             body.put("items", items);
+            body.put("locations", locations);
             for (DataField field : dataFields) {
                 body.put(field.getId(), field.getValue());
             }
@@ -178,6 +194,18 @@ public class Fetcher {
         safeExecute(() -> {
             final NetworkCall<Container> networkCall = new NetworkCall<>(callback);
             networkCall.execute(inventoryService.fetchContainer(accessToken.asAuthorization(), ID.toHex(containerId)));
+        });
+    }
+
+    public void createContainer(List<DataField> dataFields, List<String> items, final APIResponse<Container> callback) {
+        safeExecute(() -> {
+            final NetworkCall<Container> networkCall = new NetworkCall<>(callback);
+            HashMap<String, Object> body = new HashMap<>();
+            body.put("items", items);
+            for (DataField field : dataFields) {
+                body.put(field.getId(), field.getValue());
+            }
+            networkCall.execute(inventoryService.createContainer(accessToken.asAuthorization(), body));
         });
     }
 

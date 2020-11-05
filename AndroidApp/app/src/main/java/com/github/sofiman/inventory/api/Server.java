@@ -5,14 +5,11 @@ import java.net.URI;
 public class Server {
 
     private String name;
-    private String ipAddress;
     private String endpoint;
     private boolean defaultServer;
 
     public Server(String name, String url) {
         this.name = name;
-        final URI uri = URI.create(url);
-        this.ipAddress = uri.getHost();
         this.endpoint = url;
     }
 
@@ -29,10 +26,6 @@ public class Server {
         return name;
     }
 
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
     public String getEndpoint() {
         return endpoint;
     }
@@ -42,8 +35,14 @@ public class Server {
     }
 
     public void setEndpoint(String endpoint) {
-        final URI uri = URI.create(endpoint);
-        this.ipAddress = uri.getHost();
         this.endpoint = endpoint;
+    }
+
+    @Override
+    public String toString() {
+        return "Server{" +
+                "name='" + name + '\'' +
+                ", endpoint='" + endpoint + '\'' +
+                '}';
     }
 }

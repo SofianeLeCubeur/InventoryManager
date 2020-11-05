@@ -39,14 +39,12 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class QrCodeGeneratorDialog {
+public class QrCodeGeneratorDialog extends Dialog {
 
-    private final Context context;
-    private AlertDialog dialog;
     private Bitmap code;
 
     public QrCodeGeneratorDialog(Context context, LayoutInflater inflater, Drawable drawable, int[] tints, String name, String content, BarcodeFormat format, boolean imagePadding){
-        this.context = context;
+        super(context, inflater);
         TrackerComponent trackerComponent = new TrackerComponent(context);
         int pad = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, context.getResources().getDisplayMetrics());
         trackerComponent.setPadding(pad, pad, pad, 0);
@@ -126,10 +124,6 @@ public class QrCodeGeneratorDialog {
                 //dialog.getButton(DialogInterface.BUTTON_NEUTRAL).setTextColor(context.getColor(R.color.aqua));
             }
         });*/
-        dialog.show();
-    }
-
-    public void show(){
         dialog.show();
     }
 

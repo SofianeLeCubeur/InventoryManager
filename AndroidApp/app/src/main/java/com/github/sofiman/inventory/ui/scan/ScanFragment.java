@@ -38,6 +38,7 @@ import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
 import com.budiyev.android.codescanner.ErrorCallback;
 import com.budiyev.android.codescanner.ScanMode;
+import com.github.sofiman.inventory.CreateObjectActivity;
 import com.github.sofiman.inventory.R;
 import com.github.sofiman.inventory.api.Container;
 import com.github.sofiman.inventory.api.Inventory;
@@ -50,16 +51,22 @@ import com.github.sofiman.inventory.ui.components.Component;
 import com.github.sofiman.inventory.ui.components.ContainerComponent;
 import com.github.sofiman.inventory.ui.components.InventoryComponent;
 import com.github.sofiman.inventory.ui.components.ItemComponent;
+import com.github.sofiman.inventory.ui.dialogs.ConfirmDialog;
 import com.github.sofiman.inventory.ui.dialogs.DoubleEditDialog;
 import com.github.sofiman.inventory.utils.Animations;
+import com.github.sofiman.inventory.utils.IntentBuilder;
 import com.github.sofiman.inventory.utils.LayoutHelper;
 import com.google.gson.Gson;
 import com.google.zxing.Result;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.view.Gravity.CENTER_HORIZONTAL;
 
@@ -72,8 +79,10 @@ public class ScanFragment extends Fragment {
     private boolean addUnknownToHistory = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-            ViewGroup container, Bundle savedInstanceState) {
+                             ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_scan, container, false);
+
+        if (getActivity() == null) return null;
 
         CodeScannerView scannerView = view.findViewById(R.id.scanner);
         // Setup camera settings
@@ -86,10 +95,10 @@ public class ScanFragment extends Fragment {
         scanner.setDecodeCallback(new DecodeCallback() {
             @Override
             public void onDecoded(@NonNull Result result) {
-                if(!canScan.get()) return;
+                if (!canScan.get()) return;
                 canScan.set(false);
                 String text = result.getText();
-                if(previous.equals(text)){
+                if (previous.equals(text)) {
                     canScan.set(true);
                     return;
                 }
@@ -98,12 +107,7 @@ public class ScanFragment extends Fragment {
                 String id = text.split("_")[0];
 
                 // Fetch animation
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        fetchingState();
-                    }
-                });
+                getActivity().runOnUiThread(() -> fetchingState());
                 // Send the raw text to the server to fetch it
                 Fetcher.getInstance().fetchScanResult(id, HistoryDataModel.getInstance().getScanningLocation(), new APIResponse<HashMap<String, Object>>() {
                     @Override
@@ -122,18 +126,18 @@ public class ScanFragment extends Fragment {
                     public void error(RequestError error) {
                         System.out.println("Could not connect to the target server: " + error + ", text: " + text);
                         getActivity().runOnUiThread(new Runnable() {
-                           @Override
-                           public void run() {
-                               if(error.getError().equals("not_found")){
-                                   showActions(text, result.getTimestamp());
-                               } else {
-                                   Toast.makeText(getContext(), getString(R.string.login_page_no_connection, error.toString()), Toast.LENGTH_LONG).show();
-                                   resetState();
-                               }
-                               new Handler().postDelayed(() -> previous = "", 500);
-                           }
-                       });
-                       canScan.set(true);
+                            @Override
+                            public void run() {
+                                if (error.getError().equals("not_found")) {
+                                    showActions(text, result.getTimestamp());
+                                } else {
+                                    Toast.makeText(getContext(), getString(R.string.login_page_no_connection, error.toString()), Toast.LENGTH_LONG).show();
+                                    resetState();
+                                }
+                                new Handler().postDelayed(() -> previous = "", 500);
+                            }
+                        });
+                        canScan.set(true);
                     }
                 });
             }
@@ -150,7 +154,7 @@ public class ScanFragment extends Fragment {
         hideContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(hideContent.getVisibility() != View.VISIBLE){
+                if (hideContent.getVisibility() != View.VISIBLE) {
                     return;
                 }
                 Animations.collapse(content, new Animation.AnimationListener() {
@@ -189,7 +193,7 @@ public class ScanFragment extends Fragment {
         contentReset();
         // Ask for permission
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_DENIED){
+                == PackageManager.PERMISSION_DENIED) {
             showConsentDialog();
         } else {
             scanner.startPreview();
@@ -209,19 +213,10 @@ public class ScanFragment extends Fragment {
         }
     }
 
-    private void showConsentDialog(){
-         AlertDialog dialog =  new AlertDialog.Builder(getContext(), R.style.ThemeOverlay_InventoryManager_Dialog)
-                .setTitle(R.string.scan_permission_dialog_title)
-                .setMessage(R.string.scan_permission_consent)
-                .setPositiveButton(R.string.dialog_accept, (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
-                    ActivityCompat.requestPermissions(getActivity(), new String[] { Manifest.permission.CAMERA }, 200);
-                })
-                .setNegativeButton(getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE)
-                .create();
-
-         dialog.setOnShowListener(dialogInterface -> dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getContext().getColor(R.color.colorAccent)));
-         dialog.show();
+    private void showConsentDialog() {
+        new ConfirmDialog(getContext(), getLayoutInflater(), R.string.scan_permission_dialog_title,
+                R.string.scan_permission_consent, R.string.dialog_accept,
+                () -> ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, 200));
     }
 
     @Override
@@ -239,17 +234,17 @@ public class ScanFragment extends Fragment {
         System.out.println("Pausing preview");
     }
 
-    private void loadSettings(){
+    private void loadSettings() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         this.addUnknownToHistory = sharedPreferences.getBoolean("register_unknown_codes", false);
     }
 
     /**
-     *  Resets the activity in a continuous scan mode
+     * Resets the activity in a continuous scan mode
      */
-    private void resetState(){
+    private void resetState() {
         final View view = getView();
-        if(view == null) return;
+        if (view == null) return;
         TextView state = view.findViewById(R.id.scan_state);
         ImageView stateIcon = view.findViewById(R.id.scan_state_icon);
         state.setText(R.string.scan_waiting_for_code);
@@ -259,9 +254,9 @@ public class ScanFragment extends Fragment {
     /**
      * Shows fetching animation
      */
-    private void fetchingState(){
+    private void fetchingState() {
         final View view = getView();
-        if(view == null) return;
+        if (view == null) return;
         TextView state = view.findViewById(R.id.scan_state);
         ImageView stateIcon = view.findViewById(R.id.scan_state_icon);
         state.setText(R.string.scan_fetching);
@@ -271,7 +266,7 @@ public class ScanFragment extends Fragment {
     /**
      * Hides the content canvas
      */
-    private void contentReset(){
+    private void contentReset() {
         final View view = getView();
         LinearLayout loading = view.findViewById(R.id.scan_loading);
         loading.setVisibility(View.VISIBLE);
@@ -282,15 +277,15 @@ public class ScanFragment extends Fragment {
     /**
      * Setup the activity to show the scan result
      */
-    private void contentLoaded(){
+    private void contentLoaded() {
         final View view = getView();
-        if(view == null) return;
+        if (view == null) return;
         view.findViewById(R.id.scan_reduce).setVisibility(View.VISIBLE);
         resetState();
         vibrate();
     }
 
-    private void parseResult(String text, long timestamp, Map<String, Object> obj){
+    private void parseResult(String text, long timestamp, Map<String, Object> obj) {
         contentLoaded();
 
         // Extract the type from the response
@@ -300,7 +295,7 @@ public class ScanFragment extends Fragment {
 
         Component view = null;
         // Create the required component and populates it with the data
-        if(type.equals("inventory")){
+        if (type.equals("inventory")) {
             Inventory store = gson.fromJson(json, Inventory.class);
             InventoryComponent component = new InventoryComponent(getContext());
 
@@ -318,7 +313,7 @@ public class ScanFragment extends Fragment {
             HistoryDataModel.getInstance().pushScanLog(text, timestamp, "inventory", store, getContext());
 
             view = component;
-        } else if(type.equals("container")){
+        } else if (type.equals("container")) {
             Container store = gson.fromJson(json, Container.class);
             ContainerComponent component = new ContainerComponent(getContext());
 
@@ -333,7 +328,7 @@ public class ScanFragment extends Fragment {
             HistoryDataModel.getInstance().pushScanLog(text, timestamp, "container", store, getContext());
 
             view = component;
-        } else if(type.equals("item")){
+        } else if (type.equals("item")) {
             Item store = gson.fromJson(json, Item.class);
             ItemComponent component = new ItemComponent(getContext());
 
@@ -351,7 +346,7 @@ public class ScanFragment extends Fragment {
             view = component;
         }
 
-        if(view != null && getView() != null){
+        if (view != null && getView() != null) {
             view.update();
 
             // Add the component to the canvas
@@ -363,10 +358,10 @@ public class ScanFragment extends Fragment {
         }
     }
 
-    private void showActions(String scannedText, long timestamp){
+    private void showActions(String scannedText, long timestamp) {
         contentLoaded();
 
-        if(getView() == null) return;
+        if (getView() == null) return;
         RelativeLayout content = getView().findViewById(R.id.scan_content);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, +ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = CENTER_HORIZONTAL;
@@ -378,7 +373,7 @@ public class ScanFragment extends Fragment {
 
         Button addToHistory = v.findViewById(R.id.scan_action_history);
 
-        if(addUnknownToHistory){
+        if (addUnknownToHistory) {
             HistoryDataModel.getInstance().pushScanLog(scannedText, timestamp, "raw", null, getContext());
             addToHistory.setText(R.string.scan_added_to_history);
             addToHistory.setBackgroundTintList(ColorStateList.valueOf(getContext().getColor(R.color.popup)));
@@ -397,20 +392,75 @@ public class ScanFragment extends Fragment {
             });
         }
 
+        ImageView addItem = v.findViewById(R.id.scan_action_add);
+        addItem.setOnClickListener(v1 -> showCreation(scannedText));
+
         content.removeAllViews();
         content.addView(v, params);
         Animations.expand(content);
     }
 
-    private void vibrate(){
-        if(getContext() == null) return;
+    private void vibrate() {
+        if (getContext() == null) return;
         Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
         if (Build.VERSION.SDK_INT >= 29) {
             v.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK));
-        }if (Build.VERSION.SDK_INT >= 26) {
+        }
+        if (Build.VERSION.SDK_INT >= 26) {
             v.vibrate(VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
             v.vibrate(300);
         }
+    }
+
+    private void showCreation(String scannedText) {
+        Runnable[] functions = new Runnable[]{
+                () -> openInventoryCreation(scannedText),
+                () -> openContainerCreation(scannedText),
+                () -> openItemCreation(scannedText)
+        };
+        String[] types = getResources().getStringArray(R.array.types);
+        final AtomicInteger selectedIndex = new AtomicInteger(0);
+        final androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(getContext(), R.style.ThemeOverlay_InventoryManager_Dialog)
+                .setTitle(R.string.dialog_create_title)
+                .setSingleChoiceItems(types, selectedIndex.get(), (dialogInterface, i) -> selectedIndex.set(i))
+                .setPositiveButton(R.string.dialog_create, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        final int idx = selectedIndex.get();
+                        functions[idx].run();
+                    }
+                })
+                .setNegativeButton(R.string.dialog_cancel, DoubleEditDialog.DISPOSE)
+                .create();
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(getContext().getColor(R.color.colorAccent));
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(getContext().getColor(R.color.iconAccent));
+        });
+        dialog.show();
+    }
+
+    private void openInventoryCreation(String scannedText) {
+        startActivityForResult(new IntentBuilder(getActivity(), CreateObjectActivity.class)
+                .scope("create").type("inventory").blueprint(new Inventory(new byte[0], "", "", "", new ArrayList<>()))
+                .extra(Collections.singletonList(scannedText), 0)
+                .build(), 0);
+    }
+
+    private void openContainerCreation(String scannedText) {
+        startActivityForResult(new IntentBuilder(getActivity(), CreateObjectActivity.class)
+                .scope("create").type("container").blueprint(new Container(new byte[0], "", "", "", "")
+                        .setLocations(new ArrayList<>()).setItems(new ArrayList<>()))
+                .extra(Collections.singletonList(scannedText), 0)
+                .build(), 1);
+    }
+
+    private void openItemCreation(String scannedText) {
+        startActivityForResult(new IntentBuilder(getActivity(), CreateObjectActivity.class)
+                .scope("create").type("item")
+                .blueprint(new Item("", "", "", "", "", "", "", new ArrayList<>(), ""))
+                .extra(Collections.singletonList(scannedText), 0)
+                .build(), 2);
     }
 }

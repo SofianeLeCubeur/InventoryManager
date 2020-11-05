@@ -21,6 +21,7 @@
     <string name="login_page_username_desc">Username to login to the server</string>
     <string name="login_page_password">Password</string>
     <string name="login_page_password_desc">Password to login the server</string>
+    <string name="login_page_password_confirm">Confirm  Password</string>
     <string name="login_page_no_connection">Could not connect to the target server: %s</string>
     <string name="login_page_registered_servers">Registered Servers:</string>
 
@@ -33,7 +34,7 @@
     <string name="explore_filters_title">Filters</string>
     <string name="explore_filters_title_reduced">Filters (%d)</string>
     <string name="explore_page_history">Search History</string>
-    <string name="explore_filters_instructions">Click on a filter to add it to the query (typing also works) then add a \';\' at the end of the filter to validate it</string>
+    <string name="explore_filters_instructions">Click on a filter to add it to the query (typing also works) then add a \';\' at the end of the filter to validate it. Tip: use $name to search names with regex.</string>
     <string name="explore_filter_details">details:</string>
     <string name="explore_filter_details_desc">Selects movables with the same details</string>
     <string name="explore_filter_desc">desc:</string>
@@ -61,6 +62,7 @@
     <string name="scan_add_to_history">Add to history</string>
     <string name="scan_added_to_history">Added to history</string>
     <string name="scan_history_selection_copied">%s successfully copied to the clipboard</string>
+    <string name="scan_history_selection_one">item</string>
     <string name="scan_state_desc">Searching for codes</string>
 
     <string name="category_all">All</string>
@@ -74,6 +76,12 @@
     <string name="new_cnt">New Container</string>
     <string name="new_itm">New Item</string>
     <string name="new_trk">New Tracker</string>
+
+    <string-array name="types">
+        <item>Inventory</item>
+        <item>Container</item>
+        <item>Item</item>
+    </string-array>
 
     <string name="title_home">Home</string>
     <string name="title_explore">Explore</string>
@@ -104,7 +112,8 @@
     <string name="settings_intro_info">You may restart the app to view to intro</string>
     <string name="settings_acknowledgements">Acknowledgements</string>
 
-    <string name="full_data">Informations</string>
+    <string name="full_data">Details</string>
+    <string name="full_page_back">Back</string>
     <string name="full_page_qr_code">QR Code</string>
     <string name="full_page_add">Add Item</string>
     <string name="full_page_update">Update Location</string>
@@ -139,6 +148,11 @@
     <string name="create_object_push_item">the item</string>
     <string name="create_object_items_added">Added</string>
     <string name="create_object_items_explore">Explore</string>
+    <string name="create_object_item_added">Item added</string>
+    <string name="create_object_scan_assignment">Scan %d of %d</string>
+    <string name="create_object_extra_data">Scanned data (%d/%d)</string>
+    <string name="create_object_scanned_data">To use scanned data, first focus on a field then click on the scanned data field</string>
+    <string name="create_object_selection_state">Creating element %d of %d</string>
     <string name="input_field_placeholder">Content</string>
     <string name="action_placeholder">Action</string>
 
@@ -147,12 +161,15 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_delete">Delete</string>
     <string name="dialog_accept">OK</string>
+    <string name="dialog_create">Create</string>
     <string name="dialog_confirm">Confirm %s?</string>
     <string name="dialog_confirm_delete">deleting</string>
     <string name="dialog_confirm_clear">clearing</string>
     <string name="dialog_clear">Clear</string>
     <string name="dialog_clear_scan">You are about to clear the scan history (%d items)</string>
     <string name="dialog_delete_confirmation">You are about to delete %s</string>
+    <string name="dialog_create_title">Create as</string>
+    <string name="dialog_create_title_all">Create selected elements as</string>
     <string name="dialog_edit_tracker">Editing device\'s tracker details</string>
     <string name="dialog_edit_server">Edit %s\'s details</string>
     <string name="dialog_edit_tracker_name">Tracker Nickname</string>
@@ -166,7 +183,18 @@
     <string name="dialog_edit_location_locate">Locate</string>
     <string name="dialog_edit_location_granted">You can now use the locate feature</string>
 
+    <string name="privacy_join_title">Start by adding servers</string>
+    <string name="privacy_join_desc">Inventory Manager is based around public and private servers. We offer a basic public server for users that want to use simply the app.</string>
+    <string name="privacy_join_button">Join the public Server</string>
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="privacy_skip">Skip</string>
+    <string name="privacy_join_dialog">Join</string>
+    <string name="privacy_join_dialog_desc">To join the Public Server you need an account that requires an username and password</string>
+    <string name="privacy_join_dialog_register">Register</string>
+    <string name="privacy_join_dialog_login">Login</string>
+
     <string name="date_today_at">Today at %s</string>
+    <string name="date_yesterday_at">Yesterday at %s</string>
     <string name="date_ago">%d days ago at %s</string>
 
     <string name="acknowledgements_thanks">Thank you for using my app! Thank you to all who supported and helped me through it development. If you want to help me more you can contact me via GitHub. (Public servers and Illustrations)</string>

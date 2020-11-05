@@ -99,7 +99,7 @@ public class LocationPointComponent extends ContinousComponent {
         }
         View v = getChildAt(0);
         v.setTag("continuity:basic");
-        v.setBackgroundResource(R.drawable.white_box_ripple);
+        v.setBackgroundResource(R.drawable.white_ripple);
         v.setPadding(padding, 0, padding, 0);
     }
 
@@ -131,10 +131,21 @@ public class LocationPointComponent extends ContinousComponent {
     public void setAsCreate(){
         ImageView create = findViewById(R.id.location_point_add);
         create.setVisibility(VISIBLE);
+
+        getChildAt(0).setOnLongClickListener(null);
     }
 
     public void resetCreate(){
         ImageView create = findViewById(R.id.location_point_add);
         create.setVisibility(GONE);
+
+        getChildAt(0).setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                StringUtils.setClipboard(getContext(), "inventorymanager_location", location);
+                Toast.makeText(getContext(), getContext().getString(R.string.content_copied, getContext().getString(R.string.full_page_location_point)), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 }

@@ -81,12 +81,11 @@ public class InventoryComponent extends Component {
                 public void onSuccess() {
                     iconText.setVisibility(INVISIBLE);
                     iconImage.setVisibility(VISIBLE);
-                    System.out.println(">>>>> Inventory's icon successfully loaded!");
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    System.err.println(">>>>> Inventory's could not load: " + e.getMessage());
+                    System.err.println("Failed to load inventory icon for " + getName()  + " : " + e.getMessage());
                 }
             });
         }

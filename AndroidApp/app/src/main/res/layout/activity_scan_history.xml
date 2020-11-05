@@ -12,18 +12,18 @@
         android:id="@+id/dummy_header"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:paddingBottom="4dp"
         android:layout_marginEnd="4dp"
         android:background="@drawable/liquid_header"
         android:backgroundTint="@color/popup"
+        android:paddingBottom="4dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/scan_full_back"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="@dimen/full_page_action_icon_size"
+            android:layout_height="@dimen/full_page_action_icon_size"
             android:layout_marginStart="20dp"
             android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
@@ -33,47 +33,64 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/foreground" />
+            app:tint="@color/foreground"
+            android:contentDescription="@string/full_page_back" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/scan_full_back"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginStart="12dp"
-            android:orientation="vertical">
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/scan_full_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/scan_history"
-                android:translationY="12dp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textSize="18sp" />
+                android:translationY="12dp" />
 
             <TextView
                 android:id="@+id/scan_full_selected"
-                android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/iconAccent"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/scan_full_add"
+            android:layout_width="@dimen/full_page_action_icon_size"
+            android:layout_height="@dimen/full_page_action_icon_size"
+            android:layout_marginEnd="@dimen/action_margin_end"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            android:src="@drawable/icon_material_add"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/scan_full_copy"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/foreground" />
+
+        <ImageView
             android:id="@+id/scan_full_copy"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="@dimen/full_page_action_icon_size"
+            android:layout_height="@dimen/full_page_action_icon_size"
+            android:layout_marginEnd="@dimen/action_margin_end"
             android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:padding="4dp"
-            android:visibility="gone"
             android:src="@drawable/content_copy"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="@id/scan_full_delete"
             app:layout_constraintTop_toTopOf="parent"
@@ -81,15 +98,15 @@
 
         <ImageView
             android:id="@+id/scan_full_delete"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="@dimen/full_page_action_icon_size"
+            android:layout_height="@dimen/full_page_action_icon_size"
+            android:layout_marginEnd="@dimen/action_margin_end"
             android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:padding="8dp"
-            android:visibility="gone"
             android:src="@drawable/icon_material_remove"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -108,9 +125,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/scan_full_message"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -119,25 +136,25 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginHorizontal="30dp"
             android:background="@drawable/white_box"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="20dp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/icon_awesome_info"
+                android:layout_marginBottom="10dp"
                 android:background="@drawable/small_icon"
                 android:backgroundTint="@color/background"
-                app:tint="@color/foreground"
-                android:layout_marginBottom="10dp" />
+                android:src="@drawable/icon_awesome_info"
+                app:tint="@color/foreground" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -147,24 +164,20 @@
                 android:textSize="16sp" />
 
             <TextView
-               android:id="@+id/scan_full_start_scan"
+                android:id="@+id/scan_full_start_scan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="16dp"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:text="@string/scan_start_scanning"
-               android:background="@drawable/white_box_ripple"
-               android:backgroundTint="@color/popup"
-               android:textColor="@color/foreground"
-               android:textAllCaps="false"
-               android:textStyle="bold"
-               android:clickable="true"
-               android:focusable="true"
-               android:textSize="16sp"
-               android:layout_marginHorizontal="20dp"
-               android:paddingHorizontal="10dp"
-               android:paddingVertical="12dp"
-               android:gravity="center"
-               />
+                android:background="@drawable/white_box_ripple"
+                android:backgroundTint="@color/popup"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp"
+                android:text="@string/scan_start_scanning"
+                android:textColor="@color/foreground"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

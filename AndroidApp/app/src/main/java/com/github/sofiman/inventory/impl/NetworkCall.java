@@ -28,7 +28,9 @@ public class NetworkCall<T> extends AsyncTask<Call<T>, Void, T> {
             if (response.isSuccessful()) {
                 return response.body();
             } else if(response.errorBody() != null) {
-                JsonObject obj = JsonParser.parseString(response.errorBody().string()).getAsJsonObject();
+                String s = response.errorBody().string();
+                System.err.println("Server responded with an error: " + s);
+                JsonObject obj = JsonParser.parseString(s).getAsJsonObject();
                 RequestError error = new RequestError(response.code(), obj.get("err").getAsString(), obj.get("err_description").getAsString());
                 this.response.error(error);
             }

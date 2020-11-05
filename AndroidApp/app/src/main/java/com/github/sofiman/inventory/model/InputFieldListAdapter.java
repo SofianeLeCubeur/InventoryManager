@@ -84,15 +84,9 @@ public class InputFieldListAdapter extends RecyclerView.Adapter<InputFieldListAd
             @Override
             public void afterTextChanged(Editable s) {
                 store.setValue(s.toString());
-                System.out.println("textChanged: " + store.getValue());
             }
         });
-        component.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                component.focus();
-            }
-        });
+        component.setOnClickListener(view -> component.focus());
 
         component.update();
     }

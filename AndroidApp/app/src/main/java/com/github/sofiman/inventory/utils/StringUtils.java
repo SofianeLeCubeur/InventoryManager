@@ -26,17 +26,6 @@ public class StringUtils {
         return s;
     }
 
-    public static View.OnLongClickListener createLongClickCopy(Context context, String data, @StringRes int content) {
-        return new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                StringUtils.setClipboard(context, "inventorymanager_qrcode", data);
-                Toast.makeText(context, context.getString(R.string.content_copied, context.getString(content)), Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        };
-    }
-
     public static void setClipboard(Context context, String label, String text) {
         ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = android.content.ClipData.newPlainText(label, text);
@@ -44,10 +33,17 @@ public class StringUtils {
     }
 
     public static String formatDate(Context context, long timestamp) {
+        final long dayPerMillis = 86400000;
         SimpleDateFormat format = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        long days = (System.currentTimeMillis() - timestamp) / 86400000;
+        long days = (System.currentTimeMillis() - timestamp) / dayPerMillis;
         if (days == 0) {
-            return context.getString(R.string.date_today_at, format.format(timestamp));
+            long d1 = System.currentTimeMillis() / dayPerMillis;
+            long d2 = timestamp / dayPerMillis;
+            if (d1 == d2) {
+                return context.getString(R.string.date_today_at, format.format(timestamp));
+            } else {
+                return context.getString(R.string.date_yesterday_at, format.format(timestamp));
+            }
         } else {
             return context.getString(R.string.date_ago, days, format.format(timestamp));
         }

@@ -59,8 +59,8 @@ public class ExploreFragment extends Fragment {
     private SearchView query;
     private final HashMap<String, String> matches = new HashMap<>();
     private AtomicBoolean filtersReduced = new AtomicBoolean(false);
-    private final Pattern filterRegex = Pattern.compile("([a-zA-Z_-]+):\\s?([^;:]+);");
-    private final Pattern rawFilterRegex = Pattern.compile("([a-zA-Z_-]+):\\s?([^;:]+)");
+    private final Pattern filterRegex = Pattern.compile("([$a-zA-Z_-]+):\\s?([^;:]+);");
+    private final Pattern rawFilterRegex = Pattern.compile("([$a-zA-Z_-]+):\\s?([^;:]+)?");
     private String previousQuery = "";
 
     private HistoryDataModel historyDataModel;
@@ -126,6 +126,9 @@ public class ExploreFragment extends Fragment {
                     if (!filter.isActive()) {
                         if (filtersReduced.get()) {
                             int count = matches.size();
+                            if(matches.containsKey("$name") && matches.containsKey("name")){
+                                count -= 1;
+                            }
                             String titleStr = getString(R.string.explore_filters_title_reduced, count);
                             title.setText(titleStr);
                         }
@@ -144,12 +147,10 @@ public class ExploreFragment extends Fragment {
         query.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                if(rawFilterRegex.matcher(query.getQuery()).matches()){
-                    query.setQuery(query.getQuery() + ";", true);
-                    return false;
-                } else if(matches.size() == 0 && query.getQuery().length() > 0){
-                    query.setQuery("name:" + query.getQuery() + ";", true);
-                    return false;
+                if(rawFilterRegex.matcher(s).matches()){
+                    query.setQuery(s + ";", false);
+                } else if(matches.size() == 0 && s.length() > 0){
+                    query.setQuery("name:" + s + ";", false);
                 }
                 if (history.getVisibility() == View.VISIBLE) {
                     Animations.collapse(history);
@@ -167,6 +168,9 @@ public class ExploreFragment extends Fragment {
                     matches.put(m.group(1), m.group(2));
                 }
                 int count = matches.size();
+                if(matches.containsKey("$name") && matches.containsKey("name")){
+                    count -= 1;
+                }
 
                 if (s.isEmpty() && history.getVisibility() == View.GONE && historyDataModel.getSearchHistory().size() > 0) {
                     Animations.expand(history);
@@ -200,6 +204,9 @@ public class ExploreFragment extends Fragment {
                     title.setText(R.string.explore_filters_title);
                 } else {
                     int count = matches.size();
+                    if(matches.containsKey("$name") && matches.containsKey("name")){
+                        count -= 1;
+                    }
                     filtersReduced.set(true);
                     reduce.animate().rotation(0).setInterpolator(new LinearInterpolator()).setDuration(170);
                     Animations.collapse(filtersLayout);
@@ -273,7 +280,6 @@ public class ExploreFragment extends Fragment {
         View root = getView();
         if (root == null) return;
         ProgressBar bar = root.findViewById(R.id.explorer_loading);
-        bar.setVisibility(View.VISIBLE);
         LinearLayout results = root.findViewById(R.id.explorer_results);
         RecyclerView invRecycler = root.findViewById(R.id.explorer_inventories);
         RecyclerView cntRecycler = root.findViewById(R.id.explorer_containers);
@@ -285,15 +291,25 @@ public class ExploreFragment extends Fragment {
         LinearLayout noResult = root.findViewById(R.id.explorer_no_result);
         TextView noResultQuery = root.findViewById(R.id.explorer_no_result_content);
         LinearLayout filtersLayout = root.findViewById(R.id.explorer_filters_layout);
+        TextView title = root.findViewById(R.id.explore_filters_title);
 
+        bar.setVisibility(View.VISIBLE);
         query.setEnabled(false);
         final long timestamp = System.currentTimeMillis();
         final String activeTag = this.activeTag.toLowerCase();
         final String queryText = this.query.getQuery().toString();
 
         System.out.println("Performing query with " + matches + " selecting " + activeTag);
-        matches.put("type", activeTag);
-        Fetcher.getInstance().doQuery(matches, new APIResponse<HashMap<String, Object>>() {
+        HashMap<String, String> params = new HashMap<>(matches);
+        params.put("type", activeTag);
+        if(params.containsKey("name") && params.get("name") != null){
+            params.put("name", Pattern.quote(params.get("name")));
+        }
+        if(params.containsKey("$name")){
+            params.put("name", params.get("$name"));
+            params.remove("$name");
+        }
+        Fetcher.getInstance().doQuery(params, new APIResponse<HashMap<String, Object>>() {
             @Override
             public void response(HashMap<String, Object> callback) {
                 bar.setVisibility(View.GONE);
@@ -302,26 +318,39 @@ public class ExploreFragment extends Fragment {
                 List<Container> containers = new ArrayList<>();
                 List<Item> items = new ArrayList<>();
 
+                ArrayList<LinkedTreeMap<?, ?>> rawInventories = (ArrayList<LinkedTreeMap<?, ?>>) callback.get("inventories");
+                ArrayList<LinkedTreeMap<?, ?>> rawContainers = (ArrayList<LinkedTreeMap<?, ?>>) callback.get("containers");
+                ArrayList<LinkedTreeMap<?, ?>> rawItems = (ArrayList<LinkedTreeMap<?, ?>>) callback.get("items");
+                JsonObject content;
+
                 try {
-                    ArrayList<LinkedTreeMap<?, ?>> rawInventories = (ArrayList<LinkedTreeMap<?, ?>>) callback.get("inventories");
-                    ArrayList<LinkedTreeMap<?, ?>> rawContainers = (ArrayList<LinkedTreeMap<?, ?>>) callback.get("containers");
-                    ArrayList<LinkedTreeMap<?, ?>> rawItems = (ArrayList<LinkedTreeMap<?, ?>>) callback.get("items");
-
-                    JsonObject content;
-                    for (LinkedTreeMap<?, ?> json : rawInventories) {
-                        content = gson.toJsonTree(json).getAsJsonObject();
-                        inventories.add(gson.fromJson(content, Inventory.class));
+                    if(rawInventories != null){
+                        for (LinkedTreeMap<?, ?> json : rawInventories) {
+                            content = gson.toJsonTree(json).getAsJsonObject();
+                            inventories.add(gson.fromJson(content, Inventory.class));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if(rawContainers != null){
+                        for (LinkedTreeMap<?, ?> json : rawContainers) {
+                            content = gson.toJsonTree(json).getAsJsonObject();
+                            containers.add(gson.fromJson(content, Container.class));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if(rawItems != null){
+                        for (LinkedTreeMap<?, ?> json : rawItems) {
+                            content = gson.toJsonTree(json).getAsJsonObject();
+                            items.add(gson.fromJson(content, Item.class));
+                        }
                     }
 
-                    for (LinkedTreeMap<?, ?> json : rawContainers) {
-                        content = gson.toJsonTree(json).getAsJsonObject();
-                        containers.add(gson.fromJson(content, Container.class));
-                    }
-
-                    for (LinkedTreeMap<?, ?> json : rawItems) {
-                        content = gson.toJsonTree(json).getAsJsonObject();
-                        items.add(gson.fromJson(content, Item.class));
-                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -362,6 +391,12 @@ public class ExploreFragment extends Fragment {
                     }
                     noResult.setVisibility(View.GONE);
                     filtersReduced.set(true);
+                    int count = matches.size();
+                    if(matches.containsKey("$name") && matches.containsKey("name")){
+                        count -= 1;
+                    }
+                    String titleStr = getString(R.string.explore_filters_title_reduced, count);
+                    title.setText(titleStr);
                     reduce.animate().rotation(0).setInterpolator(new LinearInterpolator()).setDuration(170);
                     Animations.collapse(filtersLayout);
                     previousQuery = queryText;

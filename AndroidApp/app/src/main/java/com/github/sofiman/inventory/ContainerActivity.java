@@ -163,16 +163,16 @@ public class ContainerActivity extends AppCompatActivity {
         TextView name = findViewById(R.id.container_full_name);
         name.setText(container.getContent());
 
-        final String lastLocation = container.getLocations().get(0).getLocation();
-        TextView location = findViewById(R.id.container_full_location);
-        location.setText(lastLocation);
-        location.setOnLongClickListener(StringUtils.createLongClickCopy(this, lastLocation, R.string.full_page_location_point));
+        if(container.getLocations().size() > 0){
+            final String lastLocation = container.getLocations().get(0).getLocation();
+            TextView location = findViewById(R.id.container_full_location);
+            location.setText(lastLocation);
+        }
 
         TextView state = findViewById(R.id.container_full_state);
         String stateTxr = getString(R.string.full_page_no_state);
         if (container.getState() != null && !container.getState().isEmpty()) {
             stateTxr = container.getState();
-            state.setOnLongClickListener(StringUtils.createLongClickCopy(this, stateTxr, R.string.full_page_state));
         }
         state.setText(stateTxr);
 

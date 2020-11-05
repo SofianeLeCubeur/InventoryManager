@@ -69,7 +69,7 @@ public class ItemActivity extends AppCompatActivity {
         final String itemIcon = getIntent().getStringExtra("ITEM_ICON");
         final byte[] itemId = getIntent().getByteArrayExtra("ITEM_ID");
 
-        if(itemId == null){
+        if (itemId == null) {
             supportFinishAfterTransition();
             return;
         }
@@ -126,7 +126,7 @@ public class ItemActivity extends AppCompatActivity {
         });
     }
 
-    private void setIcon(byte[] itemId, String itemName, String itemIcon){
+    private void setIcon(byte[] itemId, String itemName, String itemIcon) {
         int[] tints = new int[2];
         ImageView icon = findViewById(R.id.item_full_icon);
 
@@ -174,11 +174,11 @@ public class ItemActivity extends AppCompatActivity {
         });
     }
 
-    private void buildGlass(ImageView back, ImageView bg){
+    private void buildGlass(ImageView back, ImageView bg) {
         final int defaultColor = getColor(R.color.iconAccent),
                 glass = getColor(R.color.glass);
         String url = item.getBackground();
-        if(url == null || url.length() == 0){
+        if (url == null || url.length() == 0) {
             url = item.getIcon();
         }
         PaletteBitmapTransformation transform = new PaletteBitmapTransformation();
@@ -195,7 +195,7 @@ public class ItemActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess() {
                         final Palette palette = transform.getPalette();
-                        if(palette != null){
+                        if (palette != null) {
                             back.setImageTintList(ColorStateList.valueOf(defaultColor));
                         }
                     }
@@ -224,10 +224,16 @@ public class ItemActivity extends AppCompatActivity {
         details.setText(item.getDetails());
 
         TextView state = findViewById(R.id.item_full_state);
-        state.setText(item.getState());
+        String stateTxr = getString(R.string.full_page_no_state);
+        if (item.getState() != null && !item.getState().isEmpty()) {
+            stateTxr = item.getState();
+        }
+        state.setText(stateTxr);
 
         TextView location = findViewById(R.id.item_full_location);
-        location.setText(item.getLocations().get(0).getLocation());
+        if (item.getLocations().size() > 0) {
+            location.setText(item.getLocations().get(0).getLocation());
+        }
 
         String itemIcon = item.getIcon();
         ImageView bg = findViewById(R.id.item_full_header_bg);
@@ -247,7 +253,7 @@ public class ItemActivity extends AppCompatActivity {
                 bg.setImageTintMode(PorterDuff.Mode.SRC_OVER);
                 ImageView back = findViewById(R.id.item_full_back);
                 back.setImageTintList(ColorStateList.valueOf(color));
-            } catch (Exception ignored){
+            } catch (Exception ignored) {
             }
         }
 
@@ -261,7 +267,7 @@ public class ItemActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivityForResult(new IntentBuilder(ItemActivity.this, CreateObjectActivity.class)
-                    .icon(itemIcon).scope("update").type("item").blueprint(item).build(), 0);
+                        .icon(itemIcon).scope("update").type("item").blueprint(item).build(), 0);
             }
         });
     }
@@ -288,7 +294,7 @@ public class ItemActivity extends AppCompatActivity {
         }
     }
 
-    private void contentNotLoaded(){
+    private void contentNotLoaded() {
         TextView internalName = findViewById(R.id.item_full_internal_name);
         TextView serialNumber = findViewById(R.id.item_full_serial_number);
         TextView description = findViewById(R.id.item_full_description);
@@ -298,13 +304,13 @@ public class ItemActivity extends AppCompatActivity {
 
         LayoutHelper.hide(internalName, serialNumber, description, details, state, location);
 
-        for(ShimmerFrameLayout shimmer : shimmers){
+        for (ShimmerFrameLayout shimmer : shimmers) {
             shimmer.startShimmer();
             shimmer.setVisibility(View.VISIBLE);
         }
     }
 
-    private void contentLoaded(){
+    private void contentLoaded() {
         TextView internalName = findViewById(R.id.item_full_internal_name);
         TextView serialNumber = findViewById(R.id.item_full_serial_number);
         TextView description = findViewById(R.id.item_full_description);
@@ -312,7 +318,7 @@ public class ItemActivity extends AppCompatActivity {
         TextView state = findViewById(R.id.item_full_state);
         TextView location = findViewById(R.id.item_full_location);
 
-        for(ShimmerFrameLayout shimmer : shimmers){
+        for (ShimmerFrameLayout shimmer : shimmers) {
             shimmer.stopShimmer();
             shimmer.setVisibility(View.GONE);
         }

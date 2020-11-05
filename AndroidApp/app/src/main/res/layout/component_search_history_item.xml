@@ -16,6 +16,7 @@
         android:layout_height="24dp"
         android:layout_marginEnd="10dp"
         android:background="@drawable/small_icon"
+        android:backgroundTint="@color/background"
         android:src="@drawable/magnify" />
 
     <TextView

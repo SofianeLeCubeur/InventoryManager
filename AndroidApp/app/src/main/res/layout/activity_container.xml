@@ -270,13 +270,13 @@
                             android:layout_width="@dimen/full_page_action_icon_size"
                             android:layout_height="@dimen/full_page_action_icon_size"
                             android:background="@drawable/small_icon"
-                            android:backgroundTint="@color/purple_mask"
+                            android:backgroundTint="@color/blue_mask"
                             android:padding="6dp"
                             android:src="@drawable/qrcode_scan"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:tint="@color/purple" />
+                            app:tint="@color/blue" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -300,7 +300,7 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <!--<androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
@@ -386,7 +386,7 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:tint="@color/foreground" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>-->
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/container_full_edit"

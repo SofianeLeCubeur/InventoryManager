@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#8E3B4A</color>
     <color name="colorAccent">#F96D80</color>
     <color name="colorAccentTransparent">#4DF96D80</color>
+    <color name="colorAccentMask">#2EF96D80</color>
 
     <color name="dark_gray">#333333</color>
     <color name="foreground">#707070</color>
@@ -23,12 +24,14 @@
     <color name="brown_mask">#33612C2C</color>
     <color name="orange">#FF9800</color>
     <color name="orange_mask">#33FF9800</color>
-    <color name="purple">#03A9F4</color>
-    <color name="purple_mask">#4D03A9F4</color>
+    <color name="blue">#03A9F4</color>
+    <color name="blue_mask">#4D03A9F4</color>
     <color name="glass">#2EFFFFFF</color>
     <color name="yellow">#FF712E</color>
     <color name="yellow_mask">#FFF0E9</color>
     <color name="yellow_glass">#33FF712E</color>
+    <color name="purple">#5326A1</color>
+    <color name="purple_mask">#4D5326A1</color>
 
     <color name="transparent">#00000000</color>
     <color name="black_overlay">#66000000</color>

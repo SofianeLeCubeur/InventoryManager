@@ -2,6 +2,7 @@ package com.github.sofiman.inventory;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
@@ -22,8 +23,10 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.View;
 import android.webkit.URLUtil;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
@@ -45,7 +48,9 @@ import com.github.sofiman.inventory.ui.components.ItemComponent;
 import com.github.sofiman.inventory.ui.components.TagComponent;
 import com.github.sofiman.inventory.ui.dialogs.DoubleEditDialog;
 import com.github.sofiman.inventory.ui.dialogs.EditLocationDialog;
+import com.github.sofiman.inventory.utils.IntentBuilder;
 import com.github.sofiman.inventory.utils.LayoutHelper;
+import com.github.sofiman.inventory.utils.StringUtils;
 import com.github.sofiman.inventory.utils.transform.BitmapBorderTransformation;
 import com.github.sofiman.inventory.utils.transform.MaskTransformation;
 import com.github.sofiman.inventory.utils.transform.PaletteBitmapTransformation;
@@ -75,6 +80,7 @@ public class CreateObjectActivity extends AppCompatActivity {
     private Map<String, TagComponent> tagList = new HashMap<>();
     private String itemActiveTag;
     private List<String> itemIds;
+    private  ConstraintLayout extraLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,13 +108,10 @@ public class CreateObjectActivity extends AppCompatActivity {
 
         // Setup icon, background and back button
         final ImageView back = findViewById(R.id.create_object_back);
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                supportFinishAfterTransition();
-            }
+        back.setOnClickListener(view -> {
+            setResult(2);
+            supportFinishAfterTransition();
         });
-        final ImageView bg = findViewById(R.id.create_object_header_bg);
         updateIcon();
 
         // Location edition
@@ -123,12 +126,9 @@ public class CreateObjectActivity extends AppCompatActivity {
                 locationPoints.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
                 locationPoints.setNestedScrollingEnabled(false);
                 locationAdapter = new LocationPointAdapter(this, points);
-                locationAdapter.setOnClick(new com.github.sofiman.inventory.utils.Callback<LocationPoint>() {
-                    @Override
-                    public void run(LocationPoint data) {
-                        if (data.getTimestamp() == -1) {
-                            openLocationDialog();
-                        }
+                locationAdapter.setOnClick(data -> {
+                    if (data.getTimestamp() == -1) {
+                        openLocationDialog();
                     }
                 });
                 locationPoints.setAdapter(locationAdapter);
@@ -165,45 +165,56 @@ public class CreateObjectActivity extends AppCompatActivity {
                                     }
                                 }
                                 itemActiveTag = tagId;
-                                if(itemActiveTag.equals("explore")){
-                                    loadExploreItems();
-                                } else if(itemActiveTag.equals("added")){
-                                    loadContent(itemIds);
-                                }
-                                // TODO: Update the item recycler view
+                                updateItemViewState();
                             }
                         }
                     });
                 }
+                updateItemViewState();
             }
         }
 
         // Icon and Background edition
-        findViewById(R.id.create_object_edit_icon).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DoubleEditDialog dialog = new DoubleEditDialog(CreateObjectActivity.this, getLayoutInflater(),
-                        new DataField(0, icon, getString(R.string.create_object_icon_url)),
-                        new DataField(0, background, getString(R.string.create_object_background_url)));
-                dialog.setButtons(getString(R.string.dialog_save), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dg, int which) {
-                        String raw = dialog.getFirstField().getText().toString();
-                        if (raw.equals("") || URLUtil.isValidUrl(raw)) {
-                            icon = raw;
-                            updateIcon();
-                        }
-                        raw = dialog.getSecondField().getText().toString();
-                        if (raw.equals("") || URLUtil.isValidUrl(raw)) {
-                            background = raw;
-                            buildGlass(back, bg);
-                        }
-                        dg.dismiss();
-                    }
-                }, getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE);
-                dialog.show();
-            }
-        });
+        ImageView editIcon = findViewById(R.id.create_object_edit_icon);
+        final TextView save = findViewById(R.id.create_object_save);
+        if (type.equals("container")) {
+             ImageView iconImage = findViewById(R.id.create_object_icon_image);
+             TextView iconText = findViewById(R.id.create_object_icon_text);
+             ImageView bg = findViewById(R.id.create_object_header_bg);
+
+            iconText.setVisibility(View.INVISIBLE);
+            iconImage.setVisibility(View.VISIBLE);
+            iconImage.setBackgroundResource(R.drawable.small_icon);
+            iconImage.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.brown_mask)));
+            iconImage.setBackgroundTintMode(PorterDuff.Mode.SRC_ATOP);
+            iconImage.setImageResource(R.drawable.cube);
+            iconImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.brown)));
+            int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
+            iconImage.setPadding(px, px, px, px);
+
+            int darkAccent = getColor(R.color.colorPrimaryDark);
+            int bgColor = Color.argb(82, Color.red(darkAccent), Color.green(darkAccent), Color.blue(darkAccent));
+            save.setTextColor(darkAccent);
+            save.setBackgroundTintList(ColorStateList.valueOf(bgColor));
+
+            bg.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.colorAccent)));
+            back.setImageTintList(ColorStateList.valueOf(darkAccent));
+
+            editIcon.setVisibility(View.INVISIBLE);
+        } else {
+            editIcon.setOnClickListener(v -> showEditIconDialog());
+        }
+
+        if(intent.hasExtra("extra")){
+            final List<String> extraData = intent.getStringArrayListExtra("extra");
+            int extraIdx = intent.getIntExtra("extraIdx", 0);
+            extraLayout = findViewById(R.id.create_object_extra);
+            TextView selection = findViewById(R.id.create_object_selection);
+            selection.setVisibility(View.VISIBLE);
+            selection.setText(getString(R.string.create_object_selection_state, extraIdx + 1, extraData.size()));
+            findViewById(R.id.create_object_scanned_data).setVisibility(View.VISIBLE);
+            showScannedData(extraData, extraIdx);
+        }
 
         View dummyHeader = findViewById(R.id.dummy_header);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) dummyHeader.getLayoutParams();
@@ -214,121 +225,130 @@ public class CreateObjectActivity extends AppCompatActivity {
         adapter = new InputFieldListAdapter(this, fields);
         recyclerView.setAdapter(adapter);
 
-        findViewById(R.id.create_object_save).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (scope.equals("update")) {
-                    System.out.println(type);
-                    if (type.equals("inventory")) {
-                        Fetcher.getInstance().pushInventory(objectId, adapter.getFields(), itemIds, icon, background, new APIResponse<Inventory>() {
-                            @Override
-                            public void response(Inventory callback) {
-                                Intent intent = new Intent();
-                                intent.putExtra("INVENTORY_ID", callback.getId());
-                                intent.putExtra("INVENTORY_NAME", callback.getName());
-                                intent.putExtra("INVENTORY_ICON", callback.getIcon());
-                                setResult(1, intent);
-                                supportFinishAfterTransition();
-                            }
+        findViewById(R.id.create_object_save).setOnClickListener(v -> {
+            System.out.println("Mutating " + fields.size() + " fields to " + scope + " the " + type);
+            if (scope.equals("update")) {
+                List<LocationPoint> locationPoints = locationAdapter.getLocations();
+                locationPoints.remove(0);
+                if (type.equals("inventory")) {
+                    Fetcher.getInstance().pushInventory(objectId, adapter.getFields(), itemIds, icon, background, new APIResponse<Inventory>() {
+                        @Override
+                        public void response(Inventory callback) {
+                            apply(new IntentBuilder().inventory(callback).build());
+                        }
 
-                            @Override
-                            public void error(RequestError error) {
-                                System.err.println("Could not update: " + error.toString());
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(CreateObjectActivity.this,
-                                                getString(R.string.create_object_push_error, getString(R.string.create_object_push_inventory),
-                                                        error.toString()), Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                        });
-                    } else if(type.equals("container")){
-                        Fetcher.getInstance().pushContainer(objectId, adapter.getFields(), itemIds, icon, background, new APIResponse<Container>() {
-                            @Override
-                            public void response(Container callback) {
-                                Intent intent = new Intent();
-                                intent.putExtra("CONTAINER_ID", callback.getRawId());
-                                intent.putExtra("CONTAINER_NAME", callback.getContent());
-                                intent.putExtra("CONTAINER_LOCATION", callback.getLocation());
-                                setResult(1, intent);
-                                supportFinishAfterTransition();
-                            }
+                        @Override
+                        public void error(RequestError error) {
+                            printError(error, R.string.create_object_push_inventory);
+                        }
+                    });
+                } else if (type.equals("container")) {
+                    Fetcher.getInstance().pushContainer(objectId, adapter.getFields(), itemIds, locationPoints, icon, background, new APIResponse<Container>() {
+                        @Override
+                        public void response(Container callback) {
+                            apply(new IntentBuilder().container(callback).build());
+                        }
 
-                            @Override
-                            public void error(RequestError error) {
-                                System.err.println("Could not update: " + error.toString());
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(CreateObjectActivity.this,
-                                                getString(R.string.create_object_push_error, getString(R.string.create_object_push_container),
-                                                        error.toString()), Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                        });
-                    } else if (type.equals("item")) {
-                        Fetcher.getInstance().pushItem(objectId, adapter.getFields(), icon, background, new APIResponse<Item>() {
-                            @Override
-                            public void response(Item callback) {
-                                Intent intent = new Intent();
-                                intent.putExtra("ITEM_ID", callback.getId());
-                                intent.putExtra("ITEM_NAME", callback.getName());
-                                intent.putExtra("ITEM_ICON", callback.getIcon());
-                                setResult(1, intent);
-                                supportFinishAfterTransition();
-                            }
+                        @Override
+                        public void error(RequestError error) {
+                            printError(error, R.string.create_object_push_container);
+                        }
+                    });
+                } else if (type.equals("item")) {
+                    Fetcher.getInstance().pushItem(objectId, adapter.getFields(), locationPoints, icon, background, new APIResponse<Item>() {
+                        @Override
+                        public void response(Item callback) {
+                            apply(new IntentBuilder().item(callback).build());
+                        }
 
-                            @Override
-                            public void error(RequestError error) {
-                                System.err.println("Could not update: " + error.toString());
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(CreateObjectActivity.this,
-                                                getString(R.string.create_object_push_error, getString(R.string.create_object_push_item),
-                                                        error.toString()), Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                        });
-                    } else {
-                        System.out.println("Err: Cannot update " + type + ": not implemented yet!! SOFIMAN GET TO WORK");
-                    }
-                } else if (scope.equals("create")) {
-                    if (type.equals("inventory")) {
-                        Fetcher.getInstance().createInventory(adapter.getFields(), itemIds, icon, background, new APIResponse<Inventory>() {
-                            @Override
-                            public void response(Inventory callback) {
-                                Intent intent = new Intent();
-                                intent.putExtra("INVENTORY_ID", callback.getId());
-                                intent.putExtra("INVENTORY_NAME", callback.getName());
-                                intent.putExtra("INVENTORY_ICON", callback.getIcon());
-                                setResult(1, intent);
-                                supportFinishAfterTransition();
-                            }
+                        @Override
+                        public void error(RequestError error) {
+                            printError(error, R.string.create_object_push_item);
+                        }
+                    });
+                }
+            } else if (scope.equals("create")) {
+                if (type.equals("inventory")) {
+                    Fetcher.getInstance().createInventory(adapter.getFields(), itemIds, icon, background, new APIResponse<Inventory>() {
+                        @Override
+                        public void response(Inventory callback) {
+                            apply(new IntentBuilder().inventory(callback).build());
+                        }
 
-                            @Override
-                            public void error(RequestError error) {
-                                System.err.println("Could not update: " + error.toString());
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(CreateObjectActivity.this,
-                                                getString(R.string.create_object_push_error, getString(R.string.create_object_push_inventory),
-                                                        error.toString()), Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                        });
-                    } else {
-                        System.out.println("Err: Cannot create " + type + ": not implemented yet!! SOFIMAN GET TO WORK");
-                    }
+                        @Override
+                        public void error(RequestError error) {
+                            printError(error, R.string.create_object_push_inventory);
+                        }
+                    });
+                } else if (type.equals("container")) {
+                    Fetcher.getInstance().createContainer(adapter.getFields(), itemIds, new APIResponse<Container>() {
+                        @Override
+                        public void response(Container callback) {
+                            apply(new IntentBuilder().container(callback).build());
+                        }
+
+                        @Override
+                        public void error(RequestError error) {
+                            printError(error, R.string.create_object_push_container);
+                        }
+                    });
+                } else if (type.equals("item")) {
+                    Fetcher.getInstance().createItem(adapter.getFields(), icon, background, new APIResponse<Item>() {
+                        @Override
+                        public void response(Item callback) {
+                            apply(new IntentBuilder().item(callback).build());
+                        }
+
+                        @Override
+                        public void error(RequestError error) {
+                            printError(error, R.string.create_object_push_item);
+                        }
+                    });
                 }
             }
         });
+    }
+
+    private void showEditIconDialog() {
+        final ImageView back = findViewById(R.id.create_object_back);
+        final ImageView bg = findViewById(R.id.create_object_header_bg);
+        DoubleEditDialog dialog = new DoubleEditDialog(CreateObjectActivity.this, getLayoutInflater(),
+                new DataField(0, icon, getString(R.string.create_object_icon_url)),
+                new DataField(0, background, getString(R.string.create_object_background_url)));
+        dialog.setButtons(getString(R.string.dialog_save), (dg, which) -> {
+            String raw = dialog.getFirstField().getText().toString();
+            if (raw.equals("") || URLUtil.isValidUrl(raw) || raw.contains(":")) {
+                icon = raw;
+                updateIcon();
+            }
+            raw = dialog.getSecondField().getText().toString();
+            if (raw.equals("") || URLUtil.isValidUrl(raw) || raw.contains(":")) {
+                background = raw;
+                buildGlass(back, bg);
+            }
+            dg.dismiss();
+        }, getString(R.string.dialog_cancel), DoubleEditDialog.DISPOSE);
+        dialog.show();
+    }
+
+    private void updateItemViewState(){
+        if (itemActiveTag.equals("explore")) {
+            loadExploreItems();
+        } else if (itemActiveTag.equals("added")) {
+            loadContent(itemIds);
+        }
+    }
+
+    private void apply(Intent intent) {
+        setResult(1, intent);
+        supportFinishAfterTransition();
+    }
+
+    private void printError(RequestError error, @StringRes int type) {
+        System.err.println("Could not update: " + error.toString());
+        runOnUiThread(() -> Toast.makeText(CreateObjectActivity.this,
+                getString(R.string.create_object_push_error, getString(type),
+                        error.toString()), Toast.LENGTH_LONG).show());
     }
 
     private void buildGlass(ImageView back, ImageView bg) {
@@ -366,7 +386,7 @@ public class CreateObjectActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Exception e) {
-
+                        e.printStackTrace();
                     }
                 });
     }
@@ -382,12 +402,9 @@ public class CreateObjectActivity extends AppCompatActivity {
 
     private void openLocationDialog() {
         new EditLocationDialog(CreateObjectActivity.this, getLayoutInflater(),
-                new com.github.sofiman.inventory.utils.Callback<LocationPoint>() {
-                    @Override
-                    public void run(LocationPoint data) {
-                        locationAdapter.getLocations().add(1, data);
-                        locationAdapter.notifyDataSetChanged();
-                    }
+                data -> {
+                    locationAdapter.getLocations().add(1, data);
+                    locationAdapter.notifyDataSetChanged();
                 }).show();
     }
 
@@ -418,7 +435,7 @@ public class CreateObjectActivity extends AppCompatActivity {
                         final TextView save = findViewById(R.id.create_object_save);
                         save.setTextColor(color);
                         save.setBackgroundTintList(ColorStateList.valueOf(bgColor));
-                    } catch (NullPointerException ignored){
+                    } catch (NullPointerException ignored) {
                     }
                 }
             } else {
@@ -436,8 +453,7 @@ public class CreateObjectActivity extends AppCompatActivity {
                     iconText.setVisibility(View.VISIBLE);
                     iconImage.setVisibility(View.INVISIBLE);
 
-                    int color = Color.parseColor("#5326A1");
-                    int bgColor = Color.argb(51, Color.red(color), Color.green(color), Color.blue(color));
+                    int color = getColor(R.color.purple), bgColor = getColor(R.color.purple_mask);
                     iconText.setTextColor(ColorStateList.valueOf(color));
                     iconText.setBackgroundTintList(ColorStateList.valueOf(bgColor));
                     iconText.setText(field.getValue().toUpperCase().substring(0, 1));
@@ -449,7 +465,7 @@ public class CreateObjectActivity extends AppCompatActivity {
         }
     }
 
-    private void setupItemRecycler(List<Item> result, int color, int background, @DrawableRes int actionDrawable, SwipeCallback callback){
+    private void setupItemRecycler(List<Item> result, int color, int background, @DrawableRes int actionDrawable, SwipeCallback callback) {
         final RecyclerView items = findViewById(R.id.create_object_items);
         items.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         Drawable deleteDrawable = ContextCompat.getDrawable(this, actionDrawable);
@@ -457,7 +473,7 @@ public class CreateObjectActivity extends AppCompatActivity {
         deleteDrawable.setTint(color);
         icon.setTint(background);
 
-        if(helper != null){
+        if (helper != null) {
             helper.attachToRecyclerView(null);
         }
         int intrinsicWidth = deleteDrawable.getIntrinsicWidth();
@@ -473,9 +489,9 @@ public class CreateObjectActivity extends AppCompatActivity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 ItemListAdapter.ItemHolder holder = (ItemListAdapter.ItemHolder) viewHolder;
                 ItemListAdapter adapter = (ItemListAdapter) items.getAdapter();
-                if(adapter != null){
+                if (adapter != null) {
                     final int idx = holder.getAdapterPosition();
-                    if(idx < adapter.getItemCount() && adapter.getItems().size() > 0){
+                    if (idx < adapter.getItemCount() && adapter.getItems().size() > 0) {
                         callback.onSwipe(holder, adapter, idx);
                     }
                 }
@@ -495,7 +511,7 @@ public class CreateObjectActivity extends AppCompatActivity {
                 deleteDrawable.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom);
                 deleteDrawable.draw(c);
 
-                int iconTop =  itemView.getTop() + 40;
+                int iconTop = itemView.getTop() + 40;
                 int iconBottom = itemView.getBottom() - 40;
                 int iconLeft = deleteIconLeft - intrinsicWidth;
                 int iconRight = deleteIconRight + intrinsicWidth;
@@ -509,12 +525,7 @@ public class CreateObjectActivity extends AppCompatActivity {
         helper = new ItemTouchHelper(itemTouchHelperCallback);
         helper.attachToRecyclerView(items);
         final SearchView itemSearch = findViewById(R.id.create_object_item_search);
-        ItemListAdapter adapter = new ItemListAdapter(CreateObjectActivity.this, result, new com.github.sofiman.inventory.utils.Callback<Pair<Item, ItemComponent>>() {
-            @Override
-            public void run(Pair<Item, ItemComponent> data) {
-                LayoutHelper.openItem(CreateObjectActivity.this, data);
-            }
-        });
+        ItemListAdapter adapter = new ItemListAdapter(CreateObjectActivity.this, result, data -> LayoutHelper.openItem(CreateObjectActivity.this, data));
         items.setAdapter(adapter);
 
         itemSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -540,14 +551,11 @@ public class CreateObjectActivity extends AppCompatActivity {
         Fetcher.getInstance().fetchItems(itemIds, new APIResponse<List<Item>>() {
             @Override
             public void response(List<Item> result) {
-                setupItemRecycler(result, colorAccent, colorAccentMask, R.drawable.icon_material_remove, new SwipeCallback() {
-                    @Override
-                    public void onSwipe(ItemListAdapter.ItemHolder holder, ItemListAdapter adapter, int idx) {
-                        Item item = adapter.getItems().remove(idx);
-                        adapter.update();
-                        CreateObjectActivity.this.itemIds.remove(item.getRawId());
-                        adapter.notifyItemRemoved(idx);
-                    }
+                setupItemRecycler(result, colorAccent, colorAccentMask, R.drawable.icon_material_remove, (holder, adapter, idx) -> {
+                    Item item = adapter.getItems().remove(idx);
+                    adapter.update();
+                    CreateObjectActivity.this.itemIds.remove(item.getRawId());
+                    adapter.notifyItemRemoved(idx);
                 });
             }
 
@@ -560,7 +568,7 @@ public class CreateObjectActivity extends AppCompatActivity {
         });
     }
 
-    private void loadExploreItems(){
+    private void loadExploreItems() {
         Gson gson = new Gson();
         HashMap<String, String> m = new HashMap<>();
         m.put("type", "items");
@@ -569,7 +577,7 @@ public class CreateObjectActivity extends AppCompatActivity {
             @Override
             public void response(HashMap<String, Object> callback) {
                 ArrayList<LinkedTreeMap<?, ?>> rawItems = (ArrayList<LinkedTreeMap<?, ?>>) callback.get("items");
-                if(rawItems != null){
+                if (rawItems != null) {
                     List<Item> items = new ArrayList<>();
 
                     JsonObject content;
@@ -580,17 +588,14 @@ public class CreateObjectActivity extends AppCompatActivity {
 
                     final int green = getColor(R.color.green);
                     final int greenMask = getColor(R.color.green_mask);
-                    setupItemRecycler(items, green, greenMask, R.drawable.icon_material_add, new SwipeCallback() {
-                        @Override
-                        public void onSwipe(ItemListAdapter.ItemHolder holder, ItemListAdapter adapter, int position) {
-                            List<Item> itemList = adapter.getItems();
-                            Item item = itemList.get(position);
-                            if(!CreateObjectActivity.this.itemIds.contains(item.getRawId())){
-                                CreateObjectActivity.this.itemIds.add(item.getRawId());
-                                Toast.makeText(CreateObjectActivity.this, "Item added to the inventory", Toast.LENGTH_SHORT).show();
-                            }
-                            adapter.notifyItemChanged(position);
+                    setupItemRecycler(items, green, greenMask, R.drawable.icon_material_add, (holder, adapter, position) -> {
+                        List<Item> itemList = adapter.getItems();
+                        Item item = itemList.get(position);
+                        if (!CreateObjectActivity.this.itemIds.contains(item.getRawId())) {
+                            CreateObjectActivity.this.itemIds.add(item.getRawId());
+                            Toast.makeText(CreateObjectActivity.this, R.string.create_object_item_added, Toast.LENGTH_SHORT).show();
                         }
+                        adapter.notifyItemChanged(position);
                     });
                 }
             }
@@ -598,6 +603,7 @@ public class CreateObjectActivity extends AppCompatActivity {
             @Override
             public void error(RequestError error) {
                 System.err.println(error.toString());
+                Toast.makeText(CreateObjectActivity.this, getString(R.string.full_page_error_items, error.toString()), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -609,5 +615,57 @@ public class CreateObjectActivity extends AppCompatActivity {
 
     private interface SwipeCallback {
         void onSwipe(ItemListAdapter.ItemHolder holder, ItemListAdapter adapter, int position);
+    }
+
+    private void showScannedData(List<String> extraData, int extraIdx){
+        final String extra = extraData.get(extraIdx);
+
+        final LinearLayout backSelection = findViewById(R.id.create_object_extra_back);
+        final LinearLayout nextSelection = findViewById(R.id.create_object_extra_next);
+        final TextView content = findViewById(R.id.create_object_extra_content);
+        final TextView label = findViewById(R.id.create_object_extra_label);
+        extraLayout.setVisibility(View.VISIBLE);
+        content.setText(extra);
+        label.setText(getString(R.string.create_object_extra_data, extraIdx+1, extraData.size()));
+        extraLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                StringUtils.setClipboard(CreateObjectActivity.this, "inventorymanager_scanned_data", extra);
+                Toast.makeText(CreateObjectActivity.this, getString(R.string.scan_history_selection_copied, getString(R.string.create_object_extra_data)), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        extraLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View currentFocus = getCurrentFocus();
+                if(currentFocus instanceof EditText){
+                    ((EditText) currentFocus).setText(extra);
+                }
+            }
+        });
+        if(extraIdx == 0){
+            backSelection.setVisibility(View.INVISIBLE);
+        } else {
+            backSelection.setVisibility(View.VISIBLE);
+            backSelection.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showScannedData(extraData, extraIdx - 1);
+                }
+            });
+        }
+        if(extraIdx == extraData.size() - 1){
+            nextSelection.setVisibility(View.INVISIBLE);
+        } else {
+            nextSelection.setVisibility(View.VISIBLE);
+            nextSelection.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showScannedData(extraData, extraIdx + 1);
+                }
+            });
+        }
+
     }
 }
