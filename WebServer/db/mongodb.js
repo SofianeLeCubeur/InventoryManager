@@ -15,14 +15,14 @@ function assertQueryMatch(query, match){
 module.exports = class Database {
 
     constructor(config){
-        MongoClient.connect('mongodb://' + config.mongodb.host + ':' + config.mongodb.port, 
-        { auth: { user: config.mongodb.username, password: config.mongodb.password }, useUnifiedTopology: true }, (err, c) => {
+        MongoClient.connect('mongodb://' + config.host + ':' + config.port, 
+        { auth: { user: config.username, password: config.password }, useUnifiedTopology: true }, (err, c) => {
             if(err){
                 console.error('[DB] Could not connect to MongoDB');
             } else {
                 console.log("[DB] Connected successfully to MongoDB");
                 this.client = c;
-                this.db = c.db(config.mongodb.databaseName);
+                this.db = c.db(config.databaseName);
                 this.db.listCollections().toArray(function(err, cols){
                     if(!err){
                         let needed = ['containers', 'inventories', 'items', 'scan_log', 'tokens']
@@ -34,16 +34,20 @@ module.exports = class Database {
                             })
                         })
                         if(needed.length == 0) return;
-                        console.warn('[DB][MongoDB] Warning: Missing', needed.join(', '), 'collections! Trying to rebuild...');
-                        needed.forEach(col => {
-                            this.db.createCollection(col, function(err, result) {
-                                if (err){
-                                    console.error('[DB][MongoDB] Could not create', col, ':', err);
-                                } else {
-                                    console.log('[DB][MongoDB] Collection', col, 'successfully created');
-                                }
+                        if(config.rebuild || config.rebuild === undefined){
+                            console.warn('[DB][MongoDB] Warning: Missing', needed.join(', '), 'collections! Trying to rebuild...');
+                            needed.forEach(col => {
+                                this.db.createCollection(col, function(err, result) {
+                                    if (err){
+                                        console.error('[DB][MongoDB] Could not create', col, ':', err);
+                                    } else {
+                                        console.log('[DB][MongoDB] Collection', col, 'successfully created');
+                                    }
+                                });
                             });
-                        });
+                        } else {
+                            console.warn('[DB][MongoDB] Warning: Missing', needed.join(', '), 'collections!');
+                        }
                     }
                 }.bind(this))
             }

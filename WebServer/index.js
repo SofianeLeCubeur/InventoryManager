@@ -4,8 +4,10 @@ const bodyParser = require('body-parser');
 const Database = require('./db/mongodb');
 const path = require('path');
 const { escapeRegExp } = require('./utils');
+const config = require('./config.json');
+const expressConfig = config.express;
 
-let database = new Database(require('./config.json'));
+let database = new Database(config.mongodb);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -38,9 +40,12 @@ function authMiddleware(authorization_type){
 }
 
 app.use('/', (req, res, next) => {
-    res.set('Access-Control-Allow-Origin', '*')
-    res.set('Access-Control-Allow-Headers', '*')
-    res.set('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    if(!expressConfig.cors){
+        expressConfig.cors = {};
+    }
+    res.set('Access-Control-Allow-Origin', expressConfig.cors.origin || '*')
+    res.set('Access-Control-Allow-Headers', expressConfig.cors.headers || '*')
+    res.set('Access-Control-Allow-Methods', expressConfig.cors.methods || 'GET,PUT,POST,DELETE,OPTIONS')
     if (req.method === 'OPTIONS') {
         res.sendStatus(204);
         return;
@@ -65,12 +70,13 @@ require('./routes/containers')(router, database, authMiddleware)
 require('./routes/items')(router, database, authMiddleware)
 require('./routes/general')(router, database, authMiddleware)
 
-app.use(router);
+app.use(expressConfig.baseUrl, router);
 app.use(function(req, res) {
     res.sendFile(path.resolve('./errors/404.html'));
 });
 
-let server = app.listen(80, () => {
-    console.log('[Express] Listening on localhost:80');
+const port = expressConfig.port;
+let server = app.listen(port, () => {
+    console.log(`[Express] Listening on port ${port}`);
 })
 
