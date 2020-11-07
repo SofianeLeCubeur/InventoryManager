@@ -75,8 +75,7 @@ app.use(function(req, res) {
     res.sendFile(path.resolve('./errors/404.html'));
 });
 
-const port = expressConfig.port;
-let server = app.listen(port, () => {
-    console.log(`[Express] Listening on port ${port}`);
+let server = app.listen(80, () => {
+    console.log(`[Express] Listening on port 80`);
 })
 

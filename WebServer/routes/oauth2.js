@@ -26,7 +26,7 @@ module.exports = function(router, database, authMiddleware){
             let b = await argon2.verify(target, input);
             return b;
         } catch (err) {
-            console.err('[EXP] ERROR: Could not assert passwords: ' + err);
+            console.err('[Express] ERROR: Could not assert passwords: ' + err);
         }
         return false;
     }
