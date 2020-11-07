@@ -25,7 +25,7 @@ module.exports = class Database {
                 this.db = c.db(config.databaseName);
                 this.db.listCollections().toArray(function(err, cols){
                     if(!err){
-                        let needed = ['containers', 'inventories', 'items', 'scan_log', 'tokens']
+                        let needed = ['users', 'inventories', 'containers', 'items', 'scan_log', 'tokens']
                         cols.forEach(col => {
                             needed.forEach((n,i) => {
                                 if(col.name === n){
@@ -57,68 +57,61 @@ module.exports = class Database {
     isConnected(){
         return !!this.db;
     }
-
-    insertItem(item, callback){
-        const collection = this.db.collection('items');
-        collection.insertOne(item, function(err, result) {
-            if(!err && result.ops[0] === item && callback){
-                callback(data);
-            } else {
-                callback(null);
-            }
-        });
-    }
-
-    insertContainer(container, callback){
-        const collection = this.db.collection('containers');
-        collection.insertOne(container, function(err, result) {
-            if(!err && result.ops[0] === container && callback){
-                callback(data);
-            } else {
-                callback(null);
-            }
-        });
+    
+    insertUser(user, callback){
+        this.insertOne('users', user, (result, data) => result.ops[0].password === password, callback);
     }
 
     insertInventory(inventory, callback){
-        const collection = this.db.collection('inventories');
-        collection.insertOne(inventory, function(err, result) {
-            if(!err && result.ops[0] === inventory && callback){
-                callback(data);
-            } else {
-                callback(null);
-            }
-        });
+        this.insertOne('inventories', inventory, (result, data) => result.ops[0] === inventory, callback);
     }
 
-    fetchItem(query, callback){
-        this.findOne('items', query, callback);
+    insertContainer(container, callback){
+        this.insertOne('containers', container, (result, data) => result.ops[0] === container, callback);
+    }
+
+    insertItem(item, callback){
+        this.insertOne('items', item, (result, data) => result.ops[0] === item, callback);
+    }
+    
+    storeToken(token, callback){
+        let timestamp = Date.now(); 
+        this.insertOne('tokens', { _id: token.token, type: token.type, uid: token.uid, scope: token.scope, timestamp }, 
+            (result, data) => result.ops[0]._id === token.token, callback);
+    }
+
+    fetchUser(query, callback){
+        this.fetchOne('users', query, callback);
+    }
+    
+    fetchInventory(query, callback){
+        this.findOne('inventories', query, callback);
     }
 
     fetchContainer(query, callback){
         this.findOne('containers', query, callback);
     }
 
-    fetchInventory(query, callback){
-        this.findOne('inventories', query, callback);
+    fetchItem(query, callback){
+        this.findOne('items', query, callback);
     }
 
     fetchToken(token, callback){
         this.findOne('tokens', { _id: token }, callback);
     }
 
-    fetchItems(query, offset, length, callback){
-        this.fetch('items', query, offset, length, callback);
+    fetchInventories(query, offset, length, callback){
+        this.fetch('inventories', query, offset, length, callback);
     }
 
     fetchContainers(query, offset, length, callback){
         this.fetch('containers', query, offset, length, callback);
     }    
 
-    fetchInventories(query, offset, length, callback){
-        this.fetch('inventories', query, offset, length, callback);
+    fetchItems(query, offset, length, callback){
+        this.fetch('items', query, offset, length, callback);
     }
-    
+
     updateInventory(query, inv, callback){
         this.updateOne('inventories', query, inv, callback);
     }
@@ -131,10 +124,8 @@ module.exports = class Database {
         this.updateOne('items', query, item, callback);
     }
 
-    pushContainer(container, callback){
-        const id = generateId();
-        let cnt = Object.assign({ _id: id, state: '', details: '', locations: [], items: [] }, container);
-        this.insertOne('containers', cnt, (result, data) => result.ops[0]._id === id, callback);
+    updateUser(query, user, callback){
+        this.updateOne('users', query, user, callback);
     }
 
     pushInventory(inventory, callback){
@@ -144,6 +135,12 @@ module.exports = class Database {
         }
         let inv = Object.assign({ _id: id, background: null, state: '', location: '', items: [], }, inventory);
         this.insertOne('inventories', inv, (result, data) => result.ops[0]._id === id, callback);
+    }
+    
+    pushContainer(container, callback){
+        const id = generateId();
+        let cnt = Object.assign({ _id: id, state: '', details: '', locations: [], items: [] }, container);
+        this.insertOne('containers', cnt, (result, data) => result.ops[0]._id === id, callback);
     }
     
     pushItem(item, callback){
@@ -157,11 +154,6 @@ module.exports = class Database {
 
     pushScanLog(log, callback){
         this.insertOne('scan_log', log, (result, data) => result.ops[0].uid === data.uid, callback);
-    }
-
-    storeToken(token, callback){
-        this.insertOne('tokens', { _id: token.token, type: token.type, uid: token.uid, scope: token.scope }, 
-            (result, data) => result.ops[0]._id === token.token, callback);
     }
 
     deleteInventory(id, callback){

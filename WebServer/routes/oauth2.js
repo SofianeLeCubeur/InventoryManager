@@ -1,4 +1,5 @@
 const { generateToken } = require('./../utils');
+const argon2 = require('argon2');
 const allowedScopes = [
     'fetch.*', 'fetch.inv', 'fetch.itm', 'fetch.cnt', 
     'scan', 
@@ -20,6 +21,49 @@ module.exports = function(router, database, authMiddleware){
         return filteredScope.substring(1);
     }
 
+    function assertPasswordEquals(input, target){
+        try {
+            if (await argon2.verify(target, input)) {
+                return true;
+            }
+        } catch (err) {
+            console.err('[EXP] ERROR: Could not assert passwords: ' + err);
+        }
+        return false;
+    }
+
+    router.post('/user', (req, res) => {
+        const body = req.body;
+        if(typeof body.username === 'string' && typeof body.password === 'string'){
+            database.insertUser({ username: body.username, password: body.password }, (user) => {
+                if(user){
+                    delete user.password;
+                    user.id = user._id;
+                    delete user._id;
+                    res.status(200).json({ success: true, ...user });
+                } else {
+                    res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not create user' });
+                }
+            });
+        } else {
+            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Missing username and password' });
+        }
+    });
+
+    router.get('/user', authMiddleware('Bearer'), (req, res) => {
+        let token = res.locals.token;
+        database.fetchUser({ _id: token.uid }, (user) => {
+            if(user){
+                delete user.password;
+                user.id = user._id;
+                delete user._id;
+                res.status(200).json({ success: true, ...user });
+            } else {
+                res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not fetch user info' });
+            }
+        })
+    });
+
     router.all('/token', (req, res) => {
         if(req.method !== 'POST'){
             res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
@@ -36,12 +80,22 @@ module.exports = function(router, database, authMiddleware){
                     if(scope && typeof scope === 'string'){
                         let scopes = filterScopes(scope, allowedScopes);
                         if(scopes.length > 0){
-                            let token = { token: generateToken(), type: 'Bearer', uid: username, scope: scopes };
-                            database.storeToken(token, result => {
-                                if(result){
-                                    res.status(200).json({ success: true, ...token });
+                            database.fetchUser({ username: username }, (user) => {
+                                if(user && user.password){
+                                    if(assertPasswordEquals(password, user.password)){
+                                        let token = { token: generateToken(), type: 'Bearer', uid: user._id, scope: scopes };
+                                        database.storeToken(token, result => {
+                                            if(result){
+                                                res.status(200).json({ success: true, ...token });
+                                            } else {
+                                                res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not acquire token' });
+                                            }
+                                        });
+                                    } else {
+                                        res.status(403).json({ success: false, err: 'forbidden', err_description: 'Forbidden' });
+                                    }
                                 } else {
-                                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Could not acquire token' });
+                                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Forbidden' });
                                 }
                             });
                         } else {

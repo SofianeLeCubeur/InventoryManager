@@ -9,6 +9,7 @@ module.exports = function(router, database, authMiddleware){
         'icon': function(s){
             if(typeof s !== 'string') return false;
             if(s.length == 0) return true;
+            if(s.length > 4) return false;
             try {
                 new URL(s);
                 return true;
@@ -34,11 +35,12 @@ module.exports = function(router, database, authMiddleware){
             return typeof s === 'string' && s.length <= 16
         }, 
         'items': function(s){
+            if(!Array.isArray(s)) return false;
             let b = 0;
             s.forEach(item => {
                 if(typeof item === 'string') b++;
             })
-            return Array.isArray(s) && b === s.length;
+            return b === s.length;
         }
     };
 
