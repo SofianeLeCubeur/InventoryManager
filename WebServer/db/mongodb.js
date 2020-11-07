@@ -1,5 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
-const { generateId, randomColor } = require('./../utils');
+const { generateId, generateHash, randomColor } = require('./../utils');
 
 function assertQueryMatch(query, match){
     let valid = true;
@@ -59,7 +59,8 @@ module.exports = class Database {
     }
     
     insertUser(user, callback){
-        this.insertOne('users', user, (result, data) => result.ops[0].password === user.password, callback);
+        const uid = generateHash();
+        this.insertOne('users', { _id: uid, ...user }, (result, data) => result.ops[0].password === user.password, callback);
     }
 
     insertInventory(inventory, callback){
@@ -81,7 +82,7 @@ module.exports = class Database {
     }
 
     fetchUser(query, callback){
-        this.fetchOne('users', query, callback);
+        this.findOne('users', query, callback);
     }
     
     fetchInventory(query, callback){

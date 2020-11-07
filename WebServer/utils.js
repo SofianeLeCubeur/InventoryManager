@@ -24,6 +24,9 @@ module.exports = {
     generateId(key=0){
         return Number(key).toString(16).padStart(2, '0') + crypto.randomBytes(12).toString('hex').substring(2)
     },
+    generateHash(){
+        return crypto.randomBytes(12).toString('hex');
+    },
     randomColor(){
         let idx = Math.floor(Math.random() * colors.length);
         return colors[idx];

@@ -34,7 +34,7 @@ module.exports = function(router, database, authMiddleware){
     router.post('/user', async (req, res) => {
         const body = req.body;
         if(typeof body.username === 'string' && typeof body.password === 'string'){
-            if(body.username.length >= 2 && body.username.length <= 26){
+            if(body.username.length >= 2 && body.username.length <= 24){
                 if(body.password.length >= 4 && body.password.length <= 128){
                     const hash = await argon2.hash(body.password);
                     database.fetchUser({ username: body.username }, (u) => {
@@ -65,9 +65,9 @@ module.exports = function(router, database, authMiddleware){
         }
     });
 
-    router.get('/user', authMiddleware('Bearer'), (req, res) => {
+    router.all('/user', authMiddleware('Bearer'), (req, res) => {
         let token = res.locals.token;
-        database.fetchUser({ _id: token.uid }, (user) => {
+        database.fetchUser({ _id: token.uid.toString() }, (user) => {
             if(user){
                 delete user.password;
                 user.id = user._id;
