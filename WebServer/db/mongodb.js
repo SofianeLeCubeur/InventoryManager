@@ -59,7 +59,7 @@ module.exports = class Database {
     }
     
     insertUser(user, callback){
-        this.insertOne('users', user, (result, data) => result.ops[0].password === password, callback);
+        this.insertOne('users', user, (result, data) => result.ops[0].password === user.password, callback);
     }
 
     insertInventory(inventory, callback){
