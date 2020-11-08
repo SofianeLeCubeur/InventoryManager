@@ -1,5 +1,6 @@
 const { generateToken } = require('./../utils');
 const argon2 = require('argon2');
+const rateLimit = require('express-rate-limit');
 const allowedScopes = [
     'fetch.*', 'fetch.inv', 'fetch.itm', 'fetch.cnt', 
     'scan', 
@@ -31,7 +32,13 @@ module.exports = function(router, database, authMiddleware){
         return false;
     }
 
-    router.post('/user', async (req, res) => {
+    const createAccountLimiter = rateLimit({
+        windowMs: 60 * 60 * 1000,
+        max: 4,
+        message: 'Too many accounts created from this IP, please try again after an hour'
+    });
+
+    router.post('/user', createAccountLimiter, async (req, res) => {
         const body = req.body;
         if(typeof body.username === 'string' && typeof body.password === 'string'){
             if(body.username.length >= 2 && body.username.length <= 24){

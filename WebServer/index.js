@@ -1,20 +1,29 @@
 const express = require('express');
-const app = express();
+const Fingerprint = require('express-fingerprint');
 const bodyParser = require('body-parser');
 const Database = require('./db/mongodb');
+const app = express();
+
 const path = require('path');
 const { escapeRegExp } = require('./utils');
+
 const config = require('./config.json');
 const expressConfig = config.express;
+if(!expressConfig.cors){
+    expressConfig.cors = {};
+}
 
-let database = new Database(config.mongodb);
+const database = new Database(config.mongodb);
 
+app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-function validateAccessToken(str){
-    return true
-}
+app.use(Fingerprint({
+    parameters: [
+        Fingerprint.useragent,
+        Fingerprint.acceptHeaders
+    ]
+}))
 
 function authMiddleware(authorization_type){
     return function(req, res, next){
@@ -25,24 +34,19 @@ function authMiddleware(authorization_type){
             validator = new RegExp(`(${escapeRegExp(authorization_type)})\\s([A-Za-z0-9+.=]+)`);
             if(validator.test(header)){
                 const stk = header.substring(authorization_type.length+1);
-                if(validateAccessToken(stk)){
-                    database.fetchToken(stk, token => {
-                        if(token && token.type === authorization_type){
-                            res.locals.authorization_type = authorization_type;
-                            res.locals.token = token;
-                            next();
-                        } else error();
-                    });
-                } else error();
+                database.fetchToken(stk, token => {
+                    if(token && token.type === authorization_type){
+                        res.locals.authorization_type = authorization_type;
+                        res.locals.token = token;
+                        next();
+                    } else error();
+                });
             } else error();
         } else error();
     }
 }
 
 app.use('/', (req, res, next) => {
-    if(!expressConfig.cors){
-        expressConfig.cors = {};
-    }
     res.set('Access-Control-Allow-Origin', expressConfig.cors.origin || '*')
     res.set('Access-Control-Allow-Headers', expressConfig.cors.headers || '*')
     res.set('Access-Control-Allow-Methods', expressConfig.cors.methods || 'GET,PUT,POST,DELETE,OPTIONS')
@@ -50,7 +54,7 @@ app.use('/', (req, res, next) => {
         res.sendStatus(204);
         return;
     }
-    console.log('[Express]', req.method, req.originalUrl);
+    console.log('[Express]', 'F{' + req.fingerprint.hash + '}', req.method, req.originalUrl);
     next();
 })
 
