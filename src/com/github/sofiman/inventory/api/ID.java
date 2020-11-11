@@ -1,6 +1,5 @@
-package com.github.sofiman.inventory.utils;
+package com.github.sofiman.inventory.api;
 
-import java.util.Base64;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ID {
@@ -14,18 +13,6 @@ public class ID {
             buf[j++] = (byte)(Integer.parseInt(b, 16) & 0xff);
         }
         return buf;
-    }
-
-    public static String toNumber(byte[] id){
-        StringBuilder sb = new StringBuilder();
-        for(byte b : id){
-            sb.append(String.format("%02d", b));
-        }
-        return sb.toString().replaceAll("-", "");
-    }
-
-    public static String toBase64(byte[] id){
-        return Base64.getEncoder().encodeToString(id);
     }
 
     public static String toHex(byte[] id){

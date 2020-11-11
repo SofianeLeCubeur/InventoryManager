@@ -1,18 +1,14 @@
 package com.github.sofiman.inventory.api;
 
-public final class LocationPoint {
+public class LocationPoint {
 
-    private final long timestamp;
-    private final String location;
+    private String location;
+    private long timestamp;
+    private double longitude = -1, latitude = -1;
 
-    public LocationPoint(long timestamp, String location) {
+    public LocationPoint(String location, long timestamp) {
+        this.location = location;
         this.timestamp = timestamp;
-        this.location = location;
-    }
-
-    public LocationPoint(String location){
-        this.timestamp = System.currentTimeMillis();
-        this.location = location;
     }
 
     public long getTimestamp() {
@@ -23,11 +19,27 @@ public final class LocationPoint {
         return location;
     }
 
-    @Override
-    public String toString() {
-        return "LocationPoint{" +
-                "timestamp=" + timestamp +
-                ", location='" + location + '\'' +
-                '}';
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 }
