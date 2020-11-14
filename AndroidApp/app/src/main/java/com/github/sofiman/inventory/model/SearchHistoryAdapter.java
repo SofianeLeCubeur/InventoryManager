@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.sofiman.inventory.R;
-import com.github.sofiman.inventory.api.SearchHistoryItem;
 import com.github.sofiman.inventory.api.Tracker;
 import com.github.sofiman.inventory.ui.components.SearchHistoryItemComponent;
 import com.github.sofiman.inventory.ui.components.TrackerComponent;

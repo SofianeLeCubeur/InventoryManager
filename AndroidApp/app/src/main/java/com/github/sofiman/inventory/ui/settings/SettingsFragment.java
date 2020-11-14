@@ -28,14 +28,12 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.impl.HistoryDataModel;
 import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.ui.dialogs.ConfirmDialog;
 import com.github.sofiman.inventory.ui.dialogs.DoubleEditDialog;
 import com.github.sofiman.inventory.ui.login.LoginActivity;
 import com.github.sofiman.inventory.R;
-import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.model.ServerListAdapter;
 import com.github.sofiman.inventory.utils.Animations;

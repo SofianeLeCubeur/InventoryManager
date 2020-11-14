@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.sofiman.inventory.api.Container;
-import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.ui.components.ContainerComponent;
 import com.github.sofiman.inventory.ui.components.ServerComponent;
 import com.github.sofiman.inventory.utils.Callback;

@@ -33,7 +33,6 @@ import com.github.sofiman.inventory.ui.login.LoginActivity;
 import com.github.sofiman.inventory.R;
 import com.github.sofiman.inventory.api.Container;
 import com.github.sofiman.inventory.api.Inventory;
-import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.APIResponse;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;

@@ -20,7 +20,6 @@ import androidx.preference.PreferenceManager;
 
 import com.github.sofiman.inventory.ui.home.HomeActivity;
 import com.github.sofiman.inventory.R;
-import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.utils.Callback;

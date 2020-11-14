@@ -26,11 +26,11 @@ public abstract class Database {
 
     public  abstract void fetchContainers(final DatabaseResponse<List<Container>> callback);
     public abstract void  pushContainer(final byte[] id, Map<String, String> params, List<String> items,
-                                       List<LocationPoint> locations, String icon, String background, final DatabaseResponse<Container> callback);
+                                       List<LocationPoint> locations, final DatabaseResponse<Container> callback);
     public  abstract void fetchContainer(byte[] containerId, final DatabaseResponse<Container> callback);
     public  abstract void createContainer(Map<String, String> params, List<String> items, final DatabaseResponse<Container> callback);
 
-    public abstract void fetchScanResult(String objectId, String location, final DatabaseResponse<HashMap<String, Object>> callback);
+    public abstract void fetchScanResult(String deviceName, String objectId, String location, final DatabaseResponse<HashMap<String, Object>> callback);
     public abstract void doQuery(HashMap<String, String> filters, final DatabaseResponse<HashMap<String, Object>> callback);
 
 }

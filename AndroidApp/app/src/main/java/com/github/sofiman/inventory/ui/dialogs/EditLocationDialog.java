@@ -16,7 +16,6 @@ import android.widget.EditText;
 import androidx.core.app.ActivityCompat;
 
 import com.github.sofiman.inventory.R;
-import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.api.LocationPoint;
 import com.github.sofiman.inventory.utils.Callback;
 

@@ -10,7 +10,6 @@ import com.github.sofiman.inventory.api.Container;
 import com.github.sofiman.inventory.api.Inventory;
 import com.github.sofiman.inventory.api.Item;
 import com.github.sofiman.inventory.api.ScanLog;
-import com.github.sofiman.inventory.api.SearchHistoryItem;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;

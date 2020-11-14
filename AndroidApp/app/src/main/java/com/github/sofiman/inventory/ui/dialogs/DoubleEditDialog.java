@@ -9,7 +9,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.sofiman.inventory.R;
-import com.github.sofiman.inventory.api.DataField;
 
 public class DoubleEditDialog extends Dialog {
 

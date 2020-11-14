@@ -34,7 +34,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.sofiman.inventory.api.Container;
-import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.api.Inventory;
 import com.github.sofiman.inventory.api.Item;
 import com.github.sofiman.inventory.api.LocationPoint;

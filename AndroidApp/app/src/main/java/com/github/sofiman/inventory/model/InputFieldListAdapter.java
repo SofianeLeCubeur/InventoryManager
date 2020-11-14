@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.ui.components.InputFieldComponent;
 
 import java.util.List;

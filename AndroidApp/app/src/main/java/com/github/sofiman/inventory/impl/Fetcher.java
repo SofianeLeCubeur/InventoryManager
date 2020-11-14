@@ -3,12 +3,9 @@ package com.github.sofiman.inventory.impl;
 import android.util.Pair;
 
 import com.github.sofiman.inventory.api.Container;
-import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.api.Inventory;
 import com.github.sofiman.inventory.api.Item;
 import com.github.sofiman.inventory.api.LocationPoint;
-import com.github.sofiman.inventory.api.Server;
-import com.github.sofiman.inventory.api.Token;
 import com.github.sofiman.inventory.utils.Callback;
 import com.github.sofiman.inventory.api.ID;
 

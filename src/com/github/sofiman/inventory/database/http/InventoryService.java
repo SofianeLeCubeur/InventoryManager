@@ -1,17 +1,14 @@
-package com.github.sofiman.inventory.impl;
+package com.github.sofiman.inventory.database.http;
 
 import com.github.sofiman.inventory.api.Container;
 import com.github.sofiman.inventory.api.Inventory;
 import com.github.sofiman.inventory.api.Item;
-import com.google.gson.JsonObject;
 
 import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
