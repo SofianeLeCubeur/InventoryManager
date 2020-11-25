@@ -131,14 +131,7 @@ module.exports = function(router, database, authMiddleware){
         }
         database.fetchContainers({}, offset, length, docs => {
             if(docs != null){
-                let containers = docs.map(cnt => {
-                    try {
-                        return Container(cnt);
-                    } catch(e){
-                        console.error(e, cnt);
-                        return undefined;
-                    }
-                });
+                let containers = docs.map(Container);
                 res.json(containers);
             } else {
                 res.status(500).json(Error('internal_error', 'Failed to query containers'));

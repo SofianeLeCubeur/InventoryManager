@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { Error } = require('./models');
 const colors = [ '#5326A1', '#FF9A76', '#76BBFF', '#ff414d', '#28df99' ];
 
 module.exports = {
@@ -44,7 +45,7 @@ module.exports = {
                     return;
                 }
             }
-            res.status(403).json({ success: false, err: 'forbidden', err_description: 'Forbidden: missing scope in authorization' });
+            res.status(403).json(Error('forbidden', 'Forbidden: missing scope in authorization'));
         }
     }
 };

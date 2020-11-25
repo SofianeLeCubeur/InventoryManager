@@ -129,7 +129,7 @@ module.exports = function(router, database, authMiddleware){
                 res.status(400).json(Error('bad_request', 'Invalid Grant Type'))
             }
         } else {
-            res.status(400).json(Error('bad_request', 'Missing Grant Type'))
+            res.status(400).json(Error('bad_request', 'Missing Grant Type'));
         }
     })
 

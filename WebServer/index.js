@@ -5,11 +5,12 @@ const Database = require('./db/mongodb');
 const app = express();
 
 const path = require('path');
+const { Error } = require('./models');
 const { escapeRegExp } = require('./utils');
 
 const config = require('./config.json');
 if(!config){
-    console.error('No configuration provided. The config file is required to start the server properly.');
+    console.error('No configuration provided. A config is required to start the server properly.');
     process.exit(1);
 }
 const expressConfig = config.express;
@@ -33,7 +34,7 @@ function authMiddleware(authorization_type){
     return function(req, res, next){
         let header = req.headers.authorization;
         let validator;
-        let error = () => res.status(401).json({ success: false, err: 'unauthorized', err_description: 'Unauthorized' });
+        let error = () => res.status(401).json(Error('unauthorized', 'Unauthorized'));
         if(header && header.indexOf(authorization_type) === 0){
             validator = new RegExp(`(${escapeRegExp(authorization_type)})\\s([A-Za-z0-9+.=]+)`);
             if(validator.test(header)){
@@ -66,7 +67,7 @@ let router = express.Router()
 
 app.use(function(req, res, next){
     if(!database.isConnected()){
-        res.status(500).sendFile(path.resolve('./errors/database_not_connected.html'));
+        res.status(500).sendFile(path.resolve('./errors/500.html'));
         return;
     }
     next();
