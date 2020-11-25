@@ -1,4 +1,5 @@
 const { mutate, requireScope } = require('./../utils');
+const { Content, Container, Error } = require('./../models');
 
 module.exports = function(router, database, authMiddleware){
 
@@ -38,15 +39,13 @@ module.exports = function(router, database, authMiddleware){
         if(p > 0 && !!props['content']){
             database.pushContainer(props, result => {
                 if(result){
-                    result.id = result._id;
-                    delete result._id;
-                    res.status(200).json({ sucess: true, ...result });
+                    res.status(200).json(Content(result));
                 } else {
-                    res.status(500).json({ sucess: false, error: 'internal_error', err_description: 'Could not push container' });
+                    res.status(500).json(Error('internal_error', 'Could not push container'));
                 }
             });
         } else {
-            res.status(400).json({  sucess: false, error: 'bad_request', err_description: 'Fields are missing' });
+            res.status(400).json(Error('bad_request', 'Fields are missing'));
         }
     });
 
@@ -58,11 +57,9 @@ module.exports = function(router, database, authMiddleware){
             if(req.method === 'GET'){
                 database.fetchContainer(query, cnt => {
                     if(cnt != null){
-                        cnt.id = cnt._id;
-                        delete cnt._id;
-                        res.json(cnt);
+                        res.status(200).json(Content(cnt));
                     } else {
-                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any container in the database.' })
+                        res.status(404).json(Error('not_found', 'The provided ID does not refer to any container in the database.'))
                     }
                 });
                 return;
@@ -75,7 +72,7 @@ module.exports = function(router, database, authMiddleware){
                         res.status(204).end();
                         return;
                     }
-                    console.log('mutation', mutation, 'from', body);
+                    //console.log('mutation', mutation, 'from', body);
 
                     database.fetchContainer(query, cnt => {
                         if(cnt != null){
@@ -83,46 +80,44 @@ module.exports = function(router, database, authMiddleware){
                             if(cnt != mutedCnt){
                                 database.updateContainer(query, mutedCnt, cb => {
                                     if(cb){
-                                        mutedCnt.id = mutedCnt._id;
-                                        delete mutedCnt._id;
-                                        res.status(200).json(mutedCnt);
+                                        res.status(200).json(Content(mutedCnt));
                                     } else {
-                                        res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not update the container' });
+                                        res.status(500).json(Error('internal_error', 'Could not update the container'));
                                     }
                                 });
                             } else {
-                                res.status(200).json(mutedInv);
+                                res.status(200).json(Content(mutedCnt));
                             }
                         } else {
-                            res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any container in the database.' })
+                            res.status(404).json(Error('not_found', 'The provided ID does not refer to any container in the database.'))
                         }
                     });
                 } else {
-                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                    res.status(403).json(Error('forbidden', 'Not Authorized'));
                 }
             } else if(req.method === 'DELETE'){
                 if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.cnt') >= 0){
                     database.deleteContainer(query, (success) => {
                         if(success){
-                            res.status(200).json({ success: true, message: 'Container successfully deleted' });
+                            res.status(200).json(Message('Container successfully deleted', 'server'));
                         } else {
-                            res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not delete the container' });
+                            res.status(500).json(Error('internal_error', 'Could not delete the container'));
                         }
                     });
                 } else {
-                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                    res.status(403).json(Error('forbidden', 'Not Authorized'));
                 }
             } else {
-                res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+                res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             }
         } else {
-            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Bad Request' });
+            res.status(400).json(Error('bad_request', 'Bad Request'));
         }
     });
 
     router.all('/containers', authMiddleware('Bearer'), requireScope([ 'fetch.*', 'fetch.cnt' ]), (req, res) => {
         if(req.method !== 'GET'){
-            res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+            res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
         }
         let body = req.query;
@@ -138,8 +133,7 @@ module.exports = function(router, database, authMiddleware){
             if(docs != null){
                 let containers = docs.map(cnt => {
                     try {
-                        let location = cnt.locations.length > 0 && cnt.locations.sort((a, b) => b-a)[0].location || '';
-                        return { id: cnt._id, content: cnt.content, location, state: cnt.state };
+                        return Container(cnt);
                     } catch(e){
                         console.error(e, cnt);
                         return undefined;
@@ -147,7 +141,7 @@ module.exports = function(router, database, authMiddleware){
                 });
                 res.json(containers);
             } else {
-                res.status(500).json({ success: false, err: 'internal_error', err_description: 'Failed to query containers' });
+                res.status(500).json(Error('internal_error', 'Failed to query containers'));
             }
         });
     });

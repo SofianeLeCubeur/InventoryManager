@@ -18,6 +18,10 @@ export default {
     Inventory(inv){
         return { success: true, id: inv._id, name: inv.name, icon: inv.icon, location: inv.location, state: inv.state, items: inv.items };
     },
+    Container(cnt){
+        let location = cnt.locations.length > 0 && cnt.locations.sort((a, b) => b-a)[0].location || '';
+        return { id: cnt._id, content: cnt.content, location, state: cnt.state }
+    },
     Token(token){
         return { success: true, token: token.token, type: 'Bearer', scope: token.scope };
     },

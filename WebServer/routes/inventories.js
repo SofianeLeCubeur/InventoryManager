@@ -117,7 +117,7 @@ module.exports = function(router, database, authMiddleware){
                 if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.inv') >= 0){
                     database.deleteInventory(query, (success) => {
                         if(success){
-                            res.status(200).json(Message('Inventory successfully deleted', 'Server'));
+                            res.status(200).json(Message('Inventory successfully deleted', 'server'));
                         } else {
                             res.status(500).json(Error('internal_error', 'Could not delete the inventory'));
                         }
