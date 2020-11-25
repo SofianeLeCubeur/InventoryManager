@@ -8,6 +8,10 @@ const path = require('path');
 const { escapeRegExp } = require('./utils');
 
 const config = require('./config.json');
+if(!config){
+    console.error('No configuration provided. The config file is required to start the server properly.');
+    process.exit(1);
+}
 const expressConfig = config.express;
 if(!expressConfig.cors){
     expressConfig.cors = {};
