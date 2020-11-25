@@ -1,4 +1,5 @@
 const { mutate, requireScope } = require('./../utils');
+const { Content, Inventory, Error } = require('./../models');
 
 module.exports = function(router, database, authMiddleware){
 
@@ -58,15 +59,13 @@ module.exports = function(router, database, authMiddleware){
         if(p > 0 && !!props['name']){
             database.pushInventory(props, result => {
                 if(result){
-                    result.id = result._id;
-                    delete result._id;
-                    res.status(200).json({ sucess: true, ...result });
+                    res.status(200).json(Content(result));
                 } else {
-                    res.status(500).json({ sucess: false, error: 'internal_error', err_description: 'Could not push inventory' });
+                    res.status(500).json(Error('internal_error', 'Could not push inventory'));
                 }
             });
         } else {
-            res.status(400).json({  sucess: false, error: 'bad_request', err_description: 'Fields are missing' });
+            res.status(400).json(Error('bad_request', 'Fields are missing'));
         }
     });
 
@@ -77,11 +76,9 @@ module.exports = function(router, database, authMiddleware){
             if(req.method === 'GET'){
                 database.fetchInventory(query, inv => {
                     if(inv != null){
-                        inv.id = inv._id;
-                        delete inv._id;
-                        res.json({ success: true, ...inv });
+                        res.json(Content(inv));
                     } else {
-                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                        res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
                     }
                 });
                 return;
@@ -101,46 +98,44 @@ module.exports = function(router, database, authMiddleware){
                             if(inv != mutedInv){
                                 database.updateInventory(query, mutedInv, cb => {
                                     if(cb){
-                                        mutedInv.id = mutedInv._id;
-                                        delete mutedInv._id;
-                                        res.status(200).json(mutedInv);
+                                        res.status(200).json(Content(mutedInv));
                                     } else {
-                                        res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not update the inventory' });
+                                        res.status(500).json(Error('internal_error', 'Could not update the inventory'));
                                     }
                                 });
                             } else {
-                                res.status(200).json(mutedInv);
+                                res.status(200).json(Content(mutedInv));
                             }
                         } else {
-                            res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                            res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
                         }
                     });
                 } else {
-                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                    res.status(403).json(Error('forbidden', 'Not Authorized'));
                 }
             } else if(req.method === 'DELETE'){
                 if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.inv') >= 0){
                     database.deleteInventory(query, (success) => {
                         if(success){
-                            res.status(200).json({ success: true, message: 'Inventory successfully deleted' });
+                            res.status(200).json(Message('Inventory successfully deleted', 'Server'));
                         } else {
-                            res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not delete the inventory' });
+                            res.status(500).json(Error('internal_error', 'Could not delete the inventory'));
                         }
                     });
                 } else {
-                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                    res.status(403).json(Error('forbidden', 'Not Authorized'));
                 }
             } else {
-                res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+                res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             }
         } else {
-            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Bad Request' });
+            res.status(400).json(Error('bad_request', 'Bad Request'));
         }
     });
 
     router.all('/inventories', authMiddleware('Bearer'), requireScope([ 'fetch.*', 'fetch.inv' ]), (req, res) => {
         if(req.method !== 'GET'){
-            res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+            res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
         }
         let body = req.query;
@@ -154,13 +149,9 @@ module.exports = function(router, database, authMiddleware){
         }
         database.fetchInventories({}, offset, length, docs => {
             if(docs != null){
-                res.status(200).json(docs.map(inv => {
-                    inv.id = inv._id;
-                    delete inv._id;
-                    return { id: inv.id, name: inv.name, icon: inv.icon, location: inv.location, state: inv.state, items: inv.items };
-                }));
+                res.status(200).json(docs.map(Inventory));
             } else {
-                res.status(500).json({ success: false, err: 'internal_error', err_description: 'Failed to query inventories' });
+                res.status(500).json(Error('internal_error', 'Failed to query inventories'));
             }
         });
     });

@@ -1,4 +1,5 @@
 const { generateToken } = require('./../utils');
+const { User, Token, Error } = require('./../models');
 const argon2 = require('argon2');
 const rateLimit = require('express-rate-limit');
 const allowedScopes = [
@@ -46,29 +47,26 @@ module.exports = function(router, database, authMiddleware){
                     const hash = await argon2.hash(body.password);
                     database.fetchUser({ username: body.username }, (u) => {
                         if(u){
-                            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Username already taken' });
+                            res.status(400).json(Error('bad_request', 'Username already taken'));
                             return;
                         }
                         database.insertUser({ username: body.username, password: hash }, (user) => {
                             if(user){
-                                delete user.password;
-                                user.id = user._id;
-                                delete user._id;
-                                res.status(200).json({ success: true, ...user });
+                                res.status(200).json(User(user));
                             } else {
-                                res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not create user' });
+                                res.status(500).json(Error('internal_error', 'Could not create user'));
                             }
                         });
                     });
                     
                 } else {
-                    res.status(400).json({ success: false, err: 'bad_request', err_description: 'Password must be at least 4 characters' });
+                    res.status(400).json(Error('bad_request', 'Password must be at least 4 characters'));
                 }
             } else {
-                res.status(400).json({ success: false, err: 'bad_request', err_description: 'Username must be between 2 and 26 characters' });
+                res.status(400).json(Error('bad_request', 'Username must be between 2 and 26 characters'));
             }
         } else {
-            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Missing username and password' });
+            res.status(400).json(Error('bad_request', 'Missing username and password'));
         }
     });
 
@@ -76,19 +74,16 @@ module.exports = function(router, database, authMiddleware){
         let token = res.locals.token;
         database.fetchUser({ _id: token.uid.toString() }, (user) => {
             if(user){
-                delete user.password;
-                user.id = user._id;
-                delete user._id;
-                res.status(200).json({ success: true, ...user });
+                res.status(200).json(User(user));
             } else {
-                res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not fetch user info' });
+                res.status(500).json(Error('internal_error', 'Could not fetch user info'));
             }
         })
     });
 
     router.all('/token', async (req, res) => {
         if(req.method !== 'POST'){
-            res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+            res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
         }
         let grant_type = req.body.grant_type;
@@ -109,32 +104,32 @@ module.exports = function(router, database, authMiddleware){
                                         let token = { token: generateToken(), type: 'Bearer', uid: user._id, scope: scopes };
                                         database.storeToken(token, result => {
                                             if(result){
-                                                res.status(200).json({ success: true, ...token });
+                                                res.status(200).json(Token(token));
                                             } else {
-                                                res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not acquire token' });
+                                                res.status(500).json(Error('internal_error', 'Could not acquire token'));
                                             }
                                         });
                                     } else {
-                                        res.status(403).json({ success: false, err: 'forbidden', err_description: 'Forbidden' });
+                                        res.status(403).json(Error('forbidden', 'Forbidden'));
                                     }
                                 } else {
-                                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Forbidden' });
+                                    res.status(403).json(Error('forbidden', 'Forbidden'));
                                 }
                             });
                         } else {
-                            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Invalid Scope' })
+                            res.status(400).json(Error('bad_request', 'Invalid Scope'))
                         }
                     } else {
-                        res.status(400).json({ success: false, err: 'bad_request', err_description: 'Missing Scope' })
+                        res.status(400).json(Error('bad_request', 'Missing Scope'))
                     }
                 } else {
-                    res.status(400).json({ success: false, err: 'bad_request', err_description: 'Bad Request' })
+                    res.status(400).json(Error('bad_request', 'Bad Request'))
                 }
             } else {
-                res.status(400).json({ success: false, err: 'bad_request', err_description: 'Invalid Grant Type' })
+                res.status(400).json(Error('bad_request', 'Invalid Grant Type'))
             }
         } else {
-            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Missing Grant Type' })
+            res.status(400).json(Error('bad_request', 'Missing Grant Type'))
         }
     })
 
