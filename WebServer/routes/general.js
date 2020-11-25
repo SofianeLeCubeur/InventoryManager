@@ -1,13 +1,12 @@
 const { escapeRegExp, requireScope } = require('./../utils');
+const { Content, Inventory, Container, Item, SmallItem, Error } = require('./../models');
 
 module.exports = function(router, database, authMiddleware){
 
     function searchInvs(query, callback){
         database.fetchInventories(query, 0, 0, docs => {
             if(docs !== null){
-                let items = docs.map(inv => {
-                    return { id: inv._id, name: inv.name, icon: inv.icon, location: inv.location, state: inv.state, items: inv.items };
-                });
+                let items = docs.map(Inventory);
                 callback(items);
             }
         })
@@ -21,10 +20,7 @@ module.exports = function(router, database, authMiddleware){
         }
         database.fetchContainers(query, 0, 0, docs => {
             if(docs != null){
-                let containers = docs.map(cnt => {
-                    let location = cnt.locations.sort((a, b) => b-a)[0].location;
-                    return { id: cnt._id, content: cnt.content, location, state: cnt.state };
-                });
+                let containers = docs.map(Container);
                 callback(containers);
             }
         })
@@ -33,9 +29,7 @@ module.exports = function(router, database, authMiddleware){
     function searchItems(query, callback){
         database.fetchItems(query, 0, 0, docs => {
             if(docs !== null){
-                let items = docs.map(it => {
-                    return { id: it._id, name: it.name, description: it.description, reference: it.reference, serial_number: it.serial_number, icon: it.icon }
-                });
+                let items = docs.map(Item);
                 callback(items);
             }
         });
@@ -104,7 +98,7 @@ module.exports = function(router, database, authMiddleware){
 
     router.all('/scan/:id', authMiddleware('Bearer'), requireScope([ 'scan' ]), (req, res) => {
         if(req.method !== 'POST'){
-            res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+            res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
         }
         let token = res.locals.token;
@@ -120,46 +114,45 @@ module.exports = function(router, database, authMiddleware){
                         if(type == 0){
                             database.fetchInventory({ _id: id }, inv => {
                                 if(inv != null){
-                                    res.json({ success: true, type: 'inventory', id: inv._id, name: inv.name, icon: inv.icon, location: inv.location, state: inv.state, items: inv.items });
+                                    res.json({ type: 'inventory', ...Inventory(inv) });
                                 } else {
-                                    res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                                    res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
                                 }
                             });
                         } else if(type == 1){
                             database.fetchItem({ _id: id }, it => {
                                 if(it != null){
-                                    res.json({ success: true, type: 'item', id: it._id, name: it.name, description: it.description, icon: it.icon });
+                                    res.json({ type: 'item', ...SmallItem(it)  });
                                 } else {
-                                    res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any item in the database.' })
+                                    res.status(404).json(Error('not_found', 'The provided ID does not refer to any item in the database.'))
                                 }
                             });
                         } else if(type == 2){
                             database.fetchContainer({ _id: id }, cnt => {
                                 if(cnt != null){
-                                    let location = cnt.locations.sort((a, b) => b-a)[0].location;
-                                    res.json({ success: true, type: 'container', id: cnt._id, content: cnt.content, location, state: cnt.state });
+                                    res.json({ type: 'container', ...Container(cnt) });
                                 } else {
-                                    res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any container in the database.' })
+                                    res.status(404).json(Errro('not_found', 'The provided ID does not refer to any container in the database.'))
                                 }
                             });
                         } else {
-                            res.status(404).json({ success: false, err: 'not_found', err_description: 'The id provided does not have a valid key' });
+                            res.status(404).json(Error('not_found', 'The id provided does not have a valid key'));
                         }
                     } else {
-                        res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not push scan log' });
+                        res.status(500).json(Error('internal_error', 'Could not push scan log'));
                     }
                 });
             } else {
-                res.status(400).json({ success: false, err: 'bad_request', err_description: 'Bad parameters' });
+                res.status(400).json(Error('bad_request', 'Bad parameters'));
             }
         } else {
-            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Missing id field' });
+            res.status(400).json(Error('bad_request', 'Missing id field'));
         }
     })
 
     router.all('/search', authMiddleware('Bearer'), (req, res) => {
         if(req.method !== 'POST'){
-            res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+            res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
         }
 
@@ -169,7 +162,7 @@ module.exports = function(router, database, authMiddleware){
             query = prepareParams(body);
         } catch(e){
             console.error('Could not prepare query params:', body, '->', e);
-            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Bad filters' });
+            res.status(400).json(Error('bad_request', 'Bad filters'));
             return;
         }
 

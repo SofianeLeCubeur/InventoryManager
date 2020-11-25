@@ -96,7 +96,7 @@ module.exports = function(router, database, authMiddleware){
                         res.status(204).end();
                         return;
                     }
-                    console.log('mutation', mutation, 'from', body);
+                    //console.log('mutation', mutation, 'from', body);
 
                     database.fetchItem(query, itm => {
                         if(itm != null){
