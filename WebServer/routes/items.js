@@ -1,4 +1,5 @@
 const { mutate, requireScope } = require('./../utils');
+const { Content, Item, Error } = require('./../models');
 
 module.exports = function(router, database, authMiddleware){
 
@@ -62,15 +63,13 @@ module.exports = function(router, database, authMiddleware){
         if(p > 0 && !!props['name']){
             database.pushItem(props, result => {
                 if(result){
-                    result.id = result._id;
-                    delete result._id;
-                    res.status(200).json({ sucess: true, ...result });
+                    res.status(200).json(Content(result));
                 } else {
-                    res.status(500).json({ sucess: false, error: 'internal_error', err_description: 'Could not push item' });
+                    res.status(500).json(Error('internal_error', 'Could not push item'));
                 }
             });
         } else {
-            res.status(400).json({  sucess: false, error: 'bad_request', err_description: 'Fields are missing' });
+            res.status(400).json(Error('bad_request', 'Fields are missing'));
         }
     });
 
@@ -82,11 +81,9 @@ module.exports = function(router, database, authMiddleware){
             if(req.method === 'GET'){
                 database.fetchItem(query, it => {
                     if(it != null){
-                        it.id = it._id;
-                        delete it._id;
-                        res.json({ success: true, ...it });
+                        res.json(Content(it));
                     } else {
-                        res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any item in the database.' })
+                        res.status(404).json(Error('not_found', 'The provided ID does not refer to any item in the database.'))
                     }
                 });
                 return;
@@ -107,52 +104,50 @@ module.exports = function(router, database, authMiddleware){
                             if(itm != mutedItm){
                                 database.updateItem(query, mutedItm, cb => {
                                     if(cb){
-                                        mutedItm.id = mutedItm._id;
-                                        delete mutedItm._id;
-                                        res.status(200).json(mutedItm);
+                                        res.status(200).json(Content(mutedItm));
                                     } else {
-                                        res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not update the item' });
+                                        res.status(500).json(Error('internal_error', 'Could not update the item'));
                                     }
                                 });
                             } else {
-                                res.status(200).json(mutedItm);
+                                res.status(200).json(Content(mutedItm));
                             }
                         } else {
-                            res.status(404).json({ success: false, err: 'not_found', err_description: 'The provided ID does not refer to any inventory in the database.' })
+                            res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
                         }
                     });
                 } else {
-                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                    res.status(403).json(Error('forbidden', 'Not Authorized'));
                 }
             } else if(req.method === 'DELETE'){
                 if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.itm') >= 0){
                     database.deleteItem(query, (success) => {
                         if(success){
-                            res.status(200).json({ sucess: true, message: 'Item successfully deleted' });
+                            res.status(200).json(Message('Item successfully deleted', 'server'));
                         } else {
-                            res.status(500).json({ success: false, err: 'internal_error', err_description: 'Could not delete the item' });
+                            res.status(500).json(Error('internal_error', 'Could not delete the item'));
                         }
                     });
                 } else {
-                    res.status(403).json({ success: false, err: 'forbidden', err_description: 'Not Authorized' });
+                    res.status(403).json(Error('forbidden', 'Not Authorized'));
                 }
             } else {
-                res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+                res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             }
         } else {
-            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Bad Request' });
+            res.status(400).json(Error('bad_request', 'Bad Request'));
         }
     });
 
     router.all('/items/', authMiddleware('Bearer'), requireScope([ 'fetch.*', 'fetch.itm' ]), (req, res) => {
         if(req.method !== 'POST'){
-            res.status(405).json({ success: false, err: 'method_not_allowed', err_description: 'This request method is not allowed' });
+            res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
         }
         const body = req.body;
         let itemIds = body.itemIds;
         if(!itemIds){
-            res.status(400).json({ success: false, err: 'bad_request', err_description: 'Missing itemIds field' });
+            res.status(400).json(Error('bad_request', 'Missing itemIds field'));
             return;
         }
         let offset = Math.round(Math.abs(parseInt(body.offset)));
@@ -165,9 +160,7 @@ module.exports = function(router, database, authMiddleware){
         }
         database.fetchItems({ _id: { $in: itemIds } }, offset, length, docs => {
             if(docs !== null){
-                let items = docs.map(it => {
-                    return { id: it._id, name: it.name, description: it.description, reference: it.reference, serial_number: it.serial_number, icon: it.icon }
-                });
+                let items = docs.map(Item);
                 res.json(items);
             } else {
                 res.status(404).json({ err: 'not_found', err_description: 'Find error: ' + docs });
