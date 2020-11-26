@@ -2,23 +2,22 @@ const needle = require('needle');
 const { WebhookBody } = require('./../models');
 
 module.exports = {
-    send(url, content){
+    deliver(url, content, callback){
         delete content.webhooks;
-        needle('post', url, content, { json: true }, function(err, resp) {
-            if (!err) {
-                console.log(resp.body);
-            }
- 
-            if (err) {
-                console.log('neddle error');
-            }
-        })
+        needle.post(url, content, { json: true }, callback)
     },
-    trigger(event, initiator, object){
+    trigger(event, initiator, type, object, callback){
         if(object.webhooks && Array.isArray(object.webhooks)){
-            let webhooks = object.webhooks.filter(wh => wh.event_type === event);
+            let webhooks = object.webhooks.filter(wh => wh.event === event);
+            let completed = 0, failed = [], success = [];
             webhooks.forEach(wh => {
-                this.send(wh.url, WebhookBody(initiator, object));
+                this.deliver(wh.url, WebhookBody(event, type, initiator, object), (err) => {
+                    completed++;
+                    (err ? failed : success).push(wh.id);
+                    if(completed == webhooks.length){
+                        callback(completed, success, failed);
+                    }
+                });
             });
         }
     }

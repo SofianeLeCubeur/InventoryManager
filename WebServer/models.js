@@ -34,7 +34,10 @@ module.exports = {
     Error(type, message){
         return { success: false, err: type, err_description: message };
     },
-    WebhookBody(initiator, content){
-        return { initiator, timestamp: Date.now(), ...this.Content(content) };
+    WebhookBody(event, initiator, type, content){
+        let obj = {...content };
+        obj.id = obj._id;
+        delete obj._id;
+        return { success: true, trigger: event, initiator, timestamp: Date.now(), type, ...obj };
     }
 }

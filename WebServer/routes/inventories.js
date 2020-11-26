@@ -1,5 +1,6 @@
 const { mutate, requireScope } = require('./../utils');
 const { Content, Inventory, Error } = require('./../models');
+const Webhook = require('./../webhooks');
 
 module.exports = function(router, database, authMiddleware){
 
@@ -42,6 +43,17 @@ module.exports = function(router, database, authMiddleware){
                 if(typeof item === 'string') b++;
             })
             return b === s.length;
+        },
+        'webhooks': function(s){
+            if(!Array.isArray(s)) return false;
+            let b = 0;
+            s.forEach(wh => {
+                if(typeof wh === 'object' && typeof wh.id === 'string' 
+                && typeof wh.url === 'string' && wh.event === 'string'){
+                    b++;
+                }
+            })
+            return b === s.length;
         }
     };
 
@@ -70,6 +82,7 @@ module.exports = function(router, database, authMiddleware){
     });
 
     router.all('/inventory/:id', authMiddleware('Bearer'), (req, res) => {
+        const token = res.locals.token;
         const id = req.params.id;
         const query = { _id: id };
         if(id && typeof id === 'string'){
@@ -99,6 +112,16 @@ module.exports = function(router, database, authMiddleware){
                                 database.updateInventory(query, mutedInv, cb => {
                                     if(cb){
                                         res.status(200).json(Content(mutedInv));
+                                        database.fetchUser({ _id: token.uid }, (cb) => {
+                                            if(cb){
+                                                Webhook.trigger('update', 'inventory', { username: cb.username, id: cb._id }, mutedInv, 
+                                                    (completed, success, failed) => {
+                                                    console.log('[Express][Webhooks] Webhook delivery done:', success.length, ' of ', completed);
+                                                });
+                                            } else {
+                                                console.log('[Express][Webhooks] Failed to deliver webhook: could not retrieve user data');
+                                            }
+                                        })
                                     } else {
                                         res.status(500).json(Error('internal_error', 'Could not update the inventory'));
                                     }
@@ -115,6 +138,7 @@ module.exports = function(router, database, authMiddleware){
                 }
             } else if(req.method === 'DELETE'){
                 if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.inv') >= 0){
+                    Webhook.trigger('delete', token.uid, mutedInv);
                     database.deleteInventory(query, (success) => {
                         if(success){
                             res.status(200).json(Message('Inventory successfully deleted', 'server'));
