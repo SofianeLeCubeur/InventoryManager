@@ -72,7 +72,7 @@ module.exports = function(router, database, authMiddleware){
 
     router.all('/user', authMiddleware('Bearer'), (req, res) => {
         let token = res.locals.token;
-        database.fetchUser({ _id: token.uid.toString() }, (user) => {
+        database.fetchUser({ _id: token.uid }, (user) => {
             if(user){
                 res.status(200).json(User(user));
             } else {
@@ -101,7 +101,7 @@ module.exports = function(router, database, authMiddleware){
                                 if(user && user.password){
                                     let verified = assertPasswordEquals(password, user.password);
                                     if(verified){
-                                        let token = { token: generateToken(), type: 'Bearer', uid: user._id, scope: scopes };
+                                        let token = { token: generateToken(), type: 'Bearer', uid: user._id.toString(), scope: scopes };
                                         database.storeToken(token, result => {
                                             if(result){
                                                 res.status(200).json(Token(token));
