@@ -54,6 +54,7 @@ module.exports = function(router, database, authMiddleware){
             s.forEach(wh => {
                 if(typeof wh === 'object' && typeof wh.id === 'string' 
                 && typeof wh.url === 'string' && wh.event === 'string'){
+                    delete wh.last_delivery;
                     b++;
                 }
             })

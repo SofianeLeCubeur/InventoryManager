@@ -214,10 +214,10 @@ module.exports = function(router, database, authMiddleware){
             }
     
             if(!results){
-                res.status(404).json({ success: false, err: 'not_found', err_description: 'Query does not have any result' });
+                res.status(404).json(Error('not_found', 'Query does not have any result'));
             }
         } else {
-            res.status(400).json({ success: false, err: 'bad_request', err_description: 'No filter was provided' });
+            res.status(400).json(Error('bad_request', 'No filter was provided'));
         }
     })
 
