@@ -33,5 +33,8 @@ module.exports = {
     },
     Error(type, message){
         return { success: false, err: type, err_description: message };
+    },
+    WebhookBody(initiator, content){
+        return { initiator, timestamp: Date.now(), ...this.Content(content) };
     }
 }
