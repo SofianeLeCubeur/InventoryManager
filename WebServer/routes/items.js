@@ -1,5 +1,6 @@
 const { mutate, requireScope } = require('./../utils');
 const { Content, Item, Error } = require('./../models');
+const Webhook = require('./../webhooks');
 
 module.exports = function(router, database, authMiddleware){
 
@@ -47,6 +48,17 @@ module.exports = function(router, database, authMiddleware){
             console.log(typeof s, s.length);
             return typeof s === 'string' && s.length <= 16
         },
+        'webhooks': function(s){
+            if(!Array.isArray(s)) return false;
+            let b = 0;
+            s.forEach(wh => {
+                if(typeof wh === 'object' && typeof wh.id === 'string' 
+                && typeof wh.url === 'string' && wh.event === 'string'){
+                    b++;
+                }
+            })
+            return b === s.length;
+        }
     };
 
     router.post('/item', authMiddleware('Bearer'), requireScope([ 'add.*', 'add.itm' ]), (req, res) => {
@@ -105,6 +117,7 @@ module.exports = function(router, database, authMiddleware){
                                 database.updateItem(query, mutedItm, cb => {
                                     if(cb){
                                         res.status(200).json(Content(mutedItm));
+                                        Webhook.call(database, 'update', 'item', token.uid, mutedItm);
                                     } else {
                                         res.status(500).json(Error('internal_error', 'Could not update the item'));
                                     }

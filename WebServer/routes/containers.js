@@ -1,5 +1,6 @@
 const { mutate, requireScope } = require('./../utils');
 const { Content, Container, Error } = require('./../models');
+const Webhook = require('./../webhooks');
 
 module.exports = function(router, database, authMiddleware){
 
@@ -22,6 +23,17 @@ module.exports = function(router, database, authMiddleware){
                 if(typeof item === 'string') b++;
             })
             return Array.isArray(s) && b === s.length;
+        },
+        'webhooks': function(s){
+            if(!Array.isArray(s)) return false;
+            let b = 0;
+            s.forEach(wh => {
+                if(typeof wh === 'object' && typeof wh.id === 'string' 
+                && typeof wh.url === 'string' && wh.event === 'string'){
+                    b++;
+                }
+            })
+            return b === s.length;
         }
     };
 
@@ -81,6 +93,7 @@ module.exports = function(router, database, authMiddleware){
                                 database.updateContainer(query, mutedCnt, cb => {
                                     if(cb){
                                         res.status(200).json(Content(mutedCnt));
+                                        Webhook.call(database, 'update', 'container', token.uid, mutedCnt);
                                     } else {
                                         res.status(500).json(Error('internal_error', 'Could not update the container'));
                                     }

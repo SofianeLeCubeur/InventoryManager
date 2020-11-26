@@ -112,16 +112,7 @@ module.exports = function(router, database, authMiddleware){
                                 database.updateInventory(query, mutedInv, cb => {
                                     if(cb){
                                         res.status(200).json(Content(mutedInv));
-                                        database.fetchUser({ _id: token.uid }, (cb) => {
-                                            if(cb){
-                                                Webhook.trigger('update', 'inventory', { username: cb.username, id: cb._id }, mutedInv, 
-                                                    (completed, success, failed) => {
-                                                    console.log('[Express][Webhooks] Webhook delivery done:', success.length, ' of ', completed);
-                                                });
-                                            } else {
-                                                console.log('[Express][Webhooks] Failed to deliver webhook: could not retrieve user data');
-                                            }
-                                        })
+                                        Webhook.call(database, 'update', 'inventory', token.uid, mutedInv);
                                     } else {
                                         res.status(500).json(Error('internal_error', 'Could not update the inventory'));
                                     }
