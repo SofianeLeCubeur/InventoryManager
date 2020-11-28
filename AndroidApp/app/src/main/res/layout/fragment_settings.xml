@@ -345,7 +345,7 @@
 
         </LinearLayout>
 
-        <TextView
+        <!--<TextView
             android:id="@+id/settings_misc_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -410,6 +410,26 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+
+        </LinearLayout>-->
+
+        <TextView
+            android:id="@+id/settings_about_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/settings_about_label"
+            android:textSize="16sp"
+            android:textStyle="bold" />-
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp">
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/settings_intro"
                 android:layout_width="match_parent"
@@ -438,24 +458,6 @@
                     app:tint="@color/iconAccent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/settings_about_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="@string/settings_about_label"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:orientation="vertical"
-            android:paddingHorizontal="10dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/settings_acknowledgements"

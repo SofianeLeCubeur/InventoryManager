@@ -1,8 +1,6 @@
 package com.github.sofiman.inventory.model;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -10,10 +8,8 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.sofiman.inventory.R;
-import com.github.sofiman.inventory.api.Tracker;
+import com.github.sofiman.inventory.api.SearchHistoryItem;
 import com.github.sofiman.inventory.ui.components.SearchHistoryItemComponent;
-import com.github.sofiman.inventory.ui.components.TrackerComponent;
 import com.github.sofiman.inventory.utils.Callback;
 
 import java.util.LinkedList;

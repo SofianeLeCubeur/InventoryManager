@@ -239,7 +239,7 @@ public class ScanHistoryActivity extends AppCompatActivity {
 
     private void openInventoryCreation(ScanLog scanLog) {
         startActivityForResult(new IntentBuilder(this, CreateObjectActivity.class)
-                .scope("create").type("inventory").blueprint(new Inventory(new byte[0], "", "", scanLog.getLocation(), new ArrayList<>()))
+                .scope("create").type("inventory").blueprint(new Inventory(new byte[0], "", "", scanLog.getLocation(), new ArrayList<>(), new ArrayList<>()))
                 .extra(logsCache, logs.indexOf(scanLog))
                 .build(), 0);
     }

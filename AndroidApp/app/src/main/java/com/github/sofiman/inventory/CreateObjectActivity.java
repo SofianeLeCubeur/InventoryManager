@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.sofiman.inventory.api.Container;
+import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.api.Inventory;
 import com.github.sofiman.inventory.api.Item;
 import com.github.sofiman.inventory.api.LocationPoint;
@@ -45,6 +46,7 @@ import com.github.sofiman.inventory.model.ItemListAdapter;
 import com.github.sofiman.inventory.model.LocationPointAdapter;
 import com.github.sofiman.inventory.ui.components.ItemComponent;
 import com.github.sofiman.inventory.ui.components.TagComponent;
+import com.github.sofiman.inventory.ui.dialogs.ConfirmDialog;
 import com.github.sofiman.inventory.ui.dialogs.DoubleEditDialog;
 import com.github.sofiman.inventory.ui.dialogs.EditLocationDialog;
 import com.github.sofiman.inventory.utils.IntentBuilder;
@@ -64,6 +66,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import jp.wasabeef.picasso.transformations.BlurTransformation;
 import jp.wasabeef.picasso.transformations.ColorFilterTransformation;
@@ -79,7 +82,7 @@ public class CreateObjectActivity extends AppCompatActivity {
     private Map<String, TagComponent> tagList = new HashMap<>();
     private String itemActiveTag;
     private List<String> itemIds;
-    private  ConstraintLayout extraLayout;
+    private ConstraintLayout extraLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,6 +218,31 @@ public class CreateObjectActivity extends AppCompatActivity {
             showScannedData(extraData, extraIdx);
         }
 
+        if(scope.equals("update")){
+            ConstraintLayout delete = findViewById(R.id.create_object_action_delete);
+            delete.setVisibility(View.VISIBLE);
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String name = "";
+                    for (DataField dataField : fields){
+                        if(dataField.getId().equals("name") || dataField.getId().equals("content")){
+                            name = dataField.getValue();
+                            break;
+                        }
+                    }
+                    new ConfirmDialog(CreateObjectActivity.this, getLayoutInflater(),
+                            getString(R.string.dialog_confirm, getString(R.string.dialog_confirm_delete)),
+                            getString(R.string.dialog_delete_confirmation, name), getString(R.string.dialog_delete), new Runnable() {
+                        @Override
+                        public void run() {
+
+                        }
+                    });
+                }
+            });
+        }
+
         View dummyHeader = findViewById(R.id.dummy_header);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) dummyHeader.getLayoutParams();
         params.setMargins(0, LayoutHelper.getStatusBarHeight(this), 0, 0);
@@ -227,85 +255,49 @@ public class CreateObjectActivity extends AppCompatActivity {
         findViewById(R.id.create_object_save).setOnClickListener(v -> {
             System.out.println("Mutating " + fields.size() + " fields to " + scope + " the " + type);
             if (scope.equals("update")) {
-                List<LocationPoint> locationPoints = locationAdapter.getLocations();
-                locationPoints.remove(0);
+                List<LocationPoint> locationPoints = null;
+                if(locationAdapter != null){
+                    locationPoints = locationAdapter.getLocations();
+                    locationPoints.remove(0);
+                }
                 if (type.equals("inventory")) {
-                    Fetcher.getInstance().pushInventory(objectId, adapter.getFields(), itemIds, icon, background, new APIResponse<Inventory>() {
-                        @Override
-                        public void response(Inventory callback) {
-                            apply(new IntentBuilder().inventory(callback).build());
-                        }
-
-                        @Override
-                        public void error(RequestError error) {
-                            printError(error, R.string.create_object_push_inventory);
-                        }
-                    });
+                    Fetcher.getInstance().pushInventory(objectId, adapter.getFields(), itemIds, icon, background,
+                            getCallback(callback -> new IntentBuilder().inventory(callback).build(),  R.string.create_object_push_inventory));
                 } else if (type.equals("container")) {
-                    Fetcher.getInstance().pushContainer(objectId, adapter.getFields(), itemIds, locationPoints, icon, background, new APIResponse<Container>() {
-                        @Override
-                        public void response(Container callback) {
-                            apply(new IntentBuilder().container(callback).build());
-                        }
-
-                        @Override
-                        public void error(RequestError error) {
-                            printError(error, R.string.create_object_push_container);
-                        }
-                    });
+                    Fetcher.getInstance().pushContainer(objectId, adapter.getFields(), itemIds, locationPoints, icon, background,
+                            getCallback(callback -> new IntentBuilder().container(callback).build(),  R.string.create_object_push_container));
                 } else if (type.equals("item")) {
-                    Fetcher.getInstance().pushItem(objectId, adapter.getFields(), locationPoints, icon, background, new APIResponse<Item>() {
-                        @Override
-                        public void response(Item callback) {
-                            apply(new IntentBuilder().item(callback).build());
-                        }
-
-                        @Override
-                        public void error(RequestError error) {
-                            printError(error, R.string.create_object_push_item);
-                        }
-                    });
+                    Fetcher.getInstance().pushItem(objectId, adapter.getFields(), locationPoints, icon, background,
+                            getCallback(callback -> new IntentBuilder().item(callback).build(), R.string.create_object_push_item));
                 }
             } else if (scope.equals("create")) {
                 if (type.equals("inventory")) {
-                    Fetcher.getInstance().createInventory(adapter.getFields(), itemIds, icon, background, new APIResponse<Inventory>() {
-                        @Override
-                        public void response(Inventory callback) {
-                            apply(new IntentBuilder().inventory(callback).build());
-                        }
-
-                        @Override
-                        public void error(RequestError error) {
-                            printError(error, R.string.create_object_push_inventory);
-                        }
-                    });
+                    Fetcher.getInstance().createInventory(adapter.getFields(), itemIds, icon, background,
+                            getCallback(callback -> new IntentBuilder().inventory(callback).build(),  R.string.create_object_push_inventory));
                 } else if (type.equals("container")) {
-                    Fetcher.getInstance().createContainer(adapter.getFields(), itemIds, new APIResponse<Container>() {
-                        @Override
-                        public void response(Container callback) {
-                            apply(new IntentBuilder().container(callback).build());
-                        }
-
-                        @Override
-                        public void error(RequestError error) {
-                            printError(error, R.string.create_object_push_container);
-                        }
-                    });
+                    Fetcher.getInstance().createContainer(adapter.getFields(), itemIds,
+                            getCallback(callback -> new IntentBuilder().container(callback).build(),  R.string.create_object_push_container));
                 } else if (type.equals("item")) {
-                    Fetcher.getInstance().createItem(adapter.getFields(), icon, background, new APIResponse<Item>() {
-                        @Override
-                        public void response(Item callback) {
-                            apply(new IntentBuilder().item(callback).build());
-                        }
-
-                        @Override
-                        public void error(RequestError error) {
-                            printError(error, R.string.create_object_push_item);
-                        }
-                    });
+                    Fetcher.getInstance().createItem(adapter.getFields(), icon, background,
+                            getCallback(item -> new IntentBuilder().item(item).build(), R.string.create_object_push_item));
                 }
             }
         });
+    }
+
+    private <T> APIResponse<T> getCallback(Mutator<T, Intent> function, @StringRes int errorString){
+        return new APIResponse<T>() {
+            @Override
+            public void response(T callback) {
+                setResult(1, function.mutate(callback));
+                supportFinishAfterTransition();
+            }
+
+            @Override
+            public void error(RequestError error) {
+                printError(error, errorString);
+            }
+        };
     }
 
     private void showEditIconDialog() {
@@ -336,11 +328,6 @@ public class CreateObjectActivity extends AppCompatActivity {
         } else if (itemActiveTag.equals("added")) {
             loadContent(itemIds);
         }
-    }
-
-    private void apply(Intent intent) {
-        setResult(1, intent);
-        supportFinishAfterTransition();
     }
 
     private void printError(RequestError error, @StringRes int type) {
@@ -612,10 +599,6 @@ public class CreateObjectActivity extends AppCompatActivity {
         findViewById(R.id.create_items_layout).setVisibility(View.VISIBLE);
     }
 
-    private interface SwipeCallback {
-        void onSwipe(ItemListAdapter.ItemHolder holder, ItemListAdapter adapter, int position);
-    }
-
     private void showScannedData(List<String> extraData, int extraIdx){
         final String extra = extraData.get(extraIdx);
 
@@ -647,24 +630,21 @@ public class CreateObjectActivity extends AppCompatActivity {
             backSelection.setVisibility(View.INVISIBLE);
         } else {
             backSelection.setVisibility(View.VISIBLE);
-            backSelection.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showScannedData(extraData, extraIdx - 1);
-                }
-            });
+            backSelection.setOnClickListener(v -> showScannedData(extraData, extraIdx - 1));
         }
         if(extraIdx == extraData.size() - 1){
             nextSelection.setVisibility(View.INVISIBLE);
         } else {
             nextSelection.setVisibility(View.VISIBLE);
-            nextSelection.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showScannedData(extraData, extraIdx + 1);
-                }
-            });
+            nextSelection.setOnClickListener(v -> showScannedData(extraData, extraIdx + 1));
         }
+    }
 
+    private interface SwipeCallback {
+        void onSwipe(ItemListAdapter.ItemHolder holder, ItemListAdapter adapter, int position);
+    }
+
+    private interface Mutator<T, V> {
+        V mutate(T arg);
     }
 }

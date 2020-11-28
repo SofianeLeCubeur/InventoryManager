@@ -66,12 +66,11 @@ public class InventoryListAdapter extends RecyclerView.Adapter<InventoryListAdap
         component.setName(store.getName());
         component.setIcon(store.getIcon());
         component.setItemCount(store.getItemCount());
-        component.setTrackerCount(store.getTrackerCount());
         component.setLocation(store.getLocation());
 
         component.update();
         component.setOnClickListener(view -> {
-            if(clickCallback != null){
+            if (clickCallback != null) {
                 clickCallback.run(new Pair<>(store, component));
             }
         });

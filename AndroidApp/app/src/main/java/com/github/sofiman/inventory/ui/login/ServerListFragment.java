@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.sofiman.inventory.ui.home.HomeActivity;
 import com.github.sofiman.inventory.R;
+import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.model.SampleListAdapter;
@@ -91,7 +92,7 @@ public class ServerListFragment extends Fragment {
 
     private void login(Server server, String id, String secret, Callback<RequestError> onFail) {
         final Fetcher fetcher = Fetcher.getInstance();
-        fetcher.init(server);
+        fetcher.init(getContext(), server);
         fetcher.login(id, secret, new Callback<RequestError>() {
             @Override
             public void run(RequestError data) {

@@ -157,7 +157,10 @@ public class ScanFragment extends Fragment {
                 if (hideContent.getVisibility() != View.VISIBLE) {
                     return;
                 }
-                Animations.collapse(content, new Animation.AnimationListener() {
+                hideContent.setVisibility(View.INVISIBLE);
+                content.setVisibility(View.GONE);
+                previous = "";
+                /*Animations.collapse(content, new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
                     }
@@ -171,7 +174,7 @@ public class ScanFragment extends Fragment {
                     @Override
                     public void onAnimationRepeat(Animation animation) {
                     }
-                });
+                });*/
             }
         });
 
@@ -294,6 +297,7 @@ public class ScanFragment extends Fragment {
         obj.remove("success");
 
         Component view = null;
+        Object data = null;
         // Create the required component and populates it with the data
         if (type.equals("inventory")) {
             Inventory store = gson.fromJson(json, Inventory.class);
@@ -302,7 +306,6 @@ public class ScanFragment extends Fragment {
             component.setName(store.getName());
             component.setIcon(store.getIcon());
             component.setItemCount(store.getItemCount());
-            component.setTrackerCount(store.getTrackerCount());
             component.setLocation(store.getLocation());
             component.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -310,12 +313,13 @@ public class ScanFragment extends Fragment {
                     LayoutHelper.openInventory(getActivity(), Pair.create(store, component));
                 }
             });
-            HistoryDataModel.getInstance().pushScanLog(text, timestamp, "inventory", store, getContext());
+            data = store;
 
             view = component;
         } else if (type.equals("container")) {
             Container store = gson.fromJson(json, Container.class);
             ContainerComponent component = new ContainerComponent(getContext());
+            System.out.println(json + " -> " + store);
 
             component.setContent(store.getContent());
             component.setLocation(store.getLocation());
@@ -325,8 +329,7 @@ public class ScanFragment extends Fragment {
                     LayoutHelper.openContainer(getActivity(), Pair.create(store, component));
                 }
             });
-            HistoryDataModel.getInstance().pushScanLog(text, timestamp, "container", store, getContext());
-
+            data = store;
             view = component;
         } else if (type.equals("item")) {
             Item store = gson.fromJson(json, Item.class);
@@ -341,10 +344,10 @@ public class ScanFragment extends Fragment {
                     LayoutHelper.openItem(getActivity(), Pair.create(store, component));
                 }
             });
-            HistoryDataModel.getInstance().pushScanLog(text, timestamp, "item", store, getContext());
-
+            data = store;
             view = component;
         }
+        HistoryDataModel.getInstance().pushScanLog(text, timestamp, type, data, getContext());
 
         if (view != null && getView() != null) {
             view.update();
@@ -354,7 +357,8 @@ public class ScanFragment extends Fragment {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             content.removeAllViews();
             content.addView(view, params);
-            Animations.expand(content);
+            content.setVisibility(View.VISIBLE);
+            //Animations.expand(content);
         }
     }
 
@@ -397,7 +401,9 @@ public class ScanFragment extends Fragment {
 
         content.removeAllViews();
         content.addView(v, params);
-        Animations.expand(content);
+        content.setVisibility(View.VISIBLE);
+        //
+        // Animations.expand(content);
     }
 
     private void vibrate() {
@@ -443,7 +449,7 @@ public class ScanFragment extends Fragment {
 
     private void openInventoryCreation(String scannedText) {
         startActivityForResult(new IntentBuilder(getActivity(), CreateObjectActivity.class)
-                .scope("create").type("inventory").blueprint(new Inventory(new byte[0], "", "", "", new ArrayList<>()))
+                .scope("create").type("inventory").blueprint(new Inventory(new byte[0], "", "", "", new ArrayList<>(), new ArrayList<>()))
                 .extra(Collections.singletonList(scannedText), 0)
                 .build(), 0);
     }

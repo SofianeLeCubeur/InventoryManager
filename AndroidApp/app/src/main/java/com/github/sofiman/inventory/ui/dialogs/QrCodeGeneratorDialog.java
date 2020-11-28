@@ -2,7 +2,6 @@ package com.github.sofiman.inventory.ui.dialogs;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -10,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -19,23 +17,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.DrawableRes;
-
 import com.github.sofiman.inventory.R;
-import com.github.sofiman.inventory.ui.components.TrackerComponent;
+import com.github.sofiman.inventory.ui.components.QRCodeHeaderComponent;
+import com.github.sofiman.inventory.ui.components.WebhookComponent;
 import com.github.sofiman.inventory.utils.StringUtils;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.datamatrix.DataMatrixWriter;
-import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.util.Hashtable;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,19 +37,13 @@ public class QrCodeGeneratorDialog extends Dialog {
 
     public QrCodeGeneratorDialog(Context context, LayoutInflater inflater, Drawable drawable, int[] tints, String name, String content, BarcodeFormat format, boolean imagePadding){
         super(context, inflater);
-        TrackerComponent trackerComponent = new TrackerComponent(context);
+        QRCodeHeaderComponent header = new QRCodeHeaderComponent(context);
         int pad = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, context.getResources().getDisplayMetrics());
-        trackerComponent.setPadding(pad, pad, pad, 0);
-        ImageView trackerIcon = trackerComponent.findViewById(R.id.tracker_icon);
-        trackerComponent.setName(name);
-        trackerComponent.setRightDrawable(R.drawable.share_variant);
-        trackerComponent.setRightDrawableOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                share();
-            }
-        });
-        trackerComponent.update();
+        header.setPadding(pad, pad, pad, 0);
+        ImageView trackerIcon = header.findViewById(R.id.qrcode_header_icon);
+        header.setName(name);
+        header.setRightDrawableOnClickListener(view -> share());
+        header.update();
 
         trackerIcon.setImageDrawable(drawable);
         if(tints[0] != 0){
@@ -75,7 +61,7 @@ public class QrCodeGeneratorDialog extends Dialog {
         }
 
         dialog = new AlertDialog.Builder(context, R.style.ThemeOverlay_InventoryManager_Dialog)
-                .setCustomTitle(trackerComponent).create();
+                .setCustomTitle(header).create();
 
         final View view = inflater.inflate(R.layout.dialog_qr_code_generator, null);
 
@@ -100,7 +86,7 @@ public class QrCodeGeneratorDialog extends Dialog {
         }
 
         BarcodeFormat[] formats = new BarcodeFormat[]{ BarcodeFormat.QR_CODE, BarcodeFormat.AZTEC, BarcodeFormat.DATA_MATRIX, BarcodeFormat.PDF_417 };
-        AtomicInteger pointer = new AtomicInteger(0);
+        AtomicInteger pointer = new AtomicInteger(1);
         qrCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -154,7 +140,7 @@ public class QrCodeGeneratorDialog extends Dialog {
 
     private void share(){
         Bitmap bitmap = addWhiteBorder(code, 28);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Inventory Manager 2D Code", null);
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Inventory Manager Code", null);
         Uri uri = Uri.parse(path);
 
         Intent intent = new Intent(Intent.ACTION_SEND);

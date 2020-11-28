@@ -28,12 +28,14 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.impl.HistoryDataModel;
 import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.ui.dialogs.ConfirmDialog;
 import com.github.sofiman.inventory.ui.dialogs.DoubleEditDialog;
 import com.github.sofiman.inventory.ui.login.LoginActivity;
 import com.github.sofiman.inventory.R;
+import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.model.ServerListAdapter;
 import com.github.sofiman.inventory.utils.Animations;
@@ -144,7 +146,7 @@ public class SettingsFragment extends Fragment {
             trackerName.setText(sharedPreferences.getString("scan_tracker_name", HistoryDataModel.getDeviceName()));
         }
 
-        root.findViewById(R.id.settings_change_lang).setOnClickListener(v -> openSwitchLocale());
+        //root.findViewById(R.id.settings_change_lang).setOnClickListener(v -> openSwitchLocale());
 
         root.findViewById(R.id.settings_intro).setOnClickListener(v -> {
             invalidateIntro = true;
@@ -237,7 +239,7 @@ public class SettingsFragment extends Fragment {
             editor.apply();
             if (fetcher.getCurrentServer() == server) {
                 try {
-                    fetcher.init(next.first);
+                    fetcher.init(getContext(), next.first);
                     fetcher.login(next.second.first, next.second.second, new Callback<RequestError>() {
                         @Override
                         public void run(RequestError data) {
@@ -330,7 +332,7 @@ public class SettingsFragment extends Fragment {
         editor.commit();
     }
 
-    private void openSwitchLocale() {
+    /*private void openSwitchLocale() {
         String[] localeList = getResources().getStringArray(R.array.languages);
         Map<Locale, String> localeMap = new HashMap<>();
         for (int i = 0; i < localeList.length; i++) {
@@ -378,5 +380,5 @@ public class SettingsFragment extends Fragment {
         } else {
             resources.updateConfiguration(configuration, displayMetrics);
         }
-    }
+    }*/
 }

@@ -1,11 +1,18 @@
 package com.github.sofiman.inventory.impl;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.util.Pair;
 
 import com.github.sofiman.inventory.api.Container;
+import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.api.Inventory;
 import com.github.sofiman.inventory.api.Item;
 import com.github.sofiman.inventory.api.LocationPoint;
+import com.github.sofiman.inventory.api.Server;
+import com.github.sofiman.inventory.api.Token;
+import com.github.sofiman.inventory.api.User;
 import com.github.sofiman.inventory.utils.Callback;
 import com.github.sofiman.inventory.api.ID;
 
@@ -13,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -31,15 +39,45 @@ public class Fetcher {
     private Token accessToken;
     private Server currentServer;
 
-    public void init(Server server) {
+    public void init(Context context, Server server) {
+        PackageInfo pInfo = null;
+        try {
+            pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        String version = pInfo == null ? "v1" : pInfo.versionName;
         this.retrofit = new Retrofit.Builder()
                 .baseUrl(server.getEndpoint())
+                .client(new OkHttpClient.Builder().addInterceptor(new UserAgentInterceptor("InventoryManager", version)).build())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         this.accessToken = null;
         this.inventoryService = retrofit.create(InventoryService.class);
         this.currentServer = server;
+    }
+
+    public void register(String username, String password, Callback<RequestError> callback){
+        safeExecute(() -> {
+            final NetworkCall<User> networkCall = new NetworkCall<>(new APIResponse<User>() {
+                @Override
+                public void response(User user) {
+                    System.out.println("Successfully created account " + user.getUsername() + " with id " + user.getId());
+                    login(username, password, callback);
+                }
+
+                @Override
+                public void error(RequestError error) {
+                    System.err.println("Failed to create an account: " + error.toString());
+                    callback.run(error);
+                }
+            });
+            HashMap<String, Object> body = new HashMap<>();
+            body.put("username", username);
+            body.put("password", password);
+            networkCall.execute(inventoryService.register(body));
+        });
     }
 
     public void login(String username, String password, Callback<RequestError> callback) {

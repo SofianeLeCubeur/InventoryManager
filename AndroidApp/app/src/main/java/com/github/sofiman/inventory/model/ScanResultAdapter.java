@@ -92,7 +92,6 @@ public class ScanResultAdapter extends RecyclerView.Adapter<ScanResultAdapter.Sc
                 cp.setName(s.getName());
                 cp.setIcon(s.getIcon());
                 cp.setItemCount(s.getItemCount());
-                cp.setTrackerCount(s.getTrackerCount());
                 cp.setLocation(s.getLocation());
                 cp.setOnClickListener(new View.OnClickListener() {
                     @Override

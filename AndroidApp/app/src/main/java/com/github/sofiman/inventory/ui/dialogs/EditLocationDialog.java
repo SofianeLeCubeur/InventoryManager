@@ -16,6 +16,7 @@ import android.widget.EditText;
 import androidx.core.app.ActivityCompat;
 
 import com.github.sofiman.inventory.R;
+import com.github.sofiman.inventory.api.DataField;
 import com.github.sofiman.inventory.api.LocationPoint;
 import com.github.sofiman.inventory.utils.Callback;
 
@@ -44,10 +45,14 @@ public class EditLocationDialog extends Dialog {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 LocationPoint point = new LocationPoint(label.getText().toString(), System.currentTimeMillis());
-                double lat = Double.parseDouble(latitude.getText().toString());
-                double lon = Double.parseDouble(longitude.getText().toString());
-                point.setLatitude(lat);
-                point.setLongitude(lon);
+                try {
+                    double lat = Double.parseDouble(latitude.getText().toString());
+                    double lon = Double.parseDouble(longitude.getText().toString());
+                    point.setLatitude(lat);
+                    point.setLongitude(lon);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 callback.run(point);
             }
         });
@@ -62,12 +67,12 @@ public class EditLocationDialog extends Dialog {
         dialog.setView(view);
     }
 
-    private void acquirePosition(EditText latitude, EditText longitude){
+    private void acquirePosition(EditText latitude, EditText longitude) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             System.out.println("Cannot locate: permission denied.");
-            ActivityCompat.requestPermissions((Activity) context, new String[]{ android.Manifest.permission.ACCESS_FINE_LOCATION }, 101);
+            ActivityCompat.requestPermissions((Activity) context, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
         } else {
-            LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+            LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
             Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             latitude.setText(String.valueOf(location.getLatitude()));
             longitude.setText(String.valueOf(location.getLongitude()));

@@ -33,6 +33,7 @@ import com.github.sofiman.inventory.ui.login.LoginActivity;
 import com.github.sofiman.inventory.R;
 import com.github.sofiman.inventory.api.Container;
 import com.github.sofiman.inventory.api.Inventory;
+import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.APIResponse;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;
@@ -130,7 +131,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 startActivityForResult(new IntentBuilder(getActivity(), CreateObjectActivity.class)
-                        .scope("create").type("inventory").blueprint(new Inventory(new byte[0], "", "", "", new ArrayList<>()))
+                        .scope("create").type("inventory").blueprint(new Inventory(new byte[0], "", "", "", new ArrayList<>(), new ArrayList<>()))
                         .build(), 0);
             }
         });
@@ -161,30 +162,30 @@ public class HomeFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(data == null) return;
+        Class<?> activityClass = null;
         if(requestCode == 0){
             if(data.hasExtra("INVENTORY_ID")
                     && data.hasExtra("INVENTORY_NAME")
                     && data.hasExtra("INVENTORY_ICON")){
-                Intent intent = new Intent(getContext(), InventoryActivity.class);
-                intent.putExtras(data);
-                startActivity(intent);
+                activityClass = InventoryActivity.class;
             }
         } else if(requestCode == 1){
             if(data.hasExtra("CONTAINER_ID")
                     && data.hasExtra("CONTAINER_NAME")
                     && data.hasExtra("CONTAINER_LOCATION")){
-                Intent intent = new Intent(getContext(), ContainerActivity.class);
-                intent.putExtras(data);
-                startActivity(intent);
+                activityClass = ContainerActivity.class;
             }
         } else if(requestCode == 2){
             if(data.hasExtra("ITEM_ID")
                     && data.hasExtra("ITEM_NAME")
                     && data.hasExtra("ITEM_ICON")){
-                Intent intent = new Intent(getContext(), ItemActivity.class);
-                intent.putExtras(data);
-                startActivity(intent);
+                activityClass = ItemActivity.class;
             }
+        }
+        if(activityClass != null){
+            Intent intent = new Intent(getContext(), activityClass);
+            intent.putExtras(data);
+            startActivity(intent);
         }
     }
 
@@ -222,7 +223,7 @@ public class HomeFragment extends Fragment {
             System.out.println("Trying to connect to " + server.first);
             serverName.setText(server.first.getName());
             Fetcher fetcher = Fetcher.getInstance();
-            fetcher.init(server.first);
+            fetcher.init(getContext(), server.first);
             fetcher.login(server.second.first, server.second.second, error -> {
                 if(error != null){
                     getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getString(R.string.login_page_no_connection, error.toString()), Toast.LENGTH_LONG).show());

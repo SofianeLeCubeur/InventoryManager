@@ -3,347 +3,347 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".ui.home.HomeFragment">
 
-    <FrameLayout
-        android:id="@+id/home_fragment_layout"
-        android:layout_width="match_parent"
-        android:layout_height="130dp"
-        android:background="@drawable/liquid_header"
-        android:backgroundTint="@color/colorAccent">
-
-        <LinearLayout
+        <FrameLayout
+            android:id="@+id/home_fragment_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/transparent"
-            android:orientation="vertical">
+            android:layout_height="130dp"
+            android:background="@drawable/liquid_header"
+            android:backgroundTint="@color/colorAccent">
 
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_horizontal"
-                android:background="@color/transparent"
-                android:contentDescription="@string/app_name"
-                android:scaleType="fitXY"
-                android:src="@drawable/cube_scan" />
-
-            <TextView
-                android:id="@+id/app_title"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="10dp"
                 android:background="@color/transparent"
-                android:gravity="top|center_horizontal"
-                android:keepScreenOn="true"
-                android:text="@string/app_title"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="24sp"
-                android:textStyle="normal" />
+                android:orientation="vertical">
 
-        </LinearLayout>
-    </FrameLayout>
-
-    <LinearLayout
-        android:id="@+id/home_fragment_body"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="90dp"
-        android:orientation="vertical">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/home_server_switch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="18dp"
-            android:background="@drawable/white_box_ripple"
-            android:clickable="true"
-            android:focusable="true"
-            android:elevation="4dp"
-            android:padding="8dp">
-
-            <ProgressBar
-                android:id="@+id/home_server_loading"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginStart="4dp"
-                android:indeterminate="true"
-                android:indeterminateTint="@color/green"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@color/transparent"
+                    android:contentDescription="@string/app_name"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/cube_scan" />
 
                 <TextView
-                    android:id="@+id/home_server_state"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/app_title"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/home_page_server_state"
-                    android:textColor="@color/iconAccent"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/home_server_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textColor="@color/foreground"
-                    android:textSize="18sp" />
+                    android:layout_marginTop="5dp"
+                    android:background="@color/transparent"
+                    android:gravity="top|center_horizontal"
+                    android:keepScreenOn="true"
+                    android:text="@string/app_title"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="24sp"
+                    android:textStyle="normal" />
 
             </LinearLayout>
-
-            <ImageView
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginEnd="4dp"
-                android:src="@drawable/menu_down"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/iconAccent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <HorizontalScrollView
-            android:id="@+id/home_actions_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="6dp"
-            android:scrollbars="none"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <FrameLayout
-                    android:id="@+id/home_new_inv"
-                    android:layout_width="@dimen/action_width"
-                    android:layout_height="@dimen/action_height"
-                    android:layout_marginEnd="@dimen/action_margin_end"
-                    android:background="@drawable/white_box_ripple"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="@dimen/action_padding">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:drawablePadding="@dimen/action_drawable_padding"
-                        android:text="@string/new_inv"
-                        android:textAlignment="center"
-                        android:textColor="@color/foreground"
-                        app:drawableTopCompat="@drawable/icon_awesome_warehouse"
-                        app:drawableTint="@color/colorAccent" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/home_new_cnt"
-                    android:layout_width="@dimen/action_width"
-                    android:layout_height="@dimen/action_height"
-                    android:layout_marginEnd="@dimen/action_margin_end"
-                    android:background="@drawable/white_box_ripple"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="@dimen/action_padding">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:drawablePadding="@dimen/action_drawable_padding"
-                        android:text="@string/new_cnt"
-                        android:textAlignment="center"
-                        android:textColor="@color/foreground"
-                        app:drawableTopCompat="@drawable/bag_personal"
-                        app:drawableTint="@color/colorAccent" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/home_new_itm"
-                    android:layout_width="@dimen/action_width"
-                    android:layout_height="@dimen/action_height"
-                    android:layout_marginEnd="@dimen/action_margin_end"
-                    android:background="@drawable/white_box_ripple"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="@dimen/action_padding">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:drawablePadding="@dimen/action_drawable_padding"
-                        android:text="@string/new_itm"
-                        android:textAlignment="center"
-                        android:textColor="@color/foreground"
-                        app:drawableTopCompat="@drawable/cube_outline"
-                        app:drawableTint="@color/colorAccent" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_width="@dimen/action_width"
-                    android:layout_height="@dimen/action_height"
-                    android:background="@drawable/white_box_ripple"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="vertical"
-                    android:padding="@dimen/action_padding">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:drawablePadding="@dimen/action_drawable_padding"
-                        android:text="@string/new_trk"
-                        android:textAlignment="center"
-                        android:textColor="@color/foreground"
-                        app:drawableTopCompat="@drawable/radar"
-                        app:drawableTint="@color/colorAccent" />
-
-                </FrameLayout>
-
-            </LinearLayout>
-        </HorizontalScrollView>
+        </FrameLayout>
 
         <LinearLayout
+            android:id="@+id/home_fragment_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="6dp"
+            android:layout_marginTop="90dp"
             android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/home_server_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/category_vertical_separator_margin">
+                android:layout_marginHorizontal="18dp"
+                android:background="@drawable/white_box_ripple"
+                android:clickable="true"
+                android:elevation="4dp"
+                android:focusable="true"
+                android:padding="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/category_inv"
-                    android:textSize="@dimen/category_label_size"
-                    android:textStyle="bold"
+                <ProgressBar
+                    android:id="@+id/home_server_loading"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="4dp"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/green"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/home_inv_shimmer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <include layout="@layout/component_inventory_placeholder" />
-
-                    <include layout="@layout/component_inventory_placeholder" />
-
-                    <include layout="@layout/component_inventory_placeholder" />
-
-                </LinearLayout>
-
-            </com.facebook.shimmer.ShimmerFrameLayout>
-
-            <RelativeLayout
-                android:id="@+id/home_inventory_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/home_inventories"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:orientation="vertical">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/category_vertical_separator_margin">
-
-                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/category_cnt"
-                    android:textSize="@dimen/category_label_size"
-                    android:textStyle="bold"
+                    android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/home_server_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/home_page_server_state"
+                        android:textColor="@color/iconAccent"
+                        android:textSize="14sp" />
 
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/home_cnt_shimmer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <include layout="@layout/component_container_placeholder" />
-
-                    <include layout="@layout/component_container_placeholder" />
-
-                    <include layout="@layout/component_container_placeholder" />
+                    <TextView
+                        android:id="@+id/home_server_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textColor="@color/foreground"
+                        android:textSize="18sp" />
 
                 </LinearLayout>
 
-            </com.facebook.shimmer.ShimmerFrameLayout>
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/menu_down"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/iconAccent" />
 
-            <RelativeLayout
-                android:id="@+id/home_container_layout"
-                android:layout_width="wrap_content"
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <HorizontalScrollView
+                android:id="@+id/home_actions_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:scrollbars="none"
                 android:visibility="gone">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/home_containers"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-            </RelativeLayout>
+                    <FrameLayout
+                        android:id="@+id/home_new_inv"
+                        android:layout_width="@dimen/action_width"
+                        android:layout_height="@dimen/action_height"
+                        android:layout_marginEnd="@dimen/action_margin_end"
+                        android:background="@drawable/white_box_ripple"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="@dimen/action_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:drawablePadding="@dimen/action_drawable_padding"
+                            android:text="@string/new_inv"
+                            android:textAlignment="center"
+                            android:textColor="@color/foreground"
+                            app:drawableTint="@color/colorAccent"
+                            app:drawableTopCompat="@drawable/icon_awesome_warehouse" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/home_new_cnt"
+                        android:layout_width="@dimen/action_width"
+                        android:layout_height="@dimen/action_height"
+                        android:layout_marginEnd="@dimen/action_margin_end"
+                        android:background="@drawable/white_box_ripple"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="@dimen/action_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:drawablePadding="@dimen/action_drawable_padding"
+                            android:text="@string/new_cnt"
+                            android:textAlignment="center"
+                            android:textColor="@color/foreground"
+                            app:drawableTint="@color/colorAccent"
+                            app:drawableTopCompat="@drawable/bag_personal" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/home_new_itm"
+                        android:layout_width="@dimen/action_width"
+                        android:layout_height="@dimen/action_height"
+                        android:layout_marginEnd="@dimen/action_margin_end"
+                        android:background="@drawable/white_box_ripple"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="@dimen/action_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:drawablePadding="@dimen/action_drawable_padding"
+                            android:text="@string/new_itm"
+                            android:textAlignment="center"
+                            android:textColor="@color/foreground"
+                            app:drawableTint="@color/colorAccent"
+                            app:drawableTopCompat="@drawable/cube_outline" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="@dimen/action_width"
+                        android:layout_height="@dimen/action_height"
+                        android:background="@drawable/white_box_ripple"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="@dimen/action_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:drawablePadding="@dimen/action_drawable_padding"
+                            android:text="@string/new_wbh"
+                            android:textAlignment="center"
+                            android:textColor="@color/foreground"
+                            app:drawableTint="@color/colorAccent"
+                            app:drawableTopCompat="@drawable/radar" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="6dp"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/category_vertical_separator_margin">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/category_inv"
+                        android:textSize="@dimen/category_label_size"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/home_inv_shimmer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <include layout="@layout/component_inventory_placeholder" />
+
+                        <include layout="@layout/component_inventory_placeholder" />
+
+                        <include layout="@layout/component_inventory_placeholder" />
+
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <RelativeLayout
+                    android:id="@+id/home_inventory_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/home_inventories"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/category_vertical_separator_margin">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/category_cnt"
+                        android:textSize="@dimen/category_label_size"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/home_cnt_shimmer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <include layout="@layout/component_container_placeholder" />
+
+                        <include layout="@layout/component_container_placeholder" />
+
+                        <include layout="@layout/component_container_placeholder" />
+
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+                <RelativeLayout
+                    android:id="@+id/home_container_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/home_containers"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
-
-    </LinearLayout>
 
 </FrameLayout>

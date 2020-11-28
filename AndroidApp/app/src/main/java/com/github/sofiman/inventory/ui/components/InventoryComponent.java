@@ -15,15 +15,12 @@ import com.github.sofiman.inventory.utils.StringUtils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-/**
- * TODO: document your custom view class.
- */
 public class InventoryComponent extends Component {
 
     private String name;
     private String icon;
     private String location;
-    private int itemCount, trackerCount;
+    private int itemCount;
 
     public InventoryComponent(Context context) {
         super(context, R.layout.component_inventory);
@@ -50,7 +47,6 @@ public class InventoryComponent extends Component {
 
         icon = a.getString(R.styleable.InventoryComponent_iconUri);
         itemCount = a.getInt(R.styleable.InventoryComponent_itemCount, 0);
-        trackerCount = a.getInt(R.styleable.InventoryComponent_trackerCount, 0);
 
         a.recycle();
         b.recycle();
@@ -58,7 +54,7 @@ public class InventoryComponent extends Component {
 
     public void update() {
         TextView iconText = findViewById(R.id.inventory_icon_text);
-        ImageView iconImage = findViewById(R.id.iventory_icon_image);
+        ImageView iconImage = findViewById(R.id.inventory_icon_image);
         if (this.icon != null && !URLUtil.isValidUrl(this.icon)) {
             iconImage.setVisibility(GONE);
             iconText.setVisibility(VISIBLE);
@@ -93,10 +89,8 @@ public class InventoryComponent extends Component {
         name.setText(this.name);
         TextView itemCount = findViewById(R.id.inventory_item_count);
         itemCount.setText(String.valueOf(this.itemCount));
-        TextView trackerCount = findViewById(R.id.inventory_tracker_count);
-        trackerCount.setText(String.valueOf(this.trackerCount));
         TextView location = findViewById(R.id.inventory_location);
-        location.setText(StringUtils.limit(this.location, 30));
+        location.setText(StringUtils.limit(this.location, 36));
     }
 
     public String getName() {
@@ -129,13 +123,5 @@ public class InventoryComponent extends Component {
 
     public void setItemCount(int itemCount) {
         this.itemCount = itemCount;
-    }
-
-    public int getTrackerCount() {
-        return trackerCount;
-    }
-
-    public void setTrackerCount(int trackerCount) {
-        this.trackerCount = trackerCount;
     }
 }

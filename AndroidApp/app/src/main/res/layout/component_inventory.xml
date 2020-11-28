@@ -20,11 +20,10 @@
         android:background="@drawable/small_icon"
         android:transitionName="inventory_icon"
         android:gravity="center"
-        android:textSize="18sp"
-        android:text="?" />
+        android:textSize="18sp" />
 
     <ImageView
-        android:id="@+id/iventory_icon_image"
+        android:id="@+id/inventory_icon_image"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:visibility="gone"
@@ -61,10 +60,9 @@
                 android:layout_width="12dp"
                 android:layout_height="12dp"
                 android:src="@drawable/cube_outline"
-                android:tint="@color/colorAccent"
                 android:layout_marginEnd="5dp"
                 android:layout_gravity="center"
-                />
+                app:tint="@color/colorAccent" />
 
             <TextView
                 android:id="@+id/inventory_item_count"
@@ -78,29 +76,10 @@
             <ImageView
                 android:layout_width="12dp"
                 android:layout_height="12dp"
-                android:src="@drawable/radar"
-                android:tint="@color/colorAccent"
-                android:layout_marginEnd="5dp"
-                android:layout_gravity="center"
-                />
-
-            <TextView
-                android:id="@+id/inventory_tracker_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawablePadding="5dp"
-                android:layout_marginEnd="5dp"
-                android:gravity="center"
-                android:textSize="12sp" />
-
-            <ImageView
-                android:layout_width="12dp"
-                android:layout_height="12dp"
                 android:src="@drawable/icon_ionic_ios_pin"
-                android:tint="@color/colorAccent"
                 android:layout_marginEnd="5dp"
                 android:layout_gravity="center"
-                />
+                app:tint="@color/colorAccent" />
 
             <TextView
                 android:id="@+id/inventory_location"
@@ -119,9 +98,9 @@
         android:layout_width="12dp"
         android:layout_height="12dp"
         android:src="@drawable/icon_material_chevron_right"
-        android:tint="@color/foreground"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="@color/foreground" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

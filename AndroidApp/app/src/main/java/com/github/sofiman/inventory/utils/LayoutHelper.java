@@ -4,20 +4,9 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.URLUtil;
 import android.widget.TextView;
 
@@ -64,7 +53,7 @@ public class LayoutHelper {
         final InventoryComponent component = data.second;
         View image = component.findViewById(R.id.inventory_icon_text);
         if (data.first.getIcon() != null && URLUtil.isValidUrl(data.first.getIcon())) {
-            image = component.findViewById(R.id.iventory_icon_image);
+            image = component.findViewById(R.id.inventory_icon_image);
         }
         System.out.println(image.getTransitionName());
         final TextView name = component.findViewById(R.id.inventory_name);

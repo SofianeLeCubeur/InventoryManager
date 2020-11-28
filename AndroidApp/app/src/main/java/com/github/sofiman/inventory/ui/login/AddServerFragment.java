@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +21,7 @@ import androidx.preference.PreferenceManager;
 
 import com.github.sofiman.inventory.ui.home.HomeActivity;
 import com.github.sofiman.inventory.R;
+import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.utils.Callback;
@@ -33,14 +35,16 @@ public class AddServerFragment extends Fragment {
     private final ConstraintLayout loadingLayout;
     private final boolean embed, confirmPassword;
     private final String serverIp;
+    private final String serverName;
     private final @StringRes int action;
     private TextView username;
     private TextView password;
 
-    public AddServerFragment(ConstraintLayout loadingLayout, boolean embed, String serverIp, boolean confirmPassword, @StringRes int action){
+    public AddServerFragment(ConstraintLayout loadingLayout, boolean embed, String serverIp, String serverName, boolean confirmPassword, @StringRes int action) {
         this.loadingLayout = loadingLayout;
         this.embed = embed;
         this.serverIp = serverIp;
+        this.serverName = serverName;
         this.confirmPassword = confirmPassword;
         this.action = action;
     }
@@ -57,7 +61,7 @@ public class AddServerFragment extends Fragment {
         username = layout.findViewById(R.id.login_username);
         password = layout.findViewById(R.id.login_password);
 
-        if(embed){
+        if (embed) {
             layout.findViewById(R.id.login_more_panel).setVisibility(View.GONE);
         } else {
             layout.findViewById(R.id.login_offline).setOnClickListener(v -> {
@@ -68,16 +72,17 @@ public class AddServerFragment extends Fragment {
             });
         }
 
-        if(serverIp != null){
+        if (serverIp != null) {
             server.setText(serverIp);
             layout.findViewById(R.id.login_server_field).setVisibility(View.GONE);
         }
 
-        if(confirmPassword){
-            layout.findViewById(R.id.login_password_confirm).setVisibility(View.VISIBLE);
+        EditText passwordConfirm = layout.findViewById(R.id.login_password_confirm);
+        if (confirmPassword) {
+            layout.findViewById(R.id.login_confirm_button).setVisibility(View.VISIBLE);
         }
 
-        if(action != 0){
+        if (action != 0) {
             TextView view = layout.findViewById(R.id.login_server_action);
             view.setText(action);
         }
@@ -86,55 +91,88 @@ public class AddServerFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String ip = server.getText().toString().trim(), id = username.getText().toString(), secret = password.getText().toString();
+                final String ip = server.getText().toString().trim(), id = username.getText().toString(), secret = password.getText().toString(),
+                        confirm_secret = passwordConfirm.getText().toString();
                 if (ip.isEmpty()) {
                     return;
+                }
+                if (confirmPassword) {
+                    if (!secret.equals(confirm_secret)) {
+                        System.out.println("Warning: passwords does not match, skipping");
+                        passwordConfirm.setText(null);
+                        return;
+                    }
                 }
                 username.setEnabled(false);
                 password.setEnabled(false);
                 loadingLayout.setVisibility(View.VISIBLE);
 
                 long p = Math.round(Math.random() * 9000 + 1000);
-                Server toConnect = new Server("Inventory Server " + p, ip + (ip.endsWith("/") ? "" : "/"));
+                String name = "Inventory Server " + p;
+                if(serverName != null){
+                    name = serverName;
+                }
+                Server toConnect = new Server(name, ip + (ip.endsWith("/") ? "" : "/"));
 
-                login(toConnect, id, secret, new Callback<RequestError>() {
-                    @Override
-                    public void run(RequestError e) {
-                        System.err.println("Could not connect to server " + ip + ":" + e);
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadingLayout.setVisibility(View.GONE);
-                                username.setEnabled(true);
-                                password.setEnabled(true);
-                                password.setText("");
-                                Toast.makeText(getContext(), getString(R.string.login_page_no_connection, e.toString()), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                });
+                Callback<RequestError> callback = e -> {
+                    System.err.println("Could not connect to server " + ip + ":" + e);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingLayout.setVisibility(View.GONE);
+                            username.setEnabled(true);
+                            password.setEnabled(true);
+                            password.setText("");
+                            Toast.makeText(getContext(), getString(R.string.login_page_no_connection, e.toString()), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                };
+
+                if (confirmPassword) {
+                    register(toConnect, id, secret, callback);
+                } else {
+                    login(toConnect, id, secret, callback);
+                }
             }
         });
+    }
+
+    private void register(Server server, String id, String secret, Callback<RequestError> onFail){
+        final Fetcher fetcher = Fetcher.getInstance();
+        try {
+            fetcher.init(getContext(), server);
+            fetcher.register(id, secret, data -> {
+                if (data == null) {
+                    server.setAsDefaultServer(true);
+                    addServer(server, id, secret);
+                    Intent intent = new Intent(getActivity(), HomeActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                } else if (onFail != null) {
+                    onFail.run(data);
+                }
+            });
+        } catch (Exception e){
+            getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getString(R.string.login_page_no_connection, e.getMessage()), Toast.LENGTH_LONG).show());
+            e.printStackTrace();
+        }
     }
 
     private void login(Server server, String id, String secret, Callback<RequestError> onFail) {
         final Fetcher fetcher = Fetcher.getInstance();
         try {
-            fetcher.init(server);
-            fetcher.login(id, secret, new Callback<RequestError>() {
-                @Override
-                public void run(RequestError data) {
-                    if (data == null) {
-                        addServer(server, id, secret);
-                        Intent intent = new Intent(getActivity(), HomeActivity.class);
-                        startActivity(intent);
-                        getActivity().finish();
-                    } else if (onFail != null) {
-                        onFail.run(data);
-                    }
+            fetcher.init(getContext(), server);
+            fetcher.login(id, secret, data -> {
+                if (data == null) {
+                    addServer(server, id, secret);
+                    Intent intent = new Intent(getActivity(), HomeActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                } else if (onFail != null) {
+                    onFail.run(data);
                 }
             });
-        } catch (Exception e){
+        } catch (Exception e) {
             getActivity().runOnUiThread(() -> Toast.makeText(getContext(), getString(R.string.login_page_no_connection, e.getMessage()), Toast.LENGTH_LONG).show());
             e.printStackTrace();
         }
@@ -147,7 +185,7 @@ public class AddServerFragment extends Fragment {
             servers = sharedPreferences.getStringSet("servers", new HashSet<>());
         }
 
-        if(servers == null){
+        if (servers == null) {
             servers = new HashSet<>();
         }
 

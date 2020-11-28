@@ -29,12 +29,11 @@ import android.widget.Toast;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.sofiman.inventory.api.Inventory;
 import com.github.sofiman.inventory.api.Item;
-import com.github.sofiman.inventory.api.Tracker;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;
 import com.github.sofiman.inventory.impl.APIResponse;
 import com.github.sofiman.inventory.model.ItemListAdapter;
-import com.github.sofiman.inventory.model.TrackerListAdapter;
+import com.github.sofiman.inventory.model.WebhookListAdapter;
 import com.github.sofiman.inventory.ui.components.ItemComponent;
 import com.github.sofiman.inventory.ui.dialogs.QrCodeGeneratorDialog;
 import com.github.sofiman.inventory.utils.IntentBuilder;
@@ -56,14 +55,8 @@ import jp.wasabeef.picasso.transformations.ColorFilterTransformation;
 
 public class InventoryActivity extends AppCompatActivity {
 
-    private List<Tracker> trackers = Arrays.asList(new Tracker("Track B, Main conveyor belt", "", ""),
-            new Tracker("Track A, Main conveyor belt", "", ""),
-            new Tracker("Track C, Main conveyor belt", "", ""),
-            new Tracker("Discharge bay conveyor belt", "", ""),
-            new Tracker("Charge bay conveyor belt", "", ""));
-
-    //private ShimmerFrameLayout trackerShimmer;
-    //private RelativeLayout trackersLayout;
+    private ShimmerFrameLayout webhooksShimmer;
+    private RelativeLayout webhooksLayout;
 
     private ShimmerFrameLayout itemShimmer;
     private RelativeLayout itemsLayout;
@@ -74,7 +67,6 @@ public class InventoryActivity extends AppCompatActivity {
     private Inventory inventory;
 
     private AtomicBoolean valid = new AtomicBoolean(false);
-    private int clicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,10 +128,10 @@ public class InventoryActivity extends AppCompatActivity {
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) dummyHeader.getLayoutParams();
         params.setMargins(0, LayoutHelper.getStatusBarHeight(this), 0, 0);
 
-        /*trackersLayout = findViewById(R.id.inventory_full_trackers_layout);
-        trackerShimmer = findViewById(R.id.inventory_full_tracker_shimmer);
-        final RecyclerView trackers = findViewById(R.id.inventory_full_trackers);
-        trackers.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));*/
+        webhooksLayout = findViewById(R.id.inventory_full_webhooks_layout);
+        webhooksShimmer = findViewById(R.id.inventory_full_webhooks_shimmer);
+        final RecyclerView trackers = findViewById(R.id.inventory_full_webhooks);
+        trackers.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         itemsLayout = findViewById(R.id.inventory_full_items_layout);
         itemShimmer = findViewById(R.id.inventory_full_item_shimmer);
@@ -310,6 +302,27 @@ public class InventoryActivity extends AppCompatActivity {
             }
         });
 
+        if(inventory.getWebhooks() != null) {
+            final RecyclerView trackers = findViewById(R.id.inventory_full_webhooks);
+            WebhookListAdapter webhookListAdapter = new WebhookListAdapter(this, inventory.getWebhooks());
+            trackers.setAdapter(webhookListAdapter);
+            SearchView webhooksSearch = findViewById(R.id.inventory_full_search_webhooks);
+            webhooksSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    webhookListAdapter.getFilter().filter(s);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    webhookListAdapter.getFilter().filter(s);
+                    return true;
+                }
+            });
+            webhooksLoaded();
+        }
+
         loadContent();
     }
 
@@ -318,7 +331,7 @@ public class InventoryActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 0 && resultCode == 1) {
             itemsNotLoaded();
-            //trackersNotLoaded();
+            webhooksNotLoaded();
             contentNotLoaded();
             Fetcher.getInstance().fetchInventory(inventory.getId(), new APIResponse<Inventory>() {
                 @Override
@@ -342,12 +355,7 @@ public class InventoryActivity extends AppCompatActivity {
         Fetcher.getInstance().fetchItems(inventory.getItems(), new APIResponse<List<Item>>() {
             @Override
             public void response(List<Item> result) {
-                ItemListAdapter adapter = new ItemListAdapter(InventoryActivity.this, result, new com.github.sofiman.inventory.utils.Callback<Pair<Item, ItemComponent>>() {
-                    @Override
-                    public void run(Pair<Item, ItemComponent> data) {
-                        LayoutHelper.openItem(InventoryActivity.this, data);
-                    }
-                });
+                ItemListAdapter adapter = new ItemListAdapter(InventoryActivity.this, result, data -> LayoutHelper.openItem(InventoryActivity.this, data));
                 items.setAdapter(adapter);
 
                 itemSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -374,20 +382,17 @@ public class InventoryActivity extends AppCompatActivity {
                         getString(R.string.full_page_error_items, error.toString()), Toast.LENGTH_LONG).show());
             }
         });
-        /*final RecyclerView trackers = findViewById(R.id.inventory_full_trackers);
-        trackers.setAdapter(new TrackerListAdapter(this, this.trackers));
-        trackersLoaded(); // TODO: Loading the trackers*/
     }
 
-    /*private void trackersLoaded() {
-        trackerShimmer.setVisibility(View.GONE);
-        trackersLayout.setVisibility(View.VISIBLE);
+    private void webhooksLoaded() {
+        webhooksShimmer.setVisibility(View.GONE);
+        webhooksLayout.setVisibility(View.VISIBLE);
     }
 
-    private void trackersNotLoaded() {
-        trackerShimmer.setVisibility(View.VISIBLE);
-        trackersLayout.setVisibility(View.GONE);
-    }*/
+    private void webhooksNotLoaded() {
+        webhooksShimmer.setVisibility(View.VISIBLE);
+        webhooksLayout.setVisibility(View.GONE);
+    }
 
     private void itemsLoaded() {
         itemShimmer.setVisibility(View.GONE);

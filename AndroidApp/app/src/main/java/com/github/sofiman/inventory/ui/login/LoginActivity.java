@@ -16,8 +16,10 @@ import android.widget.TextView;
 import com.github.sofiman.inventory.ui.home.HomeActivity;
 import com.github.sofiman.inventory.ui.intro.IntroActivity;
 import com.github.sofiman.inventory.R;
+import com.github.sofiman.inventory.api.Server;
 import com.github.sofiman.inventory.impl.Fetcher;
 import com.github.sofiman.inventory.impl.RequestError;
+import com.github.sofiman.inventory.ui.intro.PrivacyFragment;
 import com.github.sofiman.inventory.utils.Callback;
 import com.github.sofiman.inventory.utils.LayoutHelper;
 import com.google.android.material.tabs.TabLayout;
@@ -47,6 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         final Intent intent = getIntent();
         boolean embed = intent.getBooleanExtra("embed", false);
         String serverIp = intent.getStringExtra("server");
+        String serverName = intent.getStringExtra("label");
         boolean confirm = intent.getBooleanExtra("confirm_password", false);
         autoconnect = this.autoconnect && intent.getBooleanExtra("autoconnect", true);
         int action = intent.getIntExtra("action", 0);
@@ -65,11 +68,19 @@ public class LoginActivity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.indicator);
         ViewPagerAdapter adapter = new ViewPagerAdapter(this);
 
-        if (serverList != null && serverList.size() > 0 && !embed) {
-            adapter.addFragment(new ServerListFragment(serverList, loadingLayout));
+        if(!embed){
+            if (serverList != null && serverList.size() > 0) {
+                adapter.addFragment(new ServerListFragment(serverList, loadingLayout));
+            } else {
+                adapter.addFragment(new PrivacyFragment().showHeader(false));
+            }
         }
 
-        adapter.addFragment(new AddServerFragment(loadingLayout, embed, serverIp, confirm, action));
+        adapter.addFragment(new AddServerFragment(loadingLayout, embed, serverIp, serverName, confirm, action));
+
+        if(intent.getBooleanExtra("add", false)){
+           pager.setCurrentItem(1);
+        }
 
         pager.setAdapter(adapter);
         TabLayoutMediator mediator = new TabLayoutMediator(tabLayout, pager, (tab, position) -> tab.setTabLabelVisibility(TabLayout.TAB_LABEL_VISIBILITY_UNLABELED));
@@ -92,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void login(Server server, String id, String secret, Callback<RequestError> onFail) {
         final Fetcher fetcher = Fetcher.getInstance();
-        fetcher.init(server);
+        fetcher.init(this, server);
         fetcher.login(id, secret, new Callback<RequestError>() {
             @Override
             public void run(RequestError data) {

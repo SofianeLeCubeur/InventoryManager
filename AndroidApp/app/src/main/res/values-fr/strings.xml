@@ -13,8 +13,8 @@
     <string name="intro_presentation">Inventory Manager, de quoi s\'agit-il ?</string>
     <string name="intro_presentation_desc">Inventory Manager est un outil pour vous aider à gérer vos affaires. Vous pouvez ajouter tout ce que vous voulez!</string>
 
-    <string name="login_page_title">Se connecter</string>
-    <string name="login_page_register">Ajouter</string>
+    <string name="login_page_title">Connexion</string>
+    <string name="login_page_register">Inscription</string>
     <string name="login_page_server_addr">Adresse du serveur</string>
     <string name="login_page_server_addr_desc">Inventory Server to fetch data</string>
     <string name="login_page_server_addr_ext">Inventory Server to fetch data</string>
@@ -69,13 +69,13 @@
     <string name="category_inv">Inventaires</string>
     <string name="category_cnt">Contenaires</string>
     <string name="category_itm">Objets</string>
-    <string name="category_trk">Trackers</string>
+    <string name="category_wbh">Webhooks</string>
     <string name="category_act">Actions</string>
 
     <string name="new_inv">Nouveau Inventaire</string>
     <string name="new_cnt">Nouveau Contenaire</string>
     <string name="new_itm">Nouveau Objet</string>
-    <string name="new_trk">Nouveau Tracker</string>
+    <string name="new_wbh">Nouveau Webhook</string>
 
     <string-array name="types">
         <item>Inventaire</item>
@@ -139,7 +139,7 @@
     <string name="content_copied">%s copié</string>
     <string name="qr_code_instructions">Cliquez sur l\'ID pour le copier scannez et partagez ce QR Code!</string>
     <string name="search_items">Rechercher un objet</string>
-    <string name="search_trackers">Rechercher un tracker</string>
+    <string name="search_wbh">Rechercher un tracker</string>
 
     <string name="create_object_update_location">Mettre à jour la position</string>
     <string name="create_object_update_location_details">Ajouter une position à l\'historique</string>
@@ -199,5 +199,13 @@
 
     <string name="acknowledgements_thanks">Merci d\'utiliser mon application ! Merci à tous ceux qui m\'ont soutenu et aidé à travers son developpement. Si vous souhaitez m\'aider davantage vous pouvez me contactez via GitHub. (Serveurs publiques et Illustrations)</string>
     <string name="create_object_selection_state">Création %d sur %d</string>
+    <string name="privacy_policy">"Les données utilisés par l'application sont stockés et gérés sur le serveur utilisé. Nous vous recommandons d'utiliser uniquement des serveurs de confiance. Les données pouvant être recoltés par défaut sont:
+        - Le nom de l'utilisateur, l'appareil utilisé et l'addresse ip
+        - Les statistiques liés à l'utilisation de l'application
+        - L'Historique des scans réalisés et leur contenu textuel (les photos sont traités localement)
+Les données ne pouvant pas être récupérés:
+        - La localisation de l'appareil
+        - La vidéo sortante de vos caméras
+        - Les photos issues de scans"</string>
 
 </resources>

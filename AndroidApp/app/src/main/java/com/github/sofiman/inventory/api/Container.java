@@ -79,4 +79,17 @@ public class Container {
     public List<LocationPoint> getLocations() {
         return locations;
     }
+
+    @Override
+    public String toString() {
+        return "Container{" +
+                "id='" + id + '\'' +
+                ", content='" + content + '\'' +
+                ", location='" + location + '\'' +
+                ", locations=" + locations +
+                ", details='" + details + '\'' +
+                ", state='" + state + '\'' +
+                ", items=" + items +
+                '}';
+    }
 }

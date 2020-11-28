@@ -69,13 +69,13 @@
     <string name="category_inv">Inventories</string>
     <string name="category_cnt">Containers</string>
     <string name="category_itm">Items</string>
-    <string name="category_trk">Trackers</string>
+    <string name="category_wbh">Webhooks</string>
     <string name="category_act">Actions</string>
 
     <string name="new_inv">New Inventory</string>
     <string name="new_cnt">New Container</string>
     <string name="new_itm">New Item</string>
-    <string name="new_trk">New Tracker</string>
+    <string name="new_wbh">New Webhook</string>
 
     <string-array name="types">
         <item>Inventory</item>
@@ -136,7 +136,7 @@
     <string name="content_copied">%s successfully copied to the clipboard</string>
     <string name="qr_code_instructions">Click on the ID to copy it or simply scan or share this QR Code!</string>
     <string name="search_items">Search any item</string>
-    <string name="search_trackers">Search any tracker</string>
+    <string name="search_wbh">Search any webhooks</string>
 
     <string name="create_object_update_location">Update location</string>
     <string name="create_object_update_location_details">Push a new location point</string>
@@ -770,6 +770,15 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License."</string>
+    <string name="privacy_policy">"All data used by the app is stored and managed by the target server. We recommend using only trusted servers. Servers can by default collect:
+
+        - The username, Used device name and IP Address
+        - App Usage analytics
+        - Scan History and scan text contents (scanned pictures are processed locally)
+Data that cannot be collected:
+        - Geolocation of the device
+        - Video streams from cameras
+        - Les photos issues de scans"</string>
 
     <string-array name="languages" translatable="false">
         <item>en-US</item>

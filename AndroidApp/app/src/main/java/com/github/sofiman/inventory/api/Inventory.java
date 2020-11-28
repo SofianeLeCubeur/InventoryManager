@@ -8,16 +8,16 @@ public class Inventory {
     private String name;
     private String icon;
     private String background;
-    private int trackerCount;
     private String location;
     private String state;
     private List<String> items;
+    private List<Webhook> webhooks;
 
-    public Inventory(byte[] id, String name, String icon, String location, List<String> items) {
+    public Inventory(byte[] id, String name, String icon, String location, List<String> items, List<Webhook> webhooks) {
         this.id = ID.toHex(id);
         this.name = name;
         this.icon = icon;
-        this.trackerCount = 0;
+        this.webhooks = webhooks;
         this.location = location;
         this.items = items;
     }
@@ -50,10 +50,6 @@ public class Inventory {
         return items.size();
     }
 
-    public int getTrackerCount() {
-        return trackerCount;
-    }
-
     public String getLocation() {
         return location;
     }
@@ -78,13 +74,17 @@ public class Inventory {
         return background;
     }
 
+    public List<Webhook> getWebhooks() {
+        return webhooks;
+    }
+
     @Override
     public String toString() {
         return "Inventory{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", icon='" + icon + '\'' +
-                ", trackerCount=" + trackerCount +
+                ", webhooks=" + webhooks +
                 ", location='" + location + '\'' +
                 ", state='" + state + '\'' +
                 ", items=" + items +
