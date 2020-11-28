@@ -5,7 +5,7 @@ module.exports = {
     User(user){
         let cutUser = {...user, success: true};
         delete cutUser.password;
-        cutUseruser.id = cutUser._id;
+        cutUser.id = cutUser._id;
         delete cutUser._id;
         return cutUser;
     },

@@ -27,13 +27,11 @@ module.exports = function(router, database, authMiddleware){
         'webhooks': function(s){
             if(!Array.isArray(s)) return false;
             let b = 0;
-            s.forEach(wh => {
-                if(typeof wh === 'object' && typeof wh.id === 'string' 
-                && typeof wh.url === 'string' && wh.event === 'string'){
-                    delete wh.last_delivery;
-                    b++;
-                }
-            })
+            s = s.filter(wh => {
+                return typeof wh === 'object' && typeof wh.id === 'string' 
+                && typeof wh.url === 'string' && wh.event === 'string' }).map(wh => {
+                    return { id: wh.id, url: wh.url, event: wh.event };
+                })
             return b === s.length;
         }
     };
