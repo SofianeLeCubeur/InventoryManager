@@ -101,52 +101,60 @@ module.exports = function(router, database, authMiddleware){
             res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
         }
-        let token = res.locals.token;
-        let id = req.params.id;
+        const token = res.locals.token;
+        const id = req.params.id;
         let device = req.body.device;
         let marker = req.body.marker && req.body.marker.lat && req.body.marker.lon ? req.body.marker : undefined;
         let location = req.body.location || req.ip;
         if(id && typeof id === 'string'){
             if(typeof device === 'string' && typeof location === 'string'){
                 let type = parseInt(id.substring(0,2), 16);
-                database.pushScanLog({ uid: token.uid, marker, device, location, timestamp: Date.now(), recipient: { id } }, result => {
-                    if(result){
-                        if(type == 0){
-                            database.fetchInventory({ _id: id }, inv => {
-                                if(inv != null){
-                                    res.json({ type: 'inventory', ...Inventory(inv) });
+                database.fetchUser({ _id: token.uid }, (user) => {
+                    if(user){
+                        delete user.password;
+                        const query = { _id: id, owner: user.group_id };
+                        database.pushScanLog({ uid: token.uid, marker, device, location, timestamp: Date.now(), recipient: { id } }, result => {
+                            if(result){
+                                if(type == 0){
+                                    database.fetchInventory(query, inv => {
+                                        if(inv != null){
+                                            res.json({ type: 'inventory', ...Inventory(inv) });
+                                        } else {
+                                            res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
+                                        }
+                                    });
+                                } else if(type == 1){
+                                    database.fetchItem(query, it => {
+                                        if(it != null){
+                                            res.json({ type: 'item', ...SmallItem(it)  });
+                                        } else {
+                                            res.status(404).json(Error('not_found', 'The provided ID does not refer to any item in the database.'))
+                                        }
+                                    });
+                                } else if(type == 2){
+                                    database.fetchContainer(query, cnt => {
+                                        if(cnt != null){
+                                            res.json({ type: 'container', ...Container(cnt) });
+                                        } else {
+                                            res.status(404).json(Errro('not_found', 'The provided ID does not refer to any container in the database.'))
+                                        }
+                                    });
                                 } else {
-                                    res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
+                                    res.status(404).json(Error('not_found', 'The id provided does not have a valid key'));
                                 }
-                            });
-                        } else if(type == 1){
-                            database.fetchItem({ _id: id }, it => {
-                                if(it != null){
-                                    res.json({ type: 'item', ...SmallItem(it)  });
-                                } else {
-                                    res.status(404).json(Error('not_found', 'The provided ID does not refer to any item in the database.'))
-                                }
-                            });
-                        } else if(type == 2){
-                            database.fetchContainer({ _id: id }, cnt => {
-                                if(cnt != null){
-                                    res.json({ type: 'container', ...Container(cnt) });
-                                } else {
-                                    res.status(404).json(Errro('not_found', 'The provided ID does not refer to any container in the database.'))
-                                }
-                            });
-                        } else {
-                            res.status(404).json(Error('not_found', 'The id provided does not have a valid key'));
-                        }
+                            } else {
+                                res.status(500).json(Error('internal_error', 'Could not push scan log'));
+                            }
+                        });
                     } else {
-                        res.status(500).json(Error('internal_error', 'Could not push scan log'));
+                        res.status(403).json(Error('forbidden', 'Invalid Session'));
                     }
                 });
             } else {
-                res.status(400).json(Error('bad_request', 'Bad parameters'));
+                res.status(400).json(Error('bad_request', 'Bad request'));
             }
         } else {
-            res.status(400).json(Error('bad_request', 'Missing id field'));
+            res.status(400).json(Error('bad_request', 'Bad request'));
         }
     })
 
@@ -156,6 +164,7 @@ module.exports = function(router, database, authMiddleware){
             return;
         }
 
+        const token = req.locals.token;
         const body = req.body;
         let query;
         try {
@@ -173,49 +182,57 @@ module.exports = function(router, database, authMiddleware){
         }
 
         if(Object.keys(query).length > 0 && !!body.type){
-            switch(body.type){
-                case '*':
-                case 'all':
-                    results = {};
-                    searchInvs(query, invs => {
-                        results.inventories = invs;
-    
-                        searchItems(query, items => {
-                            results.items = items;
-    
-                            searchCnts(query, cnts => {
-                                results.containers = cnts;
+            database.fetchUser({ _id: token.uid }, (user) => {
+                if(user){
+                    delete user.password;
+                    query.owner = user.group_id;
+                    switch(body.type){
+                        case '*':
+                        case 'all':
+                            results = {};
+                            searchInvs(query, invs => {
+                                results.inventories = invs;
+            
+                                searchItems(query, items => {
+                                    results.items = items;
+            
+                                    searchCnts(query, cnts => {
+                                        results.containers = cnts;
+                                        validate();
+                                    });
+                                });
+                            });
+                            break;
+                        case 'inventories':
+                            results = {};
+                            searchInvs(query, cb => {
+                                results.inventories = cb;
                                 validate();
                             });
-                        });
-                    });
-                    break;
-                case 'inventories':
-                    results = {};
-                    searchInvs(query, cb => {
-                        results.inventories = cb;
-                        validate();
-                    });
-                    break;
-                case 'items':
-                    results = {};
-                    searchItems(query, cb => {
-                        results.items = cb;
-                        validate();
-                    });
-                    break;
-                case 'containers':
-                    results = {};
-                    searchCnts(query, cb => {
-                        results.containers = cb;
-                        validate();
-                    });
-                    break;
-            }
-    
-            if(!results){
-                res.status(404).json(Error('not_found', 'Query does not have any result'));
-            }
+                            break;
+                        case 'items':
+                            results = {};
+                            searchItems(query, cb => {
+                                results.items = cb;
+                                validate();
+                            });
+                            break;
+                        case 'containers':
+                            results = {};
+                            searchCnts(query, cb => {
+                                results.containers = cb;
+                                validate();
+                            });
+                            break;
+                    }
+            
+                    if(!results){
+                        res.status(404).json(Error('not_found', 'Query does not have any result'));
+                    }
+                } else {
+                    res.status(403).json(Error('forbidden', 'Invalid Session'));
+                }
+            });
         } else {
             res.status(400).json(Error('bad_request', 'No filter was provided'));
         }

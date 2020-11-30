@@ -16,7 +16,7 @@ module.exports = class Database {
 
     constructor(config){
         MongoClient.connect('mongodb://' + config.host + ':' + config.port, 
-        { auth: { user: config.username, password: config.password }, useUnifiedTopology: true }, (err, c) => {
+        { auth: { user: config.username, password: config.password }, useUnifiedTopology: true, appname: 'im-api-server' }, (err, c) => {
             if(err){
                 console.error('[DB] Could not connect to MongoDB');
             } else {
@@ -60,7 +60,7 @@ module.exports = class Database {
     
     insertUser(user, callback){
         const uid = generateHash();
-        this.insertOne('users', { _id: uid, ...user }, (result, data) => result.ops[0].password === user.password, callback);
+        this.insertOne('users', { _id: uid, group_id: uid, ...user }, (result, data) => result.ops[0].password === user.password, callback);
     }
 
     insertInventory(inventory, callback){

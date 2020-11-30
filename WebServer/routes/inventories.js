@@ -57,6 +57,7 @@ module.exports = function(router, database, authMiddleware){
     };
 
     router.post('/inventory', authMiddleware('Bearer'), requireScope([ 'add.* ', 'add.inv' ]), (req, res) => {
+        const token = res.locals.token;
         let body = req.body;
         let keys = Object.keys(req.body);
         let props = {}, p = 0;
@@ -68,11 +69,20 @@ module.exports = function(router, database, authMiddleware){
         });
 
         if(p > 0 && !!props['name']){
-            database.pushInventory(props, result => {
-                if(result){
-                    res.status(200).json(Content(result));
+            database.fetchUser({ _id: token.uid }, (user) => {
+                if(user){
+                    delete user.password;
+                    props['owner'] = user.group_id;
+                    // TODO: Encryption with group's key
+                    database.pushInventory(props, result => {
+                        if(result){
+                            res.status(200).json(Content(result));
+                        } else {
+                            res.status(500).json(Error('internal_error', 'Could not push inventory'));
+                        }
+                    });
                 } else {
-                    res.status(500).json(Error('internal_error', 'Could not push inventory'));
+                    res.status(403).json(Error('forbidden', 'Invalid Session'));
                 }
             });
         } else {
@@ -83,65 +93,72 @@ module.exports = function(router, database, authMiddleware){
     router.all('/inventory/:id', authMiddleware('Bearer'), (req, res) => {
         const token = res.locals.token;
         const id = req.params.id;
-        const query = { _id: id };
         if(id && typeof id === 'string'){
-            if(req.method === 'GET'){
-                database.fetchInventory(query, inv => {
-                    if(inv != null){
-                        res.json(Content(inv));
-                    } else {
-                        res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
-                    }
-                });
-                return;
-            } else if(req.method === 'POST' || req.method === 'UPDATE'){
-                if(token.scope.indexOf('edit.*') >= 0 || token.scope.indexOf('edit.inv') >= 0){
-                    const body = req.body;
-                    let mutation = mutate(modifiableProps, body);
-
-                    if(mutation.length == 0){
-                        res.status(204).end();
-                        return;
-                    }
-
-                    database.fetchInventory(query, inv => {
-                        if(inv != null){
-                            let mutedInv = Object.assign({}, inv, mutation);
-                            if(inv != mutedInv){
-                                database.updateInventory(query, mutedInv, cb => {
-                                    if(cb){
-                                        res.status(200).json(Content(mutedInv));
-                                        Webhook.call(database, 'update', 'inventory', token.uid, mutedInv);
-                                    } else {
-                                        res.status(500).json(Error('internal_error', 'Could not update the inventory'));
-                                    }
-                                });
+            const query = { _id: id };
+            database.fetchUser({ _id: token.uid }, (user) => {
+                if(user){
+                    query.owner = user.group_id;
+                    if(req.method === 'GET'){
+                        database.fetchInventory(query, inv => {
+                            if(inv != null){
+                                res.json(Content(inv));
                             } else {
-                                res.status(200).json(Content(mutedInv));
+                                res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
                             }
+                        });
+                        return;
+                    } else if(req.method === 'POST' || req.method === 'UPDATE'){
+                        if(token.scope.indexOf('edit.*') >= 0 || token.scope.indexOf('edit.inv') >= 0){
+                            const body = req.body;
+                            let mutation = mutate(modifiableProps, body);
+        
+                            if(mutation.length == 0){
+                                res.status(204).end();
+                                return;
+                            }
+        
+                            database.fetchInventory(query, inv => {
+                                if(inv != null){
+                                    let mutedInv = Object.assign({}, inv, mutation);
+                                    if(inv != mutedInv){
+                                        database.updateInventory(query, mutedInv, cb => {
+                                            if(cb){
+                                                res.status(200).json(Content(mutedInv));
+                                                Webhook.call(database, 'update', 'inventory', token.uid, mutedInv);
+                                            } else {
+                                                res.status(500).json(Error('internal_error', 'Could not update the inventory'));
+                                            }
+                                        });
+                                    } else {
+                                        res.status(200).json(Content(mutedInv));
+                                    }
+                                } else {
+                                    res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
+                                }
+                            });
                         } else {
-                            res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
+                            res.status(403).json(Error('forbidden', 'Not Authorized'));
                         }
-                    });
-                } else {
-                    res.status(403).json(Error('forbidden', 'Not Authorized'));
-                }
-            } else if(req.method === 'DELETE'){
-                if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.inv') >= 0){
-                    Webhook.trigger('delete', token.uid, mutedInv);
-                    database.deleteInventory(query, (success) => {
-                        if(success){
-                            res.status(200).json(Message('Inventory successfully deleted', 'server'));
+                    } else if(req.method === 'DELETE'){
+                        if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.inv') >= 0){
+                            Webhook.trigger('delete', token.uid, mutedInv);
+                            database.deleteInventory(query, (success) => {
+                                if(success){
+                                    res.status(200).json(Message('Inventory successfully deleted', 'server'));
+                                } else {
+                                    res.status(500).json(Error('internal_error', 'Could not delete the inventory'));
+                                }
+                            });
                         } else {
-                            res.status(500).json(Error('internal_error', 'Could not delete the inventory'));
+                            res.status(403).json(Error('forbidden', 'Not Authorized'));
                         }
-                    });
+                    } else {
+                        res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
+                    }
                 } else {
-                    res.status(403).json(Error('forbidden', 'Not Authorized'));
+                    res.status(403).json(Error('forbidden', 'Invalid Session'));
                 }
-            } else {
-                res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
-            }
+            });
         } else {
             res.status(400).json(Error('bad_request', 'Bad Request'));
         }
@@ -152,6 +169,7 @@ module.exports = function(router, database, authMiddleware){
             res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
         }
+        const token = res.locals.token;
         let body = req.query;
         let offset = Math.round(Math.abs(parseInt(body.offset)));
         if(!isFinite(offset)){
@@ -161,11 +179,17 @@ module.exports = function(router, database, authMiddleware){
         if(!isFinite(length)){
             length = 0;
         }
-        database.fetchInventories({}, offset, length, docs => {
-            if(docs != null){
-                res.status(200).json(docs.map(Inventory));
+        database.fetchUser({ _id: token.uid }, (user) => {
+            if(user){
+                database.fetchInventories({ owner: user.group_id }, offset, length, docs => {
+                    if(docs != null){
+                        res.status(200).json(docs.map(Inventory));
+                    } else {
+                        res.status(500).json(Error('internal_error', 'Failed to query inventories'));
+                    }
+                });
             } else {
-                res.status(500).json(Error('internal_error', 'Failed to query inventories'));
+                res.status(403).json(Error('forbidden', 'Invalid Session'));
             }
         });
     });

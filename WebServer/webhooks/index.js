@@ -23,9 +23,10 @@ module.exports = {
         }
     },
     call(database, event, type, uid, content){
-        database.fetchUser({ _id: uid }, ((cb) => {
-            if(cb){
-                this.trigger(event, type, { username: cb.username, id: cb._id }, content, 
+        database.fetchUser({ _id: uid }, ((user) => {
+            if(user){
+                delete user.password;
+                this.trigger(event, type, { username: user.username, id: user._id }, content, 
                     (completed, success, failed) => {
                         let webhooks = content.webhooks;
                         webhooks.forEach(wh => {
@@ -39,7 +40,7 @@ module.exports = {
                         });
                         content.webhooks = webhooks;
                         console.log('[Express][Webhooks] Webhook delivered to', success, 'of', completed);
-                        this.updateStatus(database, type, content);
+                        this.updateStatus(database, user, type, content);
                 });
             } else {
                 console.log('[Express][Webhooks] Failed to deliver webhook: could not retrieve user data');

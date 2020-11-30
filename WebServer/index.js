@@ -23,12 +23,7 @@ const database = new Database(config.mongodb);
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(Fingerprint({
-    parameters: [
-        Fingerprint.useragent,
-        Fingerprint.acceptHeaders
-    ]
-}))
+app.use(Fingerprint({ parameters: [ Fingerprint.useragent ] }))
 
 function authMiddleware(authorization_type){
     return function(req, res, next){
@@ -51,6 +46,7 @@ function authMiddleware(authorization_type){
     }
 }
 
+const history = [];
 app.use('/', (req, res, next) => {
     res.set('Access-Control-Allow-Origin', expressConfig.cors.origin || '*')
     res.set('Access-Control-Allow-Headers', expressConfig.cors.headers || '*')
@@ -59,7 +55,12 @@ app.use('/', (req, res, next) => {
         res.sendStatus(204);
         return;
     }
-    console.log('[Express]', 'F{' + req.fingerprint.hash + '}', req.method, req.originalUrl);
+    const fingerprint = req.fingerprint.hash;
+    console.log('[Express]', 'F{' + fingerprint + '}', req.method, req.originalUrl);
+    if(!history[fingerprint]){
+        history[fingerprint] = req.fingerprint;
+        console.log('[Express] New device detected on the network: ', JSON.stringify(req.fingerprint));
+    }
     next();
 })
 

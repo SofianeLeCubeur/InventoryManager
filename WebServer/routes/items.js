@@ -61,6 +61,7 @@ module.exports = function(router, database, authMiddleware){
     };
 
     router.post('/item', authMiddleware('Bearer'), requireScope([ 'add.*', 'add.itm' ]), (req, res) => {
+        const token = res.locals.token;
         let body = req.body;
         let keys = Object.keys(req.body);
         let props = {}, p = 0;
@@ -72,11 +73,20 @@ module.exports = function(router, database, authMiddleware){
         });
 
         if(p > 0 && !!props['name']){
-            database.pushItem(props, result => {
-                if(result){
-                    res.status(200).json(Content(result));
+            database.fetchUser({ _id: token.uid }, (user) => {
+                if(user){
+                    delete user.password;
+                    props['owner'] = user.group_id;
+                    // TODO: Encryption with group's key
+                    database.pushItem(props, result => {
+                        if(result){
+                            res.status(200).json(Content(result));
+                        } else {
+                            res.status(500).json(Error('internal_error', 'Could not push item'));
+                        }
+                    });
                 } else {
-                    res.status(500).json(Error('internal_error', 'Could not push item'));
+                    res.status(403).json(Error('forbidden', 'Invalid Session'));
                 }
             });
         } else {
@@ -85,67 +95,73 @@ module.exports = function(router, database, authMiddleware){
     });
 
     router.all('/item/:id', authMiddleware('Bearer'), (req, res) => {
-        let token = res.locals.token;
+        const token = res.locals.token;
         let id = req.params.id;
         if(id && typeof id === 'string'){
             const query = { _id: id };
-            if(req.method === 'GET'){
-                database.fetchItem(query, it => {
-                    if(it != null){
-                        res.json(Content(it));
-                    } else {
-                        res.status(404).json(Error('not_found', 'The provided ID does not refer to any item in the database.'))
-                    }
-                });
-                return;
-            } else if(req.method === 'POST' || req.method === 'UPDATE'){
-                if(token.scope.indexOf('edit.*') >= 0 || token.scope.indexOf('edit.itm') >= 0){
-                    const body = req.body;
-                    let mutation = mutate(modifiableProps, body);
-
-                    if(mutation.length == 0){
-                        res.status(204).end();
-                        return;
-                    }
-                    //console.log('mutation', mutation, 'from', body);
-
-                    database.fetchItem(query, itm => {
-                        if(itm != null){
-                            let mutedItm = Object.assign({}, itm, mutation);
-                            if(itm != mutedItm){
-                                database.updateItem(query, mutedItm, cb => {
-                                    if(cb){
-                                        res.status(200).json(Content(mutedItm));
-                                        Webhook.call(database, 'update', 'item', token.uid, mutedItm);
-                                    } else {
-                                        res.status(500).json(Error('internal_error', 'Could not update the item'));
-                                    }
-                                });
+            database.fetchUser({ _id: token.uid }, (user) => {
+                if(user){
+                    query.owner = user.group_id;
+                    if(req.method === 'GET'){
+                        database.fetchItem(query, it => {
+                            if(it != null){
+                                res.json(Content(it));
                             } else {
-                                res.status(200).json(Content(mutedItm));
+                                res.status(404).json(Error('not_found', 'The provided ID does not refer to any item in the database.'))
                             }
+                        });
+                        return;
+                    } else if(req.method === 'POST' || req.method === 'UPDATE'){
+                        if(token.scope.indexOf('edit.*') >= 0 || token.scope.indexOf('edit.itm') >= 0){
+                            const body = req.body;
+                            let mutation = mutate(modifiableProps, body);
+        
+                            if(mutation.length == 0){
+                                res.status(204).end();
+                                return;
+                            }
+        
+                            database.fetchItem(query, itm => {
+                                if(itm != null){
+                                    let mutedItm = Object.assign({}, itm, mutation);
+                                    if(itm != mutedItm){
+                                        database.updateItem(query, mutedItm, cb => {
+                                            if(cb){
+                                                res.status(200).json(Content(mutedItm));
+                                                Webhook.call(database, 'update', 'item', token.uid, mutedItm);
+                                            } else {
+                                                res.status(500).json(Error('internal_error', 'Could not update the item'));
+                                            }
+                                        });
+                                    } else {
+                                        res.status(200).json(Content(mutedItm));
+                                    }
+                                } else {
+                                    res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
+                                }
+                            });
                         } else {
-                            res.status(404).json(Error('not_found', 'The provided ID does not refer to any inventory in the database.'))
+                            res.status(403).json(Error('forbidden', 'Not Authorized'));
                         }
-                    });
-                } else {
-                    res.status(403).json(Error('forbidden', 'Not Authorized'));
-                }
-            } else if(req.method === 'DELETE'){
-                if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.itm') >= 0){
-                    database.deleteItem(query, (success) => {
-                        if(success){
-                            res.status(200).json(Message('Item successfully deleted', 'server'));
+                    } else if(req.method === 'DELETE'){
+                        if(token.scope.indexOf('delete.*') >= 0 || token.scope.indexOf('delete.itm') >= 0){
+                            database.deleteItem(query, (success) => {
+                                if(success){
+                                    res.status(200).json(Message('Item successfully deleted', 'server'));
+                                } else {
+                                    res.status(500).json(Error('internal_error', 'Could not delete the item'));
+                                }
+                            });
                         } else {
-                            res.status(500).json(Error('internal_error', 'Could not delete the item'));
+                            res.status(403).json(Error('forbidden', 'Not Authorized'));
                         }
-                    });
+                    } else {
+                        res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
+                    }
                 } else {
-                    res.status(403).json(Error('forbidden', 'Not Authorized'));
+                    res.status(403).json(Error('forbidden', 'Invalid Session'));
                 }
-            } else {
-                res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
-            }
+            });
         } else {
             res.status(400).json(Error('bad_request', 'Bad Request'));
         }
@@ -156,9 +172,10 @@ module.exports = function(router, database, authMiddleware){
             res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
         }
+        const token = res.locals.token;
         const body = req.body;
         let itemIds = body.itemIds;
-        if(!itemIds){
+        if(!Array.isArray(itemIds)){
             res.status(400).json(Error('bad_request', 'Missing itemIds field'));
             return;
         }
@@ -170,14 +187,19 @@ module.exports = function(router, database, authMiddleware){
         if(!isFinite(length)){
             length = 0;
         }
-        database.fetchItems({ _id: { $in: itemIds } }, offset, length, docs => {
-            if(docs !== null){
-                let items = docs.map(Item);
-                res.json(items);
+        database.fetchUser({ _id: token.uid }, (user) => {
+            if(user){
+                database.fetchItems({ _id: { $in: itemIds }, owner: user.group_id }, offset, length, docs => {
+                    if(docs !== null){
+                        let items = docs.map(Item);
+                        res.json(items);
+                    } else {
+                        res.status(404).json({ err: 'not_found', err_description: 'Find error: ' + docs });
+                    }
+                });
             } else {
-                res.status(404).json({ err: 'not_found', err_description: 'Find error: ' + docs });
+                res.status(403).json(Error('forbidden', 'Invalid Session'));
             }
         });
     })
-
 };

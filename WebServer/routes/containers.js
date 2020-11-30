@@ -37,6 +37,7 @@ module.exports = function(router, database, authMiddleware){
     };
 
     router.post('/container', authMiddleware('Bearer'), requireScope([ 'add.*', 'add.cnt' ]), (req, res) => {
+        const token = res.locals.token;
         let body = req.body;
         let keys = Object.keys(req.body);
         let props = {}, p = 0;
@@ -48,11 +49,20 @@ module.exports = function(router, database, authMiddleware){
         });
 
         if(p > 0 && !!props['content']){
-            database.pushContainer(props, result => {
-                if(result){
-                    res.status(200).json(Content(result));
+            database.fetchUser({ _id: token.uid }, (user) => {
+                if(user){
+                    delete user.password;
+                    props['owner'] = user.group_id;
+                    // TODO: Encryption with group's key
+                    database.pushContainer(props, result => {
+                        if(result){
+                            res.status(200).json(Content(result));
+                        } else {
+                            res.status(500).json(Error('internal_error', 'Could not push container'));
+                        }
+                    });
                 } else {
-                    res.status(500).json(Error('internal_error', 'Could not push container'));
+                    res.status(403).json(Error('forbidden', 'Invalid Session'));
                 }
             });
         } else {
@@ -128,6 +138,7 @@ module.exports = function(router, database, authMiddleware){
     });
 
     router.all('/containers', authMiddleware('Bearer'), requireScope([ 'fetch.*', 'fetch.cnt' ]), (req, res) => {
+        const token = res.locals.token;
         if(req.method !== 'GET'){
             res.status(405).json(Error('method_not_allowed', 'This request method is not allowed'));
             return;
@@ -141,14 +152,21 @@ module.exports = function(router, database, authMiddleware){
         if(!isFinite(length)){
             length = 0;
         }
-        database.fetchContainers({}, offset, length, docs => {
-            if(docs != null){
-                let containers = docs.map(Container);
-                res.json(containers);
+        database.fetchUser({ _id: token.uid }, (user) => {
+            if(user){
+                database.fetchContainers({ owner: user.group_id }, offset, length, docs => {
+                    if(docs != null){
+                        let containers = docs.map(Container);
+                        res.json(containers);
+                    } else {
+                        res.status(500).json(Error('internal_error', 'Failed to query containers'));
+                    }
+                });
             } else {
-                res.status(500).json(Error('internal_error', 'Failed to query containers'));
+                res.status(403).json(Error('forbidden', 'Invalid Session'));
             }
         });
+        
     });
 
 };
