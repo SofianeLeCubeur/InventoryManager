@@ -121,6 +121,7 @@ module.exports = function(router, database, authMiddleware){
                                 if(inv != null){
                                     let mutedInv = Object.assign({}, inv, mutation);
                                     if(inv != mutedInv){
+                                        Webhook.resetWebhooks('update', mutedInv);
                                         database.updateInventory(query, mutedInv, cb => {
                                             if(cb){
                                                 res.status(200).json(Content(mutedInv));

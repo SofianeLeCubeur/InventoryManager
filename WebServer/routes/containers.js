@@ -93,12 +93,12 @@ module.exports = function(router, database, authMiddleware){
                         res.status(204).end();
                         return;
                     }
-                    //console.log('mutation', mutation, 'from', body);
 
                     database.fetchContainer(query, cnt => {
                         if(cnt != null){
                             let mutedCnt = Object.assign({}, cnt, mutation);
                             if(cnt != mutedCnt){
+                                Webhook.resetWebhooks('update', mutedCnt);
                                 database.updateContainer(query, mutedCnt, cb => {
                                     if(cb){
                                         res.status(200).json(Content(mutedCnt));

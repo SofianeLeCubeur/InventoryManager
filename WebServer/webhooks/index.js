@@ -47,18 +47,28 @@ module.exports = {
             }
         }).bind(this))
     },
-    updateStatus(database, type, content){
+    updateStatus(database, user, type, content){
         let callback = cb => {
             if(!cb){
                 console.log('[Express][Webhooks] Warning: Could not update the item webhook history');
             }
         };
+        const query = { _id: content._id, owner: user.group_id };
         if(type === 'inventory'){
-            database.updateInventory({ _id: content._id }, content, callback);
+            database.updateInventory(query, content, callback);
         } else if(type === 'container'){
-            database.updateContainer({ _id: content._id }, content, callback);
+            database.updateContainer(query, content, callback);
         } else if(type === 'item'){
-            database.updateItem({ _id: content._id }, content, callback);
+            database.updateItem(query, content, callback);
+        }
+    },
+    resetWebhooks(event, object){
+        if(object.webhooks && Array.isArray(object.webhooks)){
+            object.webhooks.forEach(wh => {
+                if(wh.event.startsWith(event) && wh.last_delivery){
+                    wh.last_delivery.status = 3;
+                }
+            });
         }
     }
 }

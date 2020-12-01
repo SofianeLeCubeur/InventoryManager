@@ -18,7 +18,7 @@ module.exports = function(router, database, authMiddleware){
             queryR['content'] = queryR['name'];
             delete queryR['name'];
         }
-        database.fetchContainers(query, 0, 0, docs => {
+        database.fetchContainers(queryR, 0, 0, docs => {
             if(docs != null){
                 let containers = docs.map(Container);
                 callback(containers);
@@ -164,7 +164,7 @@ module.exports = function(router, database, authMiddleware){
             return;
         }
 
-        const token = req.locals.token;
+        const token = res.locals.token;
         const body = req.body;
         let query;
         try {
