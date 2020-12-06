@@ -1,7 +1,7 @@
 const express = require('express');
 const Fingerprint = require('express-fingerprint');
 const bodyParser = require('body-parser');
-const Database = require('./db/mongodb');
+const Database = require('./db');
 const app = express();
 
 const path = require('path');
@@ -22,7 +22,7 @@ if(!config.id){
 }
 console.log('[' + config.id + '] Starting server');
 
-const database = new Database(config.mongodb);
+const database = new Database(config);
 
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: false }));

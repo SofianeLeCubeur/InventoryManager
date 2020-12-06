@@ -47,5 +47,14 @@ module.exports = {
             }
             res.status(403).json(Error('forbidden', 'Forbidden: missing scope in authorization'));
         }
+    },
+    fingerprintIp(next) {
+        const ip =
+            (this.req.headers["x-forwarded-for"] || "").split(",").pop() ||
+            (this.req.connection && this.req.connection.remoteAddress) ||
+            (this.req.socket && this.req.socket.remoteAddress) ||
+            (this.req.connection && this.req.connection.socket && this.req.connection.socket.remoteAddress) ||
+            this.req.ip;
+        next(null, { ip });
     }
 };
