@@ -36,7 +36,7 @@ module.exports = function(router, database, authMiddleware){
     const accessTokenExpireDelta = 40 * 60 * 60 * 1000;
     const createAccountLimiter = rateLimit({
         windowMs: 60 * 60 * 1000,
-        max: 4,
+        max: 3,
         message: 'Too many accounts created from this IP, please try again after an hour'
     });
 

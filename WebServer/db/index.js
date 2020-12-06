@@ -57,12 +57,10 @@ module.exports = class Database {
         //this.mongodb.findOne('tokens', { _id: token }, callback);
         this.redis.fetch('tokens', token, (result) => {
             if(result){
-                if(result.expire < Date.now()){
+                if(result.expire > Date.now()){
                     return callback(result);
                 } else {
-                    this.redis.del('tokens', token, (result) => {
-                        console.log('hdel', result);
-                    })
+                    this.redis.del('tokens', token);
                 }
             }
             callback(false);
