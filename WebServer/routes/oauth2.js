@@ -33,6 +33,7 @@ module.exports = function(router, database, authMiddleware){
         return false;
     }
 
+    const accessTokenExpireDelta = 40 * 60 * 60 * 1000;
     const createAccountLimiter = rateLimit({
         windowMs: 60 * 60 * 1000,
         max: 4,
@@ -101,7 +102,9 @@ module.exports = function(router, database, authMiddleware){
                                 if(user && user.password){
                                     let verified = assertPasswordEquals(password, user.password);
                                     if(verified){
-                                        let token = { token: generateToken(), type: 'Bearer', uid: user._id.toString(), scope: scopes };
+                                        const timestamp = Date.now();
+                                        let token = { token: generateToken(), type: 'Bearer', uid: user._id.toString(), 
+                                            scope: scopes, timestamp, expire: accessTokenExpireDelta + timestamp };
                                         database.storeToken(token, result => {
                                             if(result){
                                                 res.status(200).json(Token(token));

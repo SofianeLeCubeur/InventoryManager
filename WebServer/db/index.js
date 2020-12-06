@@ -32,10 +32,9 @@ module.exports = class Database {
     }
     
     storeToken(token, callback){
-        let timestamp = Date.now(); 
         /*this.mongodb.insertOne('tokens', { _id: token.token, type: token.type, uid: token.uid, scope: token.scope, timestamp }, 
             (result, data) => result.ops[0]._id === token.token, callback);*/
-        this.redis.store('tokens', token.token, { ...token, timestamp: timestamp }, callback);
+        this.redis.store('tokens', token.token, token, callback);
     }
 
     fetchUser(query, callback){
@@ -56,7 +55,18 @@ module.exports = class Database {
 
     fetchToken(token, callback){
         //this.mongodb.findOne('tokens', { _id: token }, callback);
-        this.redis.fetch('tokens', token, callback);
+        this.redis.fetch('tokens', token, (result) => {
+            if(result){
+                if(result.expire < Date.now()){
+                    return callback(result);
+                } else {
+                    this.redis.del('tokens', token, (result) => {
+                        console.log('hdel', result);
+                    })
+                }
+            }
+            callback(false);
+        });
     }
 
     fetchInventories(query, offset, length, callback){

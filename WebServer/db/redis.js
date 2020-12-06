@@ -3,7 +3,7 @@ const redis = require("redis");
 module.exports = class RedisDatabase {
 
     constructor(config, id){
-        const password = config.auth || {};
+        const password = config.auth || undefined;
         delete config.auth;
         const client = redis.createClient('redis://' + config.host + ':' + config.port, { password });
         client.on("error", (error) => {
@@ -37,6 +37,10 @@ module.exports = class RedisDatabase {
                 console.err('[DB][Redis] Failed to fetch data:', e);
             }
         })
+    }
+
+    del(col, key, callback){
+        this.client.hdel(col, key, callback);
     }
 
 }
