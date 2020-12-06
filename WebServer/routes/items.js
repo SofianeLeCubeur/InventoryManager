@@ -177,7 +177,7 @@ module.exports = function(router, database, authMiddleware){
         const body = req.body;
         let itemIds = body.itemIds;
         if(!Array.isArray(itemIds)){
-            res.status(400).json(Error('bad_request', 'Missing itemIds field'));
+            res.status(400).json(Error('bad_request', 'Invalid Items'));
             return;
         }
         let offset = Math.round(Math.abs(parseInt(body.offset)));

@@ -6,7 +6,7 @@ const app = express();
 
 const path = require('path');
 const { Error } = require('./models');
-const { escapeRegExp } = require('./utils');
+const { escapeRegExp, fingerprintIp } = require('./utils');
 
 const config = require('./config.json');
 if(!config){
@@ -17,13 +17,17 @@ const expressConfig = config.express;
 if(!expressConfig.cors){
     expressConfig.cors = {};
 }
+if(!config.id){
+    config.id = 'im-api-server';
+}
+console.log('[' + config.id + '] Starting server');
 
 const database = new Database(config.mongodb);
 
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(Fingerprint({ parameters: [ Fingerprint.useragent ] }))
+app.use(Fingerprint({ parameters: [ Fingerprint.useragent, fingerprintIp ] }))
 
 function authMiddleware(authorization_type){
     return function(req, res, next){
@@ -59,7 +63,7 @@ app.use('/', (req, res, next) => {
     console.log('[Express]', 'F{' + fingerprint + '}', req.method, req.originalUrl);
     if(!history[fingerprint]){
         history[fingerprint] = req.fingerprint;
-        console.log('[Express] New device detected on the network: ', JSON.stringify(req.fingerprint));
+        console.log('[Express] New device detected on the network:', JSON.stringify(req.fingerprint));
     }
     next();
 })
